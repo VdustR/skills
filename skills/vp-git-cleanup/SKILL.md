@@ -42,8 +42,8 @@ patterns to the repository.
 
 Confirm or infer:
 
-- Base branch: default remote HEAD, then `main`, `master`, `develop`, or the
-  current branch as a fallback.
+- Base branch: default remote HEAD, then `main`, `master`, `trunk`,
+  `develop`, or the current branch as a fallback.
 - Remote: `origin` if present, otherwise the first configured remote.
 - Stale threshold: default 60 days unless the user specifies another value.
 - Protected branches: `main`, `master`, `develop`, `trunk`, `release/*`,
@@ -63,6 +63,7 @@ git remote -v
 git branch --show-current
 git symbolic-ref --quiet --short refs/remotes/<remote>/HEAD
 git worktree list --porcelain
+git -C <worktree-path> status --short
 git branch --format='%(refname:short) %(committerdate:short) %(upstream:short) %(upstream:track)'
 git branch --merged <base>
 git branch --no-merged <base>
@@ -141,7 +142,11 @@ remote deletion or force deletion.
 
 Branches:
 
+- Switch to the base branch before local branch deletion when feasible so Git's
+  deletion checks are evaluated from the intended cleanup context.
 - Use `git branch -d <branch>` for merged local branches.
+- If `git branch -d` refuses, stop and re-check ancestry, upstream, and host PR
+  evidence before considering any force delete.
 - If the branch is checked out in a worktree, remove the worktree first.
 - For squash/rebase-merged branches that Git cannot prove with ancestry, show
   the merged PR evidence before asking whether to use `git branch -D`.
