@@ -44,8 +44,8 @@ Confirm or infer:
 
 - Remote: `origin` if present, otherwise the first configured remote.
 - Default branch: refresh and resolve `<remote>/HEAD`, then fall back to
-  `main`, `master`, `trunk`, `develop`, or the current branch only if the
-  remote default cannot be determined.
+  `main`, `master`, `trunk`, or `develop`. If none can be found, ask before
+  proceeding.
 - Base ref: use `refs/remotes/<remote>/<default-branch>` at its fetched commit,
   not a local branch.
 - Stale threshold: default 60 days unless the user specifies another value.
@@ -64,12 +64,29 @@ local default branch only to perform cleanup.
 
 ```bash
 remote=<remote>
+default_branch=
 git fetch --prune "$remote"
-git remote set-head "$remote" --auto
-default_ref="$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD")"
-default_branch="${default_ref#${remote}/}"
+git remote set-head "$remote" --auto || true
+
+default_ref="$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD" || true)"
+if test -n "$default_ref"; then
+  default_branch="${default_ref#${remote}/}"
+else
+  for candidate in main master trunk develop; do
+    if git show-ref --verify --quiet "refs/remotes/$remote/$candidate"; then
+      default_branch="$candidate"
+      break
+    fi
+  done
+fi
+
+: "${default_branch:?Could not determine default branch}"
 base_ref="refs/remotes/$remote/$default_branch"
 base_head="$(git rev-parse --verify "$base_ref^{commit}")"
+test -z "$(git status --porcelain)" || {
+  echo "Refuse to detach with local changes" >&2
+  exit 1
+}
 git switch --detach "$base_head"
 ```
 
@@ -87,7 +104,7 @@ git status --short --branch
 git remote -v
 git branch --show-current
 git symbolic-ref --quiet --short refs/remotes/<remote>/HEAD
-git rev-parse --verify refs/remotes/<remote>/<default-branch>^{commit}
+git rev-parse --verify <base>^{commit}
 git worktree list --porcelain
 git -C <worktree-path> status --short
 git branch --format='%(refname:short) %(committerdate:short) %(upstream:short) %(upstream:track)'
