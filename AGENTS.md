@@ -10,7 +10,7 @@ Do not add plugin marketplace files, plugin manifests, or agent-specific adapter
 
 ```
 skills/
-└── <skill-name>/
+└── vp-<skill-name>/
     ├── SKILL.md
     ├── references/
     └── scripts/
@@ -20,7 +20,7 @@ skills/
 
 ## Skill Rules
 
-- Use kebab-case skill directory names.
+- Use kebab-case skill directory names with the `vp-` prefix.
 - `SKILL.md` frontmatter must include `name` and `description`.
 - The `name` field must match the skill directory name.
 - Keep `SKILL.md` concise; move detailed material into directly linked `references/` files.
@@ -36,6 +36,7 @@ Default to `npx skills` for installation and management:
 ```bash
 npx -y skills add VdustR/skills --list
 npx -y skills add VdustR/skills --skill '*' -g --agent codex
+npx -y skills add VdustR/skills --skill '*' -g --agent claude-code
 ```
 
 Do not recommend plugin marketplace installation from this repository by default.
