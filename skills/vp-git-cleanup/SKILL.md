@@ -19,7 +19,7 @@ worktree, stash, and remote-ref cleanup as separate risk classes.
 
 1. **Default to read-only audit** - Do not delete branches, worktrees, stashes,
    or refs until the user approves an exact plan.
-2. **Protect active work** - Never delete the current branch, base branch,
+2. **Protect active work** - Never delete the current branch, base ref,
    checked-out branches, dirty worktrees, locked worktrees, or stashes that have
    not been inspected.
 3. **Separate local and remote risk** - Local branch cleanup and remote branch
@@ -33,7 +33,7 @@ worktree, stash, and remote-ref cleanup as separate risk classes.
 ## Quick Start
 
 Start with a read-only audit. Use commands as evidence, not as an automatic
-cleanup script. Adapt the base branch, remote, stale threshold, and keep
+cleanup script. Adapt the base ref, remote, stale threshold, and keep
 patterns to the repository.
 
 ## Workflow
@@ -42,18 +42,43 @@ patterns to the repository.
 
 Confirm or infer:
 
-- Base branch: default remote HEAD, then `main`, `master`, `trunk`,
-  `develop`, or the current branch as a fallback.
 - Remote: `origin` if present, otherwise the first configured remote.
+- Default branch: refresh and resolve `<remote>/HEAD`, then fall back to
+  `main`, `master`, `trunk`, `develop`, or the current branch only if the
+  remote default cannot be determined.
+- Base ref: use `refs/remotes/<remote>/<default-branch>` at its fetched commit,
+  not a local branch.
 - Stale threshold: default 60 days unless the user specifies another value.
 - Protected branches: `main`, `master`, `develop`, `trunk`, `release/*`,
-  `hotfix/*`, the current branch, the base branch, and any user-provided
+  `hotfix/*`, the current branch, the default branch, and any user-provided
   patterns.
 
 If the user asks to actually clean up, still run the audit first and present
 the exact commands before deleting.
 
-### 2. Audit Candidates
+### 2. Refresh The Default Head
+
+Before classifying or deleting local branches, update the remote-tracking default
+branch and detach at that exact commit. Do not create, check out, or keep a
+local default branch only to perform cleanup.
+
+```bash
+remote=<remote>
+git fetch --prune "$remote"
+git remote set-head "$remote" --auto
+default_ref="$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD")"
+default_branch="${default_ref#${remote}/}"
+base_ref="refs/remotes/$remote/$default_branch"
+base_head="$(git rev-parse --verify "$base_ref^{commit}")"
+git switch --detach "$base_head"
+```
+
+Use `fetch` here instead of `pull`: cleanup needs the latest remote-tracking ref,
+while `pull` requires and mutates a local branch. If the user explicitly wants a
+local default branch updated, ask before doing that and keep it separate from the
+cleanup plan.
+
+### 3. Audit Candidates
 
 Use read-only commands to gather evidence:
 
@@ -62,6 +87,7 @@ git status --short --branch
 git remote -v
 git branch --show-current
 git symbolic-ref --quiet --short refs/remotes/<remote>/HEAD
+git rev-parse --verify refs/remotes/<remote>/<default-branch>^{commit}
 git worktree list --porcelain
 git -C <worktree-path> status --short
 git branch --format='%(refname:short) %(committerdate:short) %(upstream:short) %(upstream:track)'
@@ -90,7 +116,7 @@ Group findings:
   dropping.
 - **Remote-tracking refs**: review via dry-run prune before changing refs.
 
-### 3. Add Optional Host Checks
+### 4. Add Optional Host Checks
 
 When `gh` is available and the repository is hosted on GitHub, use it for
 ambiguous branch/worktree decisions:
@@ -103,7 +129,7 @@ gh pr view <number> --json number,state,mergedAt,headRefName,baseRefName,url
 Keep branches or worktrees for open PRs. For closed-but-unmerged PRs, report
 the state and ask before deletion.
 
-### 4. Classify Merge Evidence
+### 5. Classify Merge Evidence
 
 Use evidence tiers instead of treating every "looks old" branch as merged:
 
@@ -115,12 +141,12 @@ Use evidence tiers instead of treating every "looks old" branch as merged:
 | Upstream is `[gone]` | Remote tracking branch was deleted or pruned | Review only; not proof of merge |
 
 Squash merge caveat: after a squash merge, the branch tip is usually not an
-ancestor of the base branch. `git branch --merged <base>` and
+ancestor of the base ref. `git branch --merged <base>` and
 `git branch -d <branch>` may both treat it as unmerged even though the PR was
 merged. In that case, rely on host PR evidence and require explicit
 confirmation before using `git branch -D`.
 
-### 5. Present The Cleanup Plan
+### 6. Present The Cleanup Plan
 
 Before destructive actions, show grouped commands:
 
@@ -138,12 +164,13 @@ Requires separate confirmation:
 Ask for confirmation once for the safe local cleanup group. Ask separately for
 remote deletion or force deletion.
 
-### 6. Execute Safely
+### 7. Execute Safely
 
 Branches:
 
-- Switch to the base branch before local branch deletion when feasible so Git's
-  deletion checks are evaluated from the intended cleanup context.
+- Switch to the refreshed default head in detached mode before local branch
+  deletion when feasible so Git's deletion checks are evaluated from the
+  intended cleanup context without retaining a local default branch.
 - Use `git branch -d <branch>` for merged local branches.
 - If `git branch -d` refuses, stop and re-check ancestry, upstream, and host PR
   evidence before considering any force delete.
@@ -178,7 +205,7 @@ Remote refs:
 - Delete remote branches with `git push <remote> --delete <branch>` only after
   separate confirmation and PR-state review.
 
-### 7. Verify
+### 8. Verify
 
 After cleanup, rerun the relevant read-only audit commands and report:
 
