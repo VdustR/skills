@@ -3,21 +3,31 @@
 # merge-gitignore.sh
 # Fetch and merge .gitignore templates from github/gitignore
 #
-# Usage: merge-gitignore.sh <template1> [template2] ...
+# Usage: merge-gitignore.sh [--target repo|global] [options] <template1> [template2] ...
 #
 # Templates can be:
-#   - Top-level: Node, Python, Rust, Go, etc.
-#   - Global: Global/macOS, Global/VisualStudioCode, etc.
+#   - Repo target: top-level templates such as Node, Python, Rust, Go
+#   - Global target: Global/ templates such as Global/macOS, Global/VisualStudioCode
+#
+# Options:
+#   --target repo|global       Target output type (default: repo)
+#   --allow-global-in-repo     Permit Global/ templates in repo output
+#   --allow-project-in-global  Permit top-level project templates in global output
 #
 # Exit codes:
 #   0 - Success
 #   1 - Network error (failed to fetch)
 #   2 - EOL conflict detected (details in stderr)
+#   3 - Template rejected for selected target
 #
 
 set -euo pipefail
 
 GITHUB_RAW_BASE="https://raw.githubusercontent.com/github/gitignore/main"
+TARGET="repo"
+ALLOW_GLOBAL_IN_REPO=false
+ALLOW_PROJECT_IN_GLOBAL=false
+TEMPLATES=()
 
 # Temporary directory for downloads
 TEMP_DIR=$(mktemp -d)
@@ -26,6 +36,129 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 # File to track EOL types
 EOL_LOG="${TEMP_DIR}/eol_types.log"
 touch "$EOL_LOG"
+
+usage() {
+    cat <<'EOF'
+Usage: merge-gitignore.sh [--target repo|global] [options] <template1> [template2] ...
+
+Examples:
+  merge-gitignore.sh --target repo Node Python
+  merge-gitignore.sh --target global Global/macOS Global/VisualStudioCode
+
+Options:
+  --target repo|global       Target output type (default: repo)
+  --allow-global-in-repo     Permit Global/ templates in repo output only when explicitly requested
+  --allow-project-in-global  Permit top-level project templates in global output only when explicitly requested
+  -h, --help                 Show this help
+EOF
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --target)
+                if [ $# -lt 2 ]; then
+                    echo "Error: --target requires repo or global" >&2
+                    return 1
+                fi
+                TARGET="$2"
+                shift 2
+                ;;
+            --target=*)
+                TARGET="${1#--target=}"
+                shift
+                ;;
+            --allow-global-in-repo)
+                ALLOW_GLOBAL_IN_REPO=true
+                shift
+                ;;
+            --allow-project-in-global)
+                ALLOW_PROJECT_IN_GLOBAL=true
+                shift
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            --)
+                shift
+                while [ $# -gt 0 ]; do
+                    TEMPLATES+=("$1")
+                    shift
+                done
+                ;;
+            -*)
+                echo "Error: Unknown option: $1" >&2
+                usage >&2
+                return 1
+                ;;
+            *)
+                TEMPLATES+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    case "$TARGET" in
+        repo|global)
+            ;;
+        *)
+            echo "Error: --target must be repo or global" >&2
+            return 1
+            ;;
+    esac
+
+    if [ "${#TEMPLATES[@]}" -eq 0 ]; then
+        usage >&2
+        return 1
+    fi
+
+    return 0
+}
+
+is_global_template() {
+    local template="$1"
+    [[ "$template" == Global/* ]]
+}
+
+validate_template_targets() {
+    local rejected=()
+    local template
+
+    for template in "${TEMPLATES[@]}"; do
+        if [ "$TARGET" = "repo" ] && is_global_template "$template" && ! $ALLOW_GLOBAL_IN_REPO; then
+            rejected+=("$template")
+        elif [ "$TARGET" = "global" ] && ! is_global_template "$template" && ! $ALLOW_PROJECT_IN_GLOBAL; then
+            rejected+=("$template")
+        fi
+    done
+
+    if [ "${#rejected[@]}" -eq 0 ]; then
+        return 0
+    fi
+
+    if [ "$TARGET" = "repo" ]; then
+        echo "Error: Global templates are for global gitignore generation by default." >&2
+        echo "Target: repo .gitignore" >&2
+        echo "Rejected templates:" >&2
+        for template in "${rejected[@]}"; do
+            echo "  - ${template}.gitignore" >&2
+        done
+        echo "" >&2
+        echo "Use --target global for a global gitignore, or --allow-global-in-repo only when the user explicitly requested committing these patterns to this repo." >&2
+    else
+        echo "Error: Project templates are for repo .gitignore generation by default." >&2
+        echo "Target: global gitignore" >&2
+        echo "Rejected templates:" >&2
+        for template in "${rejected[@]}"; do
+            echo "  - ${template}.gitignore" >&2
+        done
+        echo "" >&2
+        echo "Use --target repo for a repo .gitignore, or --allow-project-in-global only when the user explicitly requested global project-language patterns." >&2
+    fi
+
+    return 3
+}
 
 # Detect EOL type of a file
 # Returns: LF, CRLF, CR, or MIXED
@@ -115,7 +248,10 @@ print_source_header() {
 
 # Print local files section
 print_local_files_section() {
-    cat <<'EOF'
+    local target="$1"
+
+    if [ "$target" = "repo" ]; then
+        cat <<'EOF'
 
 # ============================================
 # Local files (project-specific ignores)
@@ -124,11 +260,24 @@ print_local_files_section() {
 # Add project-specific files to ignore here
 # Example: .env.local, local-config.json
 EOF
+    else
+        cat <<'EOF'
+
+# ============================================
+# Personal files (machine-wide ignores)
+# ============================================
+
+# Add personal OS/editor/tool ignores here
+EOF
+    fi
 }
 
 # Print overrides section
 print_overrides_section() {
-    cat <<'EOF'
+    local target="$1"
+
+    if [ "$target" = "repo" ]; then
+        cat <<'EOF'
 
 # ============================================
 # Overrides (highest priority - last wins)
@@ -142,6 +291,17 @@ print_overrides_section() {
 # Use negation (!) to re-include files excluded above
 # Example: !important.log
 EOF
+    else
+        cat <<'EOF'
+
+# ============================================
+# Personal overrides (highest priority - last wins)
+# ============================================
+
+# Add custom machine-wide overrides here
+# Use negation (!) to re-include files excluded above
+EOF
+    fi
 }
 
 # Check for EOL conflicts and report
@@ -182,16 +342,10 @@ convert_to_lf() {
 
 # Main function
 main() {
-    if [ $# -eq 0 ]; then
-        echo "Usage: $0 <template1> [template2] ..." >&2
-        echo "" >&2
-        echo "Examples:" >&2
-        echo "  $0 Node Python" >&2
-        echo "  $0 Global/macOS Global/VisualStudioCode" >&2
-        exit 1
-    fi
+    parse_args "$@" || exit 1
+    validate_template_targets || exit 3
 
-    local templates=("$@")
+    local templates=("${TEMPLATES[@]}")
 
     # Fetch all templates
     for template in "${templates[@]}"; do
@@ -229,10 +383,10 @@ main() {
     print_templates_end
 
     # 2. Local files section
-    print_local_files_section
+    print_local_files_section "$TARGET"
 
     # 3. Overrides section (highest priority - last wins in gitignore)
-    print_overrides_section
+    print_overrides_section "$TARGET"
 
     # Return appropriate exit code
     exit $eol_exit_code
