@@ -16,6 +16,35 @@ Example:
 - [a1b2c3f fix(auth): add null check for user session](https://github.com/owner/repo/commit/a1b2c3f)
 ```
 
+## PR Discussion Comment Wrapper
+
+Use this wrapper for bottom-of-PR discussion comments. GitHub does not provide threaded replies or resolution state for these comments, so create a new PR comment that mentions the author and quotes the original comment or the shortest relevant excerpt.
+
+```markdown
+@{AUTHOR}
+
+> {ORIGINAL_COMMENT_EXCERPT}
+
+{REPLY_BODY}
+
+Generated with [vp-pr-comment-resolver](https://github.com/VdustR/skills).
+```
+
+Example:
+
+```markdown
+@reviewer
+
+> Can we also cover the retry path here?
+
+- [a1b2c3f test(api): cover retry path](https://github.com/owner/repo/commit/a1b2c3f)
+
+**Files modified:**
+- `src/api/retry.test.ts`
+
+Generated with [vp-pr-comment-resolver](https://github.com/VdustR/skills).
+```
+
 ## Fix Applied Templates
 
 ### Standard Fix
@@ -374,6 +403,8 @@ No changes needed - {BRIEF_REASON}.
 | `{COMMIT_URL}` | Full URL to commit | `https://github.com/owner/repo/commit/a1b2c3f` |
 | `{FILE_PATH}` | Path to modified file | `src/auth/session.ts` |
 | `{ISSUE_NUMBER}` | Related issue number | `42` |
+| `{AUTHOR}` | GitHub login to mention for PR discussion comments | `reviewer` |
+| `{ORIGINAL_COMMENT_EXCERPT}` | Quoted original PR discussion comment or concise excerpt | `Can we also cover the retry path here?` |
 
 ## Tone Guidelines
 
@@ -424,11 +455,11 @@ After processing all comments, output a summary:
 | Skipped | <n> |
 
 ### Details
-| Comment | File | Action | Commit |
-|---------|------|--------|--------|
-| <summary> | `<path>` | Fixed | [<hash>](<url>) |
-| <summary> | `<path>` | No fix | - |
-| <summary> | `<path>` | Disagreed | (pending reviewer response) |
+| Comment | Kind | File | Action | Commit |
+|---------|------|------|--------|--------|
+| <summary> | Review thread | `<path>` | Fixed | [<hash>](<url>) |
+| <summary> | PR discussion | - | No fix | - |
+| <summary> | Review thread | `<path>` | Disagreed | (pending reviewer response) |
 
 ### Pending Discussions
 > These comments were flagged as potentially incorrect. Replies have been posted but threads remain open for reviewer response.

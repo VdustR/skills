@@ -5,15 +5,16 @@ description: >-
   Use when the user asks to "handle PR comments", "resolve PR review comments",
   "fix PR feedback", "process review comments", "address PR suggestions",
   "deal with review comments", or provides a GitHub PR URL with review comments.
-  Also trigger when the user mentions unresolved PR threads or wants to
-  batch-process reviewer feedback.
+  Also trigger when the user mentions unresolved PR threads, PR discussion
+  comments at the bottom of the conversation, or wants to batch-process
+  reviewer feedback.
   Boundary: not for writing PR reviews (use code-review) or PR checklists
   (use vp-checklist-runner).
 ---
 
 # PR Comment Resolver
 
-Automate the process of handling GitHub PR review comments: evaluate each comment, fix issues with atomic commits, and reply with detailed resolution information.
+Automate the process of handling GitHub PR feedback: evaluate review-thread comments and general PR discussion comments, fix issues with atomic commits, and reply with detailed resolution information.
 
 ## Core Principles
 
@@ -28,7 +29,7 @@ Automate the process of handling GitHub PR review comments: evaluate each commen
 3. **Atomic Commits** - Each commit should be a single logical fix; different concerns require separate commits
 4. **Human Collaboration** - Ask the user when uncertain about a fix, interpretation, or when you disagree with a comment
 5. **Detailed Replies** - Include fix explanation, commit hash, and link in every resolution
-6. **Reply to Thread** - Always reply directly to each review thread, NOT as a general PR comment at the bottom
+6. **Reply to the Correct Target** - For review threads, reply directly to the thread. For general PR discussion comments, post a new PR comment that mentions the author and quotes the original comment because GitHub does not provide resolvable per-comment PR discussion threads.
 
 ## Quick Start
 
@@ -39,16 +40,16 @@ User: Handle the comments on this PR: https://github.com/owner/repo/pull/123
 ```
 
 Workflow:
-1. Fetch all unresolved review comments
+1. Fetch unresolved review threads and general PR discussion comments
 2. Present each comment for review
 3. For each comment, determine whether to fix or explain why no fix is needed
 4. Execute fixes with atomic commits
-5. Reply and resolve each comment
+5. Reply and conditionally resolve each comment
 
 ### Auto Mode
 
 ```
-User: Auto-resolve all comments on https://github.com/owner/repo/pull/123
+User: Auto-process all comments on https://github.com/owner/repo/pull/123
 ```
 
 Process all comments automatically, only pausing for truly ambiguous cases.
@@ -57,13 +58,15 @@ Process all comments automatically, only pausing for truly ambiguous cases.
 
 ### Phase 1: Fetch Comments
 
-Use `gh api graphql` to retrieve unresolved review comments, including `isOutdated` so stale diff anchors are visible:
+Use `gh api graphql` to retrieve unresolved review threads and general PR discussion comments. Include `isOutdated` for review threads so stale diff anchors are visible:
 
 ```bash
-gh api graphql -f query='
-{
-  repository(owner: "<OWNER>", name: "<REPO>") {
-    pullRequest(number: <PR_NUMBER>) {
+gh api graphql -f owner="<OWNER>" -f repo="<REPO>" -F number=<PR_NUMBER> -f query='
+query($owner:String!, $repo:String!, $number:Int!) {
+  viewer { login }
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $number) {
+      id
       reviewThreads(first: 100) {
         nodes {
           id
@@ -73,22 +76,80 @@ gh api graphql -f query='
           line
           comments(first: 10) {
             nodes {
+              id
               body
               author {
                 __typename
                 login
               }
+              createdAt
+              url
             }
           }
         }
       }
+      comments(first: 100) {
+        nodes {
+          id
+          body
+          author {
+            __typename
+            login
+          }
+          createdAt
+          url
+        }
+      }
     }
   }
-}' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
+}' --jq '
+  .data.viewer.login as $viewer |
+  {
+    viewer: $viewer,
+    pullRequestId: .data.repository.pullRequest.id,
+    reviewThreads: [
+      .data.repository.pullRequest.reviewThreads.nodes[]
+      | select(.isResolved == false)
+      | {
+          kind: "review-thread",
+          id,
+          isOutdated,
+          path,
+          line,
+          comments: [
+            .comments.nodes[]
+            | select((.author.login // "ghost") != $viewer)
+            | {
+                id,
+                author: (.author.login // "ghost"),
+                authorType: (.author.__typename // "User"),
+                body,
+                createdAt,
+                url
+              }
+          ]
+        }
+    ],
+    prComments: [
+      .data.repository.pullRequest.comments.nodes[]
+      | select((.author.login // "ghost") != $viewer)
+      | {
+          kind: "pr-comment",
+          id,
+          author: (.author.login // "ghost"),
+          authorType: (.author.__typename // "User"),
+          body,
+          createdAt,
+          url
+        }
+    ]
+  }
+'
 ```
 
 Extract key information:
-- Comment ID and thread ID
+- Comment kind: `review-thread` or `pr-comment`
+- Comment ID, thread ID when applicable, and PR ID for bottom-comment replies
 - Resolution and outdated state
 - File path and line number
 - Comment body (the feedback)
@@ -96,9 +157,15 @@ Extract key information:
 
 Do not skip outdated threads. An outdated unresolved thread still needs a decision; `isOutdated` only means the line anchor may no longer match the current diff. Re-read the current file, verify whether a newer commit already addressed the feedback, then reply and apply the normal bot/human resolution policy.
 
+For general PR discussion comments:
+- They are `IssueComment` comments on the PR conversation, not review threads.
+- They have no `isResolved` state and cannot be resolved.
+- Skip comments from the current viewer and comments that are clearly prior resolver replies.
+- Inspect later conversation context before replying so you do not duplicate an answer that already exists.
+
 ### Phase 1.5: Classify Author (Bot vs Human)
 
-Determine if each comment author is a bot. **Bot threads are always auto-resolved after handling; human threads are never auto-resolved.**
+Determine if each comment author is a bot. **Bot review threads are always auto-resolved after handling; human review threads are never auto-resolved. General PR discussion comments cannot be resolved, regardless of author.**
 
 Use a tiered approach — stop at the first definitive answer. Once an author has been classified in this session, reuse that conclusion for later comments from the same author (conversation context serves as the cache; no separate lookup structure needed).
 
@@ -151,7 +218,7 @@ This tier is triggered by the agent's judgment, not a mechanical rule — only f
 
 When all prior tiers leave doubt, or when `__typename == "Organization"`:
 
-> "Should I treat @{author} as a bot? Profile: bio=<...>, repos=<n>, followers=<n>. If yes, the thread will be auto-resolved after handling."
+> "Should I treat @{author} as a bot? Profile: bio=<...>, repos=<n>, followers=<n>. If yes, any review thread from this author will be auto-resolved after handling."
 
 #### Conflict handling
 
@@ -159,7 +226,7 @@ If any tiers disagree (e.g., `__typename == "User"` but profile looks strongly b
 
 ### Phase 2: Evaluate Each Comment
 
-For each unresolved comment, **critically assess whether the suggestion is correct** before determining action:
+For each queued comment, **critically assess whether the suggestion is correct** before determining action:
 
 | Decision | Criteria |
 |----------|----------|
@@ -195,13 +262,13 @@ This applies regardless of whether the author is a bot or a human — bots can a
 3. Create an atomic commit with descriptive message
 4. Push to the PR branch
 5. Reply with fix details
-6. **If author is a bot**: Resolve the thread | **If human**: Leave unresolved
+6. **If review thread and author is a bot**: Resolve the thread | **If review thread and human**: Leave unresolved | **If PR discussion comment**: Leave as replied-only
 
 #### If No Fix Needed
 
 1. Compose explanation of why no change is required
 2. Reply with the explanation
-3. **If author is a bot**: Resolve the thread | **If human**: Leave unresolved
+3. **If review thread and author is a bot**: Resolve the thread | **If review thread and human**: Leave unresolved | **If PR discussion comment**: Leave as replied-only
 
 #### If Disagree
 
@@ -213,8 +280,9 @@ This applies regardless of whether the author is a bot or a human — bots can a
    - Is it based on incorrect assumptions about the code?
 4. Compose a polite, technical response with evidence
 5. **Resolution behavior**:
-   - **If author is a bot** → resolve the thread after posting the reply (bot won't follow up; leaving it open is noise)
-   - **If author is a human** → leave the thread unresolved so the reviewer can respond
+   - **If review thread and author is a bot** → resolve the thread after posting the reply (bot won't follow up; leaving it open is noise)
+   - **If review thread and author is a human** → leave the thread unresolved so the reviewer can respond
+   - **If PR discussion comment** → post a mention+quote reply; there is no thread to resolve
 
 #### If Uncertain
 
@@ -225,16 +293,27 @@ This applies regardless of whether the author is a bot or a human — bots can a
 
 ### Phase 4: Reply (and Conditionally Resolve)
 
-After each action, reply to the comment thread. **Bot threads are always resolved; human threads are never auto-resolved.**
+After each action, reply to the right target. **Bot review threads are always resolved; human review threads are never auto-resolved. General PR discussion comments are replied to, but never resolved because GitHub has no resolution state for them.**
 
-| Comment Source | Fix | No-Fix | Disagree |
-|----------------|-----|--------|----------|
-| **Bot** | Resolve | Resolve | Resolve |
-| **Human** | Leave unresolved | Leave unresolved | Leave unresolved |
+| Comment Kind | Reply API | Fix | No-Fix | Disagree |
+|--------------|-----------|-----|--------|----------|
+| **Review thread, bot** | `addPullRequestReviewThreadReply` | Resolve | Resolve | Resolve |
+| **Review thread, human** | `addPullRequestReviewThreadReply` | Leave unresolved | Leave unresolved | Leave unresolved |
+| **PR discussion comment** | `addComment` on the PR with `@author` + quote | Reply only | Reply only | Reply only |
 
 **Rationale:** Bots don't follow up, so any decided outcome (fix / no-fix / disagree) is terminal. Humans may dispute any decision, so threads are always left for the reviewer to close.
 
-> **⚠️ CRITICAL:** You MUST use the GraphQL `addPullRequestReviewThreadReply` mutation to reply directly to each review thread. Do NOT use `gh pr comment` as it posts to the PR bottom instead of the specific thread.
+> **⚠️ CRITICAL:** For review threads, you MUST use the GraphQL `addPullRequestReviewThreadReply` mutation. Do NOT use `gh pr comment` for review-thread replies because it posts to the PR bottom instead of the specific thread.
+
+For general PR discussion comments, use GraphQL `addComment` against the PR `id` and include a mention plus quote wrapper:
+
+```markdown
+@<author>
+
+> <original comment excerpt>
+
+<resolution reply body>
+```
 
 **Reply format for fixes:**
 
@@ -283,22 +362,22 @@ After processing all comments, output a summary report:
 - [<hash> <message>](<url>)
 
 ### Statistics
-| Action | Bot (auto-resolved) | Human (reply only) | Total |
-|--------|---------------------|---------------------|-------|
-| Fixed | <n> | <n> | <n> |
-| No fix | <n> | <n> | <n> |
-| Disagreed | <n> | <n> | <n> |
-| Skipped | <n> | <n> | <n> |
+| Action | Bot review thread (auto-resolved) | Human review thread (reply only) | PR discussion comment (reply only) | Total |
+|--------|-----------------------------------|----------------------------------|------------------------------------|-------|
+| Fixed | <n> | <n> | <n> | <n> |
+| No fix | <n> | <n> | <n> | <n> |
+| Disagreed | <n> | <n> | <n> | <n> |
+| Skipped | <n> | <n> | <n> | <n> |
 
-> Bot threads are always resolved after handling; human threads are never auto-resolved.
+> Bot review threads are always resolved after handling; human review threads are never auto-resolved; PR discussion comments cannot be resolved.
 
 ### Details
-| Comment | Author | Type | File | Action | Resolved |
-|---------|--------|------|------|--------|----------|
-| <summary> | @bot | 🤖 Bot | `<path>` | Fixed [<hash>](<url>) | ✅ |
-| <summary> | @human | 👤 Human | `<path>` | Fixed [<hash>](<url>) | ⏳ Pending |
-| <summary> | @bot | 🤖 Bot | `<path>` | Disagreed | ✅ |
-| <summary> | @human | 👤 Human | `<path>` | Disagreed | ⏳ Pending |
+| Comment | Author | Kind | File | Action | Resolution |
+|---------|--------|------|------|--------|------------|
+| <summary> | @bot | Review thread | `<path>` | Fixed [<hash>](<url>) | Resolved |
+| <summary> | @human | Review thread | `<path>` | Fixed [<hash>](<url>) | Pending reviewer |
+| <summary> | @bot | PR discussion | - | Fixed [<hash>](<url>) | Replied (not resolvable) |
+| <summary> | @human | PR discussion | - | Disagreed | Replied (not resolvable) |
 ```
 
 ## GitHub CLI Commands
@@ -306,11 +385,12 @@ After processing all comments, output a summary report:
 ### Fetch PR Comments
 
 ```bash
-# Get all review threads (requires GraphQL - gh pr view does not support reviewThreads)
+# Get review threads and PR discussion comments
 gh api graphql -f query='
 {
   repository(owner: "<OWNER>", name: "<REPO>") {
     pullRequest(number: <NUMBER>) {
+      id
       reviewThreads(first: 100) {
         nodes {
           id
@@ -323,15 +403,24 @@ gh api graphql -f query='
           }
         }
       }
+      comments(first: 100) {
+        nodes {
+          id
+          body
+          author { __typename login }
+          createdAt
+          url
+        }
+      }
     }
   }
 }'
 
-# Get unresolved threads only (add jq filter)
+# Get unresolved review threads only (add jq filter)
 # ... --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
 ```
 
-### Reply to Comment
+### Reply to Review Thread
 
 ```bash
 gh api graphql -f query='
@@ -344,6 +433,25 @@ gh api graphql -f query='
     }
   }
 ' -f threadId="<THREAD_ID>" -f body="<REPLY_BODY>"
+```
+
+### Reply to PR Discussion Comment
+
+```bash
+gh api graphql -f query='
+  mutation($body: String!, $subjectId: ID!) {
+    addComment(input: {
+      subjectId: $subjectId,
+      body: $body
+    }) {
+      commentEdge { node { id url } }
+    }
+  }
+' -f subjectId="<PULL_REQUEST_ID>" -f body="@<AUTHOR>
+
+> <ORIGINAL_COMMENT_EXCERPT>
+
+<REPLY_BODY>"
 ```
 
 ### Resolve Thread
@@ -472,9 +580,14 @@ Comment Received
   (After ANY action: fix, no-fix, disagree, or clarification)
          │
          ▼
-┌─────────────────┐
-│ is_bot == true? │──Yes──▶ Resolve thread
-└────────┬────────┘
+┌──────────────────────┐
+│ Review thread?       │──No──▶ PR discussion comment:
+└────────┬─────────────┘        post mention+quote reply only
+         │Yes
+         ▼
+┌──────────────────────┐
+│ is_bot == true?      │──Yes──▶ Resolve thread
+└────────┬─────────────┘
          │No
          ▼
    Leave unresolved (human reviewer will close)
@@ -486,8 +599,9 @@ Comment Received
 
 - **Critically evaluate comments:** Verify the technical validity of each suggestion against the codebase before acting. Reviewers can be wrong.
 - **Classify the author:** Use the Phase 1.5 tiered detection (`__typename` → profile → activity → ask user) before deciding whether to resolve.
-- **Always resolve bot threads:** For any outcome (fix, no-fix, disagree), resolve the thread after replying. Bots won't follow up; leaving threads open adds noise.
-- **Never auto-resolve human threads:** Reply only; let humans close their own threads, regardless of outcome.
+- **Always resolve bot review threads:** For any outcome (fix, no-fix, disagree), resolve the thread after replying. Bots won't follow up; leaving threads open adds noise.
+- **Never auto-resolve human review threads:** Reply only; let humans close their own threads, regardless of outcome.
+- **Handle PR discussion comments:** Treat bottom-of-PR discussion comments as actionable PR feedback. Reply with `@author` and a quoted excerpt because they are not threaded or resolvable.
 - **Commit by topic:** Create atomic commits for each logical change. Group related fixes into one commit, never bundle unrelated changes. Reply to all related comments with the same commit link.
 - **Write descriptive commit messages:** Describe the *what* and *why* of the change using conventional commit format. Avoid messages like "address PR comments".
 - **Collaborate with the user:** Ask for clarification on ambiguous comments. Always discuss with the user before pushing back on a reviewer.
@@ -497,8 +611,8 @@ Comment Received
 ### DON'T
 
 - **Blindly accept all comments** - always verify correctness first (applies to bot and human comments alike)
-- **Auto-resolve human reviewer comments** - let humans close their own threads regardless of the outcome
-- **Leave bot threads open** - after handling, resolve; unresolved bot threads are noise
+- **Auto-resolve human review threads** - let humans close their own threads regardless of the outcome
+- **Leave bot review threads open** - after handling, resolve; unresolved bot threads are noise
 - **Maintain a hardcoded list of bot service names** - rely on `__typename` and profile inspection instead
 - **Bundle different concerns** into one commit - separate topics need separate commits
 - Write commit messages like "address PR comments" or "per reviewer request"
@@ -508,13 +622,14 @@ Comment Received
 - Make assumptions about ambiguous requests
 - Force push or rewrite history
 - Skip verification steps
-- **Use `gh pr comment` for replies** - This posts to PR bottom, not to the review thread. Always use GraphQL `addPullRequestReviewThreadReply` for direct replies; use `gh pr comment` only as a fallback.
+- **Use `gh pr comment` for review-thread replies** - This posts to PR bottom, not to the review thread. Use GraphQL `addPullRequestReviewThreadReply` for review threads; use a PR-bottom comment only for general PR discussion comments or as an explicit fallback.
 
 ## Error Handling
 
 | Error | Action |
 |-------|--------|
 | Comment already resolved | Skip and continue |
+| PR discussion comment already answered later | Skip and include in summary |
 | File not found | Ask user for correct path |
 | Commit fails | Report error, do not resolve |
 | Push fails | Report error, suggest manual intervention |
@@ -531,7 +646,7 @@ For detailed workflows and templates:
 
 ## Fallback Behavior
 
-If the GraphQL API fails to reply to a thread (e.g., network error, permission issue, thread already resolved):
+If the GraphQL API fails to reply to a review thread (e.g., network error, permission issue, thread already resolved):
 
 1. **Retry once** after a brief delay
 2. **If retry fails**, fall back to `gh pr comment` with clear context:
@@ -554,6 +669,8 @@ EOF
 4. **Continue processing** remaining comments
 
 > **Important:** The fallback should only be used when GraphQL truly fails. Always attempt GraphQL first.
+
+For PR discussion comments, if GraphQL `addComment` fails but `gh pr comment` works, use `gh pr comment` with the same `@author` and quoted-excerpt body. Do not add the review-thread fallback note unless you are falling back from an actual review thread.
 
 ## Notes
 
