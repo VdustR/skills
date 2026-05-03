@@ -8,7 +8,7 @@ User: /gitignore
 Agent: Detected project root: /Users/dev/my-app
         Found: package.json
 
-        Recommended templates:
+        Recommended repo templates:
         ✓ Node.gitignore
 
         Proceed with these templates? [Y/n/edit]
@@ -65,11 +65,11 @@ Agent: ✅ Created /Users/dev/my-app/.gitignore
 User: Create a global gitignore for me
 
 Agent: ⚠️ You're currently inside a git repository (/Users/dev/my-app).
-        Global gitignore is recommended to be placed at ~/.gitignore
+        Global gitignore is separate from the repo .gitignore.
 
         Options:
-        1. Create at ~/.gitignore (recommended)
-        2. Create at /Users/dev/my-app/.gitignore
+        1. Create/update ~/.gitignore (recommended)
+        2. Switch to repo .gitignore instead
 
         Which do you prefer?
 
@@ -87,7 +87,24 @@ Agent: Detecting environment...
         Proceed? [Y/n/edit]
 ```
 
-## Example 3: Merging with Existing Gitignore
+## Example 3: Repo Gitignore Does Not Include Global Templates
+
+```
+User: /gitignore
+
+Agent: Detected project root: /Users/dev/my-app
+        Found: package.json, .vscode/
+
+        Recommended repo templates:
+        ✓ Node.gitignore
+
+        Not adding to repo by default:
+        - Global/VisualStudioCode.gitignore (editor preference; use global gitignore)
+
+        Proceed with repo templates? [Y/n/edit]
+```
+
+## Example 4: Merging with Existing Gitignore
 
 ```
 User: Add Python ignores to my gitignore
@@ -135,7 +152,7 @@ Agent: Found existing .gitignore at /Users/dev/my-app/.gitignore (15 lines)
         Confirm merge? [Y/n]
 ```
 
-## Example 4: Auto-trigger on Suspicious Files
+## Example 5: Auto-trigger on Suspicious Files
 
 ```
 User: git status

@@ -1,9 +1,10 @@
 ---
 name: vp-gitignore-builder
 description: >-
-  Build and merge .gitignore files using github/gitignore templates with smart
-  project detection. Use when the user asks to "create gitignore", "build .gitignore",
-  "add gitignore templates", "set up gitignore", "update gitignore", or requests
+  Build and merge repository .gitignore files or global gitignore files using
+  github/gitignore templates with smart target separation. Use when the user asks
+  to "create gitignore", "build .gitignore", "add gitignore templates", "set up
+  gitignore", "update gitignore", "create global gitignore", or requests
   "/gitignore". Also trigger when observing projects without .gitignore, seeing
   untracked files like node_modules/, .env, __pycache__/, or *.log in git status,
   or after git init in a new repo.
@@ -12,35 +13,51 @@ description: >-
 
 # Gitignore Builder
 
-Build and merge `.gitignore` files using templates from [github/gitignore](https://github.com/github/gitignore) with smart project detection.
+Build and merge repository `.gitignore` files or global gitignore files using templates from [github/gitignore](https://github.com/github/gitignore) with smart target separation.
 
 ## When to Use
 
 Invoke this skill when:
 
 - User explicitly requests `/gitignore` or asks to create/update a `.gitignore`
+- User asks to create/update a global gitignore or personal git excludes file
 - Detecting `git init` or a newly cloned repo without `.gitignore`
 - User mentions ignoring files, not wanting to track certain files
 - Observing `git status` output with files that should typically be ignored (e.g., `node_modules/`, `.env`, `__pycache__/`, `*.log`)
 
 ## Workflow
 
-### Step 1: Determine Target Location
+### Step 1: Determine Target Mode and Location
+
+Choose the target mode before detecting templates. Do not mix repo and global ignore rules by default.
+
+| Target Mode | Default Location | Use When |
+|-------------|------------------|----------|
+| Repo `.gitignore` | Nearest git repo root | User asks for `.gitignore`, project ignores, or the request is ambiguous while inside a repo |
+| Global gitignore | `git config --global core.excludesFile` value, or `~/.gitignore` if unset | User explicitly asks for global/personal/system/editor/OS ignores, or confirms global mode when outside a repo |
+
+Rules:
+
+- Inside a repo, default to repo mode unless the user explicitly asks for global ignore.
+- Do not infer global mode from OS/editor detection alone.
+- Do not add `Global/...` templates to a repo `.gitignore` unless the user explicitly asks to commit those machine/editor/OS patterns to the repo.
+- Do not add project templates like `Node` or `Python` to a global gitignore unless the user explicitly asks for project-language patterns globally.
 
 1. Find the nearest `.git` directory to determine repo root
-2. If no `.git` found, ask user if they want to create a global gitignore at `~`
+2. If no `.git` found and the user did not explicitly ask for global ignore, ask whether they want a repo-local file in the current directory or a global gitignore
 
 **Location Rules:**
 
 | Situation | Action |
 |-----------|--------|
-| Inside a repo, project-level requested | Use repo root (where `.git` is) |
-| Inside a repo, global requested | Warn: "Global gitignore is recommended at `~/.gitignore`. You're currently inside a repo. Proceed here anyway?" |
-| Not in a repo | Suggest creating global gitignore at `~/.gitignore` |
+| Inside a repo, project-level or ambiguous request | Use repo root (where `.git` is) |
+| Inside a repo, global requested | Use the global gitignore path; do not write the repo `.gitignore` unless the user changes target |
+| Not in a repo, global requested | Use the global gitignore path |
+| Not in a repo, ambiguous request | Ask whether to create a local `.gitignore` in the current directory or a global gitignore |
 
 ### Step 2: Detect Project Type
 
-**For project-level gitignore (basic detection):**
+**For repo `.gitignore` (project detection):**
 
 | Indicator File | Template |
 |----------------|----------|
@@ -57,6 +74,8 @@ Invoke this skill when:
 | `CMakeLists.txt` | CMake.gitignore |
 | `Makefile` with C/C++ files | C.gitignore or C++.gitignore |
 
+Do not recommend OS/editor global templates for repo mode just because `.vscode/`, `.idea/`, `.DS_Store`, or similar files are present. Instead, say those are usually global ignore candidates and offer a separate global gitignore only if the user wants it.
+
 **For global gitignore (environment-aware detection):**
 
 | Detection Method | Template (from Global/) |
@@ -69,6 +88,13 @@ Invoke this skill when:
 | `vim` or `nvim` available | Vim.gitignore |
 | `emacs` available | Emacs.gitignore |
 
+**Template boundary rules:**
+
+| Target Mode | Allowed By Default | Rejected By Default |
+|-------------|--------------------|---------------------|
+| Repo `.gitignore` | Top-level project templates such as `Node`, `Python`, `Rust` | `Global/...` templates such as `Global/macOS`, `Global/VisualStudioCode` |
+| Global gitignore | `Global/...` templates | Top-level project templates such as `Node`, `Python`, `Rust` |
+
 ### Step 3: Present Recommendations
 
 Show detected templates and ask for confirmation:
@@ -77,9 +103,11 @@ Show detected templates and ask for confirmation:
 Detected project root: /path/to/repo
 Found indicators: package.json, .vscode/
 
-Recommended templates:
+Recommended repo templates:
 - Node.gitignore
-- VisualStudioCode.gitignore (for global)
+
+Not adding to repo by default:
+- Global/VisualStudioCode.gitignore (global editor ignore)
 
 Proceed with these templates? [Y/n/edit]
 ```
@@ -94,7 +122,11 @@ Allow user to:
 Use the bundled `scripts/merge-gitignore.sh` script from this skill directory:
 
 ```bash
-scripts/merge-gitignore.sh Node Python macOS
+# Repo .gitignore
+scripts/merge-gitignore.sh --target repo Node Python
+
+# Global gitignore
+scripts/merge-gitignore.sh --target global Global/macOS Global/VisualStudioCode
 ```
 
 **Merge Order (later entries have higher priority in gitignore):**
@@ -272,11 +304,16 @@ The `merge-gitignore.sh` script handles:
 
 ```bash
 # Fetch and merge templates
-scripts/merge-gitignore.sh <template1> [template2] ...
+scripts/merge-gitignore.sh --target repo <template1> [template2] ...
+scripts/merge-gitignore.sh --target global <template1> [template2] ...
 
 # Templates can be:
-# - Top-level: Node, Python, Rust, Go, etc.
-# - Global: Global/macOS, Global/VisualStudioCode, etc.
+# - Repo target: top-level templates such as Node, Python, Rust, Go
+# - Global target: Global/ templates such as Global/macOS, Global/VisualStudioCode
+
+# Escape hatches, only when explicitly requested by the user:
+scripts/merge-gitignore.sh --target repo --allow-global-in-repo Global/macOS
+scripts/merge-gitignore.sh --target global --allow-project-in-global Node
 ```
 
 **Exit Codes:**
@@ -286,3 +323,4 @@ scripts/merge-gitignore.sh <template1> [template2] ...
 | 0 | Success |
 | 1 | Network error (failed to fetch) |
 | 2 | EOL conflict detected (info in stderr) |
+| 3 | Template rejected for the selected target |
