@@ -102,7 +102,49 @@ query($owner:String!, $repo:String!, $number:Int!) {
       }
     }
   }
-}' --jq '{viewer: .data.viewer.login, pullRequest: .data.repository.pullRequest}'
+}' --jq '
+  .data.viewer.login as $viewer |
+  {
+    viewer: $viewer,
+    pullRequestId: .data.repository.pullRequest.id,
+    reviewThreads: [
+      .data.repository.pullRequest.reviewThreads.nodes[]
+      | select(.isResolved == false)
+      | {
+          kind: "review-thread",
+          id,
+          isOutdated,
+          path,
+          line,
+          comments: [
+            .comments.nodes[]
+            | select((.author.login // "ghost") != $viewer)
+            | {
+                id,
+                author: (.author.login // "ghost"),
+                authorType: (.author.__typename // "User"),
+                body,
+                createdAt,
+                url
+              }
+          ]
+        }
+    ],
+    prComments: [
+      .data.repository.pullRequest.comments.nodes[]
+      | select((.author.login // "ghost") != $viewer)
+      | {
+          kind: "pr-comment",
+          id,
+          author: (.author.login // "ghost"),
+          authorType: (.author.__typename // "User"),
+          body,
+          createdAt,
+          url
+        }
+    ]
+  }
+'
 ```
 
 Extract key information:

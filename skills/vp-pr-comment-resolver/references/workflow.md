@@ -58,8 +58,9 @@ query($owner:String!, $repo:String!, $number:Int!) {
     }
   }
 }' --jq '
+  .data.viewer.login as $viewer |
   {
-    viewer: .data.viewer.login,
+    viewer: $viewer,
     pullRequestId: .data.repository.pullRequest.id,
     reviewThreads: [
       .data.repository.pullRequest.reviewThreads.nodes[]
@@ -70,23 +71,28 @@ query($owner:String!, $repo:String!, $number:Int!) {
           isOutdated,
           path,
           line,
-          comments: [.comments.nodes[] | {
-            id,
-            author: .author.login,
-            authorType: .author.__typename,
-            body,
-            createdAt,
-            url
-          }]
+          comments: [
+            .comments.nodes[]
+            | select((.author.login // "ghost") != $viewer)
+            | {
+                id,
+                author: (.author.login // "ghost"),
+                authorType: (.author.__typename // "User"),
+                body,
+                createdAt,
+                url
+              }
+          ]
         }
     ],
     prComments: [
       .data.repository.pullRequest.comments.nodes[]
+      | select((.author.login // "ghost") != $viewer)
       | {
           kind: "pr-comment",
           id,
-          author: .author.login,
-          authorType: .author.__typename,
+          author: (.author.login // "ghost"),
+          authorType: (.author.__typename // "User"),
           body,
           createdAt,
           url
