@@ -12,12 +12,6 @@ the user explicitly asks.
 gh pr view <NUMBER_OR_URL> --json number,title,author,headRefName,baseRefName,url,commits,reviewDecision,statusCheckRollup
 ```
 
-Fetch the viewer login:
-
-```bash
-gh api user --jq '.login'
-```
-
 If local checkout is necessary for verification, prefer an isolated worktree or
 read-only checkout flow that matches the current agent's git policy. If changing
 the current checkout would be surprising or unsafe, ask first.
@@ -57,7 +51,7 @@ query($owner:String!, $repo:String!, $number:Int!) {
           isOutdated
           path
           line
-          comments(first: 50) {
+          openerComment: comments(first: 1) {
             nodes {
               id
               body
@@ -66,6 +60,23 @@ query($owner:String!, $repo:String!, $number:Int!) {
               author { __typename login }
             }
           }
+          latestComments: comments(last: 50) {
+            nodes {
+              id
+              body
+              createdAt
+              url
+              author { __typename login }
+            }
+            pageInfo {
+              hasPreviousPage
+              startCursor
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
       comments(first: 100) {
@@ -75,6 +86,10 @@ query($owner:String!, $repo:String!, $number:Int!) {
           createdAt
           url
           author { __typename login }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }
@@ -103,7 +118,6 @@ query($owner:String!, $repo:String!, $number:Int!) {
     ],
     reviewThreads: [
       $pr.reviewThreads.nodes[]
-      | .comments.nodes as $comments
       | {
           kind: "review-thread",
           id,
@@ -111,10 +125,11 @@ query($owner:String!, $repo:String!, $number:Int!) {
           isOutdated,
           path,
           line,
-          opener: (($comments[0].author.login) // "ghost"),
-          openedByViewer: ((($comments[0].author.login) // "ghost") == $viewer),
+          opener: ((.openerComment.nodes[0].author.login) // "ghost"),
+          openedByViewer: (((.openerComment.nodes[0].author.login) // "ghost") == $viewer),
+          commentsPageInfo: .latestComments.pageInfo,
           comments: [
-            $comments[]
+            .latestComments.nodes[]
             | {
                 id,
                 author: (.author.login // "ghost"),
@@ -126,6 +141,7 @@ query($owner:String!, $repo:String!, $number:Int!) {
           ]
         }
     ],
+    reviewThreadsPageInfo: $pr.reviewThreads.pageInfo,
     prComments: [
       $pr.comments.nodes[]
       | {
@@ -138,13 +154,16 @@ query($owner:String!, $repo:String!, $number:Int!) {
           createdAt,
           url
         }
-    ]
+    ],
+    prCommentsPageInfo: $pr.comments.pageInfo
   }
 '
 ```
 
-If there are more than 100 threads or comments, page the GraphQL connections
-instead of silently ignoring older conversations.
+If `reviewThreadsPageInfo.hasNextPage`,
+`prCommentsPageInfo.hasNextPage`, or any
+`reviewThreads[].commentsPageInfo.hasPreviousPage` value is true, page the
+matching GraphQL connection instead of silently ignoring older conversations.
 
 ## 3. Classify Conversations
 
