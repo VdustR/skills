@@ -1,6 +1,6 @@
 # Detailed Workflow Reference
 
-This document provides step-by-step instructions for processing PR review comments.
+This document provides step-by-step instructions for processing PR review-thread comments and general PR discussion comments.
 
 ## Complete Workflow
 
@@ -17,15 +17,17 @@ git checkout <headRefName>
 git pull origin <headRefName>
 ```
 
-### Step 2: Fetch Unresolved Review Comments
+### Step 2: Fetch PR Feedback Comments
 
-Retrieve unresolved review threads with GraphQL. Include `isOutdated`; do not filter it out.
+Retrieve unresolved review threads and general PR discussion comments with GraphQL. Include `isOutdated` for review threads; do not filter it out.
 
 ```bash
 gh api graphql -f owner="<OWNER>" -f repo="<REPO>" -F number=<NUMBER> -f query='
 query($owner:String!, $repo:String!, $number:Int!) {
+  viewer { login }
   repository(owner:$owner, name:$repo) {
     pullRequest(number:$number) {
+      id
       reviewThreads(first:100) {
         nodes {
           id
@@ -44,29 +46,59 @@ query($owner:String!, $repo:String!, $number:Int!) {
           }
         }
       }
+      comments(first:100) {
+        nodes {
+          id
+          author { __typename login }
+          body
+          createdAt
+          url
+        }
+      }
     }
   }
 }' --jq '
-  [.data.repository.pullRequest.reviewThreads.nodes[]
-   | select(.isResolved == false)
-   | {
-       id,
-       isOutdated,
-       path,
-       line,
-       comments: [.comments.nodes[] | {
-         id,
-         author: .author.login,
-         authorType: .author.__typename,
-         body,
-         createdAt,
-         url
-       }]
-     }]
+  {
+    viewer: .data.viewer.login,
+    pullRequestId: .data.repository.pullRequest.id,
+    reviewThreads: [
+      .data.repository.pullRequest.reviewThreads.nodes[]
+      | select(.isResolved == false)
+      | {
+          kind: "review-thread",
+          id,
+          isOutdated,
+          path,
+          line,
+          comments: [.comments.nodes[] | {
+            id,
+            author: .author.login,
+            authorType: .author.__typename,
+            body,
+            createdAt,
+            url
+          }]
+        }
+    ],
+    prComments: [
+      .data.repository.pullRequest.comments.nodes[]
+      | {
+          kind: "pr-comment",
+          id,
+          author: .author.login,
+          authorType: .author.__typename,
+          body,
+          createdAt,
+          url
+        }
+    ]
+  }
 '
 ```
 
 Process outdated unresolved threads too. Their diff context has been superseded, so re-read the current file before deciding whether the feedback is already addressed, needs another fix, or should receive a no-fix explanation.
+
+Process general PR discussion comments too. These are bottom-of-PR `IssueComment` items, not review threads. They do not have `isResolved`, `path`, or `line`, and GitHub cannot mark them resolved. Skip comments authored by the current viewer and comments that are clearly prior resolver replies; inspect later conversation comments before replying to avoid duplicate answers.
 
 ### Step 3: Build Comment Queue
 
@@ -76,6 +108,7 @@ Organize comments for processing:
 Queue Structure:
 [
   {
+    kind: "review-thread",
     threadId: "thread-1",
     isOutdated: false,
     filePath: "src/auth.ts",
@@ -84,6 +117,16 @@ Queue Structure:
     author: "reviewer1",
     authorType: "User",
     status: "pending"  // pending | processing | fixed | skipped | uncertain
+  },
+  {
+    kind: "pr-comment",
+    commentId: "comment-1",
+    pullRequestId: "pr-node-id",
+    originalComment: "Can we also handle the retry path?",
+    author: "reviewer2",
+    authorType: "User",
+    commentUrl: "https://github.com/owner/repo/pull/123#issuecomment-...",
+    status: "pending"
   },
   ...
 ]
@@ -95,7 +138,7 @@ For each comment in the queue:
 
 #### 4.1 Read Context
 
-Use the current agent's file-reading tool to read file contents:
+For review-thread comments, use the current agent's file-reading tool to read file contents:
 
 ```
 Read file: <filePath>
@@ -105,6 +148,8 @@ Read file: <filePath> (offset: <start>, limit: <count>)
 ```
 
 > **Note:** Prefer the agent's structured file-reading tool when available. If the current agent does not provide one, use a focused shell read command such as `sed -n` or `rg` with a narrow range.
+
+For PR discussion comments, there may be no file path. Search the changed files and surrounding project context for the topic named in the comment. If the target is still ambiguous after a focused search, ask the user instead of guessing.
 
 #### 4.2 Analyze Comment
 
@@ -158,7 +203,7 @@ git push origin <branchName>
 
 ### Step 5: Reply and Resolve
 
-#### Using GraphQL API
+#### Review-thread replies
 
 ```bash
 # Add reply comment
@@ -172,8 +217,11 @@ gh api graphql -f query='
     }
   }
 ' -f threadId="<THREAD_ID>" -f body="<REPLY_BODY>"
+```
 
-# Resolve the thread
+Resolve review threads only when the author is classified as a bot:
+
+```bash
 gh api graphql -f query='
   mutation($threadId: ID!) {
     resolveReviewThread(input: {
@@ -184,6 +232,31 @@ gh api graphql -f query='
   }
 ' -f threadId="<THREAD_ID>"
 ```
+
+Human-authored review threads are left unresolved after replying.
+
+#### PR discussion comment replies
+
+Post a new PR comment against the pull request `id`. Always mention the author and quote the original comment or the shortest relevant excerpt:
+
+```bash
+gh api graphql -f query='
+  mutation($body: String!, $subjectId: ID!) {
+    addComment(input: {
+      subjectId: $subjectId,
+      body: $body
+    }) {
+      commentEdge { node { id url } }
+    }
+  }
+' -f subjectId="<PULL_REQUEST_ID>" -f body="@<AUTHOR>
+
+> <ORIGINAL_COMMENT_EXCERPT>
+
+<REPLY_BODY>"
+```
+
+Do not call `resolveReviewThread` for PR discussion comments; there is no review thread to resolve.
 
 ### Step 6: Commit by Topic
 
@@ -202,7 +275,7 @@ Action:
 1. Implement session null check
 2. Commit: "fix(auth): add null check for user session"
 3. Reply to thread-1, thread-3, thread-5 with same commit link
-4. Resolve all three
+4. Resolve bot review threads; leave human review threads unresolved
 ```
 
 #### Different topics → Separate commits
@@ -274,18 +347,18 @@ Action:
 │        → Verifying... Comment is valid                     │
 │        → Fixing... Done                                    │
 │        → Committed: abc1234                                │
-│        → Replied and resolved ✓                            │
+│        → Replied; resolved if bot review thread ✓          │
 │                                                            │
 │  [2/6] src/api.ts:87 - Error handling                     │
 │        → Verifying... Comment is valid                     │
 │        → Fixing... Done                                    │
 │        → Committed: def5678                                │
-│        → Replied and resolved ✓                            │
+│        → Replied; resolved if bot review thread ✓          │
 │                                                            │
 │  [3/6] src/utils.ts:15 - "Why this approach?"             │
 │        → Analyzing... Question, no fix needed              │
 │        → Replied with explanation ✓                        │
-│        → Resolved ✓                                        │
+│        → Resolved if bot review thread ✓                   │
 │                                                            │
 │  [4/6] src/config.ts:33 - Ambiguous request               │
 │        → PAUSED: Need user input                           │
@@ -308,6 +381,16 @@ Action:
 > Auto Mode will NEVER auto-reply disagreements without user approval.
 
 ## Edge Cases
+
+### General PR Discussion Comments
+
+When feedback appears as a bottom-of-PR discussion comment:
+
+1. Treat it as normal PR feedback and run the same validity checks.
+2. Search for the relevant files or changed areas because the comment has no diff anchor.
+3. Reply with a new PR comment that starts with `@author` and quotes the original comment.
+4. Do not resolve anything; PR discussion comments are not resolvable review threads.
+5. Before replying, scan newer PR comments to avoid answering a comment that has already been handled.
 
 ### Incorrect or Harmful Suggestions
 
@@ -336,6 +419,7 @@ When you determine a reviewer's suggestion is technically incorrect:
 5. **Resolution behavior depends on author**
    - **If the author is a bot** → resolve the thread after posting the reply; the bot won't follow up, so the thread is terminal
    - **If the author is a human** → leave the thread open for the reviewer to respond; only resolve after reaching consensus or on user instruction
+   - **If this is a PR discussion comment** → post the mention+quote reply only; there is no thread to resolve
 
 ### Comment on Deleted Lines
 
@@ -344,7 +428,7 @@ If the comment references lines that no longer exist:
 1. Check git history to understand context
 2. Determine if the issue is already resolved by recent changes
 3. Reply explaining the situation
-4. Resolve with appropriate explanation
+4. Resolve only if this is a bot review thread; otherwise leave it replied-only or pending reviewer
 
 ### Conflicting Comments
 
@@ -362,11 +446,11 @@ When a comment suggests extensive changes:
 1. Acknowledge the suggestion
 2. Explain it's out of scope for this PR
 3. Offer to create a follow-up issue
-4. Resolve with the explanation
+4. Reply with the explanation; resolve only when it is a bot review thread
 
 ## Verification Checklist
 
-Before resolving each comment:
+Before replying to or resolving each comment:
 
 - [ ] Fix is correct and complete
 - [ ] Code compiles without errors
@@ -375,6 +459,7 @@ Before resolving each comment:
 - [ ] Changes are pushed to remote
 - [ ] Reply includes commit link
 - [ ] Reply explains the change
+- [ ] PR discussion comment replies include `@author` and a quoted excerpt
 
 ## Recovery from Errors
 
