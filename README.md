@@ -49,6 +49,10 @@ Replace one library with another or migrate deprecated API patterns.
 
 Upgrade dependencies with breaking change detection and migration planning.
 
+### vp-env-secrets
+
+Safely list, choose, load, stage, and persist sensitive `.env*` variables using `dotenvx`.
+
 ### vp-gitignore-builder
 
 Build and merge `.gitignore` files using github/gitignore templates with smart project detection.
