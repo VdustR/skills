@@ -427,10 +427,10 @@ cmd_stage_from_file() {
 
   local value
   local value_count
-  value_count="$(sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' "$input" | wc -l | tr -d ' ')"
+  value_count="$(sed '/^[[:space:]]*# Put .* below this line/d; /^[[:space:]]*$/d' "$input" | wc -l | tr -d ' ')"
   [ "$value_count" -le 1 ] || die "input has multiple non-comment lines; multiline values are not supported by this first-version helper"
-  value="$(sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' "$input" | sed -n '1p')"
-  [ -n "$value" ] || die "no non-comment value found in input file"
+  value="$(sed '/^[[:space:]]*# Put .* below this line/d; /^[[:space:]]*$/d' "$input" | sed -n '1p')"
+  [ -n "$value" ] || die "no value found in input file"
 
   (umask 077; mkdir -p "$STAGE_DIR")
   printf '%s=%s\n' "$key" "$(quote_dotenv_value "$value")" >> "$STAGE_FILE"
@@ -444,7 +444,7 @@ cmd_verify_staged() {
   local key="$1"
   validate_key "$key"
   [ -f "$STAGE_FILE" ] || die "staging file not found"
-  "$DOTENVX" run -f "$STAGE_FILE" --strict --quiet -- sh -c '
+  "$DOTENVX" run -f "$STAGE_FILE" --strict --quiet --overload -- sh -c '
     key="$1"
     if value="$(printenv "$key")"; then
       printf "set:%s:%s\n" "$key" "${#value}"
@@ -593,7 +593,7 @@ cmd_persist_staged() {
 cmd_verify_target() {
   local key="$1"
   local target="$2"
-  "$DOTENVX" run -f "$target" --strict --quiet -- sh -c '
+  "$DOTENVX" run -f "$target" --strict --quiet --overload -- sh -c '
     key="$1"
     if value="$(printenv "$key")"; then
       printf "persisted:%s:%s\n" "$key" "${#value}"
