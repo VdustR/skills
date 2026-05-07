@@ -57,6 +57,10 @@ function parseArgs(args) {
 }
 
 function scanForeignSkills(repoRoot, activeAgent) {
+  if (!isDirectory(repoRoot)) {
+    return [];
+  }
+
   const entries = fs.readdirSync(repoRoot, { withFileTypes: true });
   const indexed = [];
 
@@ -143,12 +147,16 @@ function parseFrontmatter(frontmatter) {
       const block = [];
       const baseIndent = leadingSpaces(lines[i]);
 
-      while (i + 1 < lines.length && leadingSpaces(lines[i + 1]) > baseIndent) {
+      while (
+        i + 1 < lines.length &&
+        (lines[i + 1].trim() === "" || leadingSpaces(lines[i + 1]) > baseIndent)
+      ) {
         i += 1;
-        block.push(lines[i].trim());
+        block.push(lines[i]);
       }
 
-      result[key] = rawValue.startsWith("|") ? block.join("\n").trim() : block.join(" ").trim();
+      const dedented = dedentBlock(block);
+      result[key] = rawValue.startsWith("|") ? dedented.join("\n").trim() : foldBlock(dedented);
       continue;
     }
 
@@ -228,6 +236,41 @@ function isDirectory(candidate) {
 
 function leadingSpaces(line) {
   return line.match(/^ */)[0].length;
+}
+
+function dedentBlock(lines) {
+  const nonEmptyIndents = lines
+    .filter((line) => line.trim() !== "")
+    .map((line) => leadingSpaces(line));
+  const trimWidth = nonEmptyIndents.length === 0 ? 0 : Math.min(...nonEmptyIndents);
+
+  return lines.map((line) => (line.trim() === "" ? "" : line.slice(trimWidth)));
+}
+
+function foldBlock(lines) {
+  const chunks = [];
+  let paragraph = [];
+
+  for (const line of lines) {
+    if (line.trim() === "") {
+      if (paragraph.length > 0) {
+        chunks.push(paragraph.join(" "));
+        paragraph = [];
+      }
+      if (chunks[chunks.length - 1] !== "") {
+        chunks.push("");
+      }
+      continue;
+    }
+
+    paragraph.push(line.trim());
+  }
+
+  if (paragraph.length > 0) {
+    chunks.push(paragraph.join(" "));
+  }
+
+  return chunks.join("\n").trim();
 }
 
 function unquote(value) {
