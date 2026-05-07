@@ -22,7 +22,8 @@ Use this only after explicit user activation.
    ```
 
 3. Exclude the current agent's own skill root, such as `.codex/skills` when
-   running in Codex. Do not scan shared roots such as `skills/`.
+   running in Codex. Do not scan shared roots such as `skills/` or
+   `.agents/skills`.
 4. Read only frontmatter and keep a concise index with `name`, `description`,
    `path`, `source_agent`, and `source_root`.
 5. Do not read any foreign skill body during indexing.
@@ -41,7 +42,9 @@ node <skill-dir>/scripts/index-foreign-agent-skills.mjs --root . --current-agent
 ```
 
 Resolve `<skill-dir>` relative to this `SKILL.md`. Pass the current agent name
-explicitly when known; for Claude Code, use `claude-code`.
+explicitly when known; for Claude Code, use `claude-code`. If `--root` is
+omitted, the scanner walks up from the current directory to find the repository
+root.
 
 Use `--format json` when structured output is easier to consume.
 

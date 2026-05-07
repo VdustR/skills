@@ -8,11 +8,12 @@ const usage = `Usage:
   index-foreign-agent-skills.mjs [--root <dir>] [--current-agent <name>] [--format markdown|json]
 
 Scans .<agent>/skills/<skill-name>/SKILL.md under the repository root, filters
-the current agent's own root, and prints a frontmatter-only index.
+shared and current-agent roots, and prints a frontmatter-only index. When --root
+is omitted, the scanner walks up from the current directory to find a Git root.
 `;
 
 const options = parseArgs(process.argv.slice(2));
-const root = path.resolve(options.root ?? process.cwd());
+const root = path.resolve(options.root ?? findRepoRoot(process.cwd()));
 const currentAgent = normalizeAgent(options.currentAgent ?? "");
 const format = options.format ?? "markdown";
 
@@ -70,7 +71,7 @@ function scanForeignSkills(repoRoot, activeAgent) {
     }
 
     const sourceAgent = normalizeAgent(rawAgent);
-    if (activeAgent && sourceAgent === activeAgent) {
+    if (isSharedAgentRoot(sourceAgent) || (activeAgent && sourceAgent === activeAgent)) {
       continue;
     }
 
@@ -193,8 +194,28 @@ function normalizeAgent(agent) {
   return normalized;
 }
 
+function findRepoRoot(startDir) {
+  let candidate = path.resolve(startDir);
+
+  while (true) {
+    if (fs.existsSync(path.join(candidate, ".git"))) {
+      return candidate;
+    }
+
+    const parent = path.dirname(candidate);
+    if (parent === candidate) {
+      return path.resolve(startDir);
+    }
+    candidate = parent;
+  }
+}
+
 function isAgentName(name) {
   return /^[A-Za-z0-9_-]+$/.test(name);
+}
+
+function isSharedAgentRoot(agent) {
+  return agent === "agents";
 }
 
 function isDirectory(candidate) {
