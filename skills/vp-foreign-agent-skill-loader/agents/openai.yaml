@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Foreign Agent Skill Loader"
+  short_description: "Index repo-local skills from other agents"
+  default_prompt: "Use $vp-foreign-agent-skill-loader to index foreign agent skills in this repository."
