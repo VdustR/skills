@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Prename"
+  short_description: "Name agent sessions from context"
+  default_prompt: "Use $vp-prename to suggest a concise name for this session."

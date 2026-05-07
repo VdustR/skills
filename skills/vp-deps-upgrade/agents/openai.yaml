@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Dependency Upgrade"
+  short_description: "Upgrade dependencies with risk checks"
+  default_prompt: "Use $vp-deps-upgrade to review and upgrade this dependency safely."

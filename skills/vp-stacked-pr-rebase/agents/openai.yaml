@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Stacked PR Rebase"
+  short_description: "Rebase stacked PRs after parent merge"
+  default_prompt: "Use $vp-stacked-pr-rebase to rebase this stacked PR after its parent merged."

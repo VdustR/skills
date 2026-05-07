@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Dependency Migration"
+  short_description: "Plan and execute dependency migrations"
+  default_prompt: "Use $vp-deps-migrate to migrate this project from one library to another."

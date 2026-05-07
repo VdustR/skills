@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP PR Review Follow-Up"
+  short_description: "Follow up reviewer-side PR threads"
+  default_prompt: "Use $vp-pr-review-followup to review replies on PR threads I opened."

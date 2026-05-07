@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP PR Comment Resolver"
+  short_description: "Resolve GitHub PR review feedback"
+  default_prompt: "Use $vp-pr-comment-resolver to process unresolved feedback on this PR."

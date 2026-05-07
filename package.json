@@ -1,0 +1,14 @@
+{
+  "name": "@vdustr/skills",
+  "private": true,
+  "scripts": {
+    "validate": "npm run validate:offline && npm run validate:smoke-fixtures && npm run validate:parser",
+    "validate:offline": "./scripts/validate-skills.sh",
+    "validate:smoke-fixtures": "./scripts/validate-smoke-fixtures.sh",
+    "validate:parser": "./scripts/validate-skills-parser.sh",
+    "validate:latest": "./scripts/validate-skills-latest.sh"
+  },
+  "devDependencies": {
+    "skills": "1.5.3"
+  }
+}

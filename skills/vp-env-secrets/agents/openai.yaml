@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Env Secrets"
+  short_description: "Handle env secrets without leaks"
+  default_prompt: "Use $vp-env-secrets to load the needed env vars without exposing values."

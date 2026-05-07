@@ -17,7 +17,7 @@ I need to know which PR to rebase. Options:
 
 **Trigger:** Confidence is MEDIUM or LOW, or multiple candidates exist.
 
-See Phase 1 output examples in SKILL.md. Always present numbered options with a recommendation.
+See `parent-detection.md` for output examples. Always present numbered options with a recommendation.
 
 ## 3. Are the commit classifications correct?
 
@@ -27,13 +27,13 @@ See Phase 1 output examples in SKILL.md. Always present numbered options with a 
 
 **Trigger:** Commit cannot be clearly classified (amended, message-only match, different author).
 
-Options: Exclude / Keep / Show diff. See Phase 3 "UNCERTAIN commits" example in SKILL.md.
+Options: Exclude / Keep / Show diff. See `commit-classification.md` for the uncertain-commit example.
 
 ## 5. Ready to execute?
 
 **Trigger:** ALWAYS, before any destructive operation.
 
-See Phase 3.5 Pre-Execution Confirmation in SKILL.md.
+See `execution.md` for the pre-execution confirmation example.
 
 ## 6. How to handle conflicts?
 
@@ -69,4 +69,4 @@ git reset --hard backup-pr<NUMBER>-<timestamp>
 
 **Trigger:** ALWAYS, before pushing.
 
-See Phase 5 "Confirm Force Push" example in SKILL.md.
+See `execution.md` for the force-push confirmation example.

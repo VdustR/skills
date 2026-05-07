@@ -7,26 +7,26 @@ Reusable Agent Skills by [VdustR](https://github.com/VdustR).
 Preview available skills:
 
 ```bash
-npx -y skills add VdustR/skills --list
+npx -y skills@1.5.3 add VdustR/skills --list
 ```
 
 Install all skills globally for Codex:
 
 ```bash
-npx -y skills add VdustR/skills --skill '*' -g --agent codex
+npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent codex
 ```
 
 Install all skills globally for Claude Code:
 
 ```bash
-npx -y skills add VdustR/skills --skill '*' -g --agent claude-code
+npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent claude-code
 ```
 
 Install selected skills:
 
 ```bash
-npx -y skills add VdustR/skills --skill vp-cspell --skill vp-gitignore-builder -g --agent codex
-npx -y skills add VdustR/skills --skill vp-cspell --skill vp-gitignore-builder -g --agent claude-code
+npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-gitignore-builder -g --agent codex
+npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-gitignore-builder -g --agent claude-code
 ```
 
 Install to the current project instead of globally by omitting `-g`.
@@ -52,6 +52,10 @@ Upgrade dependencies with breaking change detection and migration planning.
 ### vp-env-secrets
 
 Safely list, choose, load, stage, and persist sensitive `.env*` variables using `dotenvx`.
+
+### vp-git-cleanup
+
+Audit and safely clean up local Git branches, worktrees, stashes, and stale refs.
 
 ### vp-gitignore-builder
 
@@ -97,7 +101,30 @@ Apply TypeScript guidelines for type design, naming, and maintainable patterns.
 
 Skills live under `skills/vp-<skill-name>/` and each skill must include `SKILL.md` with valid `name` and `description` frontmatter.
 
-Use `npx skills` for installation and management. Agent-specific plugin adapters, if needed, should live outside this repository or be generated from these canonical skill sources.
+Use the pinned `npx skills@1.5.3` CLI for installation and management. Agent-specific plugin adapters, if needed, should live outside this repository or be generated from these canonical skill sources.
+
+Install locked development tooling:
+
+```bash
+npm ci
+```
+
+Validate the repository before publishing changes:
+
+```bash
+npm run validate
+```
+
+Validation layers:
+
+- `npm run validate:offline` checks repository-owned rules without external package execution.
+- `npm run validate:smoke-fixtures` checks high-risk workflow smoke fixtures.
+- `npm run validate:parser` checks compatibility with the locked `skills@1.5.3` parser.
+- `npm run validate:latest` checks compatibility with the latest `skills` CLI for monitoring only.
+
+Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
+prove with static validation, such as PR comment resolution policy and stacked
+PR history-rewrite safety.
 
 ## License
 
