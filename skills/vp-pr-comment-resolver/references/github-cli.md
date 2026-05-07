@@ -20,7 +20,7 @@ query($owner:String!, $repo:String!, $number:Int!) {
           isOutdated
           path
           line
-          comments(first: 10) {
+          comments(first: 20) {
             nodes {
               id
               body

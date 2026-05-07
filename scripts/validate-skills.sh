@@ -47,6 +47,47 @@ require_command sort
 require_command tr
 require_command wc
 
+frontmatter_value() {
+  local key="$1"
+
+  printf '%s\n' "$frontmatter" | awk -v key="$key" -v sq="'" '
+    $0 ~ "^[[:space:]]*" key "[[:space:]]*:" {
+      value = $0
+      sub("^[[:space:]]*" key "[[:space:]]*:[[:space:]]*", "", value)
+      sub(/[[:space:]]+#.*$/, "", value)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      if (value ~ /^".*"$/) {
+        value = substr(value, 2, length(value) - 2)
+      } else if (index(value, sq) == 1 && substr(value, length(value), 1) == sq) {
+        value = substr(value, 2, length(value) - 2)
+      }
+      print value
+      exit
+    }
+  '
+}
+
+mentions_skill() {
+  local file="$1"
+  local skill="$2"
+
+  awk -v skill="$skill" '
+    {
+      line = $0
+      needle = "$" skill
+      while ((pos = index(line, needle)) > 0) {
+        next_char = substr(line, pos + length(needle), 1)
+        if (next_char == "" || next_char !~ /[[:alnum:]_-]/) {
+          found = 1
+          exit
+        }
+        line = substr(line, pos + length(needle))
+      }
+    }
+    END { exit !found }
+  ' "$file"
+}
+
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
@@ -77,7 +118,7 @@ while IFS= read -r skill_dir; do
     in_fm { print }
   ' "$skill_md")"
 
-  name="$(printf '%s\n' "$frontmatter" | awk -F': *' '$1 == "name" { print $2; exit }')"
+  name="$(frontmatter_value name)"
   [ -n "$name" ] || fail "$skill_name is missing frontmatter name"
   [ "$name" = "$skill_name" ] || fail "$skill_name frontmatter name is $name"
   printf '%s\n' "$frontmatter" | awk -F': *' '$1 == "description" { found = 1 } END { exit !found }' \
@@ -85,9 +126,8 @@ while IFS= read -r skill_dir; do
 
   if [ -d "$skill_dir/references" ]; then
     while IFS= read -r ref_file; do
-      ref_base="$(basename "$ref_file")"
-      ref_rel="references/$ref_base"
-      if ! grep -Fq "$ref_base" "$skill_md" && ! grep -Fq "$ref_rel" "$skill_md"; then
+      ref_rel="${ref_file#"$skill_dir"/}"
+      if ! grep -Fq "$ref_rel" "$skill_md"; then
         fail "$ref_file is not directly referenced from $skill_md"
       fi
     done < <(find "$skill_dir/references" -type f | sort)
@@ -109,7 +149,7 @@ while IFS= read -r skill_dir; do
   grep -Fq 'display_name:' "$openai_yaml" || fail "$openai_yaml is missing display_name"
   grep -Fq 'short_description:' "$openai_yaml" || fail "$openai_yaml is missing short_description"
   grep -Fq 'default_prompt:' "$openai_yaml" || fail "$openai_yaml is missing default_prompt"
-  grep -Fq "\$$skill_name" "$openai_yaml" || fail "$openai_yaml default_prompt must mention \$$skill_name"
+  mentions_skill "$openai_yaml" "$skill_name" || fail "$openai_yaml default_prompt must mention \$$skill_name"
 done < <(find skills -mindepth 1 -maxdepth 1 -type d | sort)
 
 printf 'Validated %s skills.\n' "$(wc -l < "$actual_skills" | tr -d ' ')"

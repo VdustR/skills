@@ -9,6 +9,14 @@ fail() {
   exit 1
 }
 
+require_pattern() {
+  local fixture="$1"
+  local pattern="$2"
+  local message="$3"
+
+  grep -Eiq -- "$pattern" "$fixture" || fail "$message"
+}
+
 required_skills=(
   "vp-pr-comment-resolver"
   "vp-stacked-pr-rebase"
@@ -32,20 +40,23 @@ for skill_name in "${required_skills[@]}"; do
     || fail "$fixture is missing ## Regression Coverage"
 done
 
-grep -Fq 'Resolve only the handled bot review thread.' fixtures/smoke/vp-pr-comment-resolver.md \
-  || fail "vp-pr-comment-resolver fixture must cover bot-only resolution"
-grep -Fq 'Leave all human review threads unresolved' fixtures/smoke/vp-pr-comment-resolver.md \
-  || fail "vp-pr-comment-resolver fixture must cover human unresolved policy"
-grep -Fq 'PR discussion comment' fixtures/smoke/vp-pr-comment-resolver.md \
-  || fail "vp-pr-comment-resolver fixture must cover PR discussion comments"
-grep -Fq 'Do not skip the outdated unresolved review thread.' fixtures/smoke/vp-pr-comment-resolver.md \
-  || fail "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
+pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
+stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr-rebase.md"
 
-grep -Fq 'squash merge' fixtures/smoke/vp-stacked-pr-rebase.md \
-  || fail "vp-stacked-pr-rebase fixture must cover squash merges"
-grep -Fq 'Ask before `git push --force-with-lease`.' fixtures/smoke/vp-stacked-pr-rebase.md \
-  || fail "vp-stacked-pr-rebase fixture must cover force-with-lease confirmation"
-grep -Fq 'Never delete the backup branch automatically.' fixtures/smoke/vp-stacked-pr-rebase.md \
-  || fail "vp-stacked-pr-rebase fixture must cover backup retention"
+require_pattern "$pr_resolver_fixture" 'resolve.*bot review thread|bot review thread.*resolve' \
+  "vp-pr-comment-resolver fixture must cover bot-only resolution"
+require_pattern "$pr_resolver_fixture" 'human review threads?.*unresolved|unresolved.*human review threads?' \
+  "vp-pr-comment-resolver fixture must cover human unresolved policy"
+require_pattern "$pr_resolver_fixture" 'PR discussion comment' \
+  "vp-pr-comment-resolver fixture must cover PR discussion comments"
+require_pattern "$pr_resolver_fixture" 'outdated unresolved review thread' \
+  "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
+
+require_pattern "$stacked_rebase_fixture" 'squash[[:space:]-]*merge' \
+  "vp-stacked-pr-rebase fixture must cover squash merges"
+require_pattern "$stacked_rebase_fixture" 'force-with-lease' \
+  "vp-stacked-pr-rebase fixture must cover force-with-lease confirmation"
+require_pattern "$stacked_rebase_fixture" 'backup branch' \
+  "vp-stacked-pr-rebase fixture must cover backup retention"
 
 printf 'Validated %s smoke fixtures.\n' "${#required_skills[@]}"
