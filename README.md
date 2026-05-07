@@ -53,6 +53,10 @@ Upgrade dependencies with breaking change detection and migration planning.
 
 Safely list, choose, load, stage, and persist sensitive `.env*` variables using `dotenvx`.
 
+### vp-foreign-agent-skill-loader
+
+Index repository-local skills written for other agent systems without converting them.
+
 ### vp-git-cleanup
 
 Audit and safely clean up local Git branches, worktrees, stashes, and stale refs.
