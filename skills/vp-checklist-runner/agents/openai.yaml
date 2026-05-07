@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Checklist Runner"
+  short_description: "Verify PR and issue checklists"
+  default_prompt: "Use $vp-checklist-runner to verify unchecked items on this GitHub PR."

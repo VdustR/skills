@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Skills"
+  short_description: "Manage reusable agent skills"
+  default_prompt: "Use $vp-skills to install, update, or inspect agent skills."

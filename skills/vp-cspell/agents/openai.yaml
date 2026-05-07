@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Cspell"
+  short_description: "Handle cspell dictionary fixes"
+  default_prompt: "Use $vp-cspell to resolve these cspell warnings safely."

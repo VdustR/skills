@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP TypeScript Best Practices"
+  short_description: "Apply TypeScript design guidelines"
+  default_prompt: "Use $vp-typescript-best-practices to review this TypeScript change."

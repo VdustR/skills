@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Gitignore Builder"
+  short_description: "Build gitignore files from templates"
+  default_prompt: "Use $vp-gitignore-builder to create or update this repository gitignore."

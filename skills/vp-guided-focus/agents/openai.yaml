@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Guided Focus"
+  short_description: "Clarify requirements before planning"
+  default_prompt: "Use $vp-guided-focus to clarify this task before making a plan."

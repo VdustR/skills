@@ -14,18 +14,20 @@ description: >-
 # Agent Skills Management
 
 Manage agent skills using the `npx skills` CLI from vercel-labs/agent-skills.
+Use the pinned known-good CLI version `skills@1.5.3` unless the user explicitly
+asks to verify or use the latest CLI behavior.
 
 ## Commands Overview
 
 | Command | Purpose |
 |---------|---------|
-| `npx -y skills add <repo>` | Install skills from repository |
-| `npx -y skills remove [names]` | Remove installed skills |
-| `npx -y skills list` | List installed skills |
-| `npx -y skills find [query]` | Search for skills interactively |
-| `npx -y skills update` | Update all skills to latest |
-| `npx -y skills check` | Check for available updates |
-| `npx -y skills init [name]` | Initialize a new skill |
+| `npx -y skills@1.5.3 add <repo>` | Install skills from repository |
+| `npx -y skills@1.5.3 remove [names]` | Remove installed skills |
+| `npx -y skills@1.5.3 list` | List installed skills |
+| `npx -y skills@1.5.3 find [query]` | Search for skills interactively |
+| `npx -y skills@1.5.3 update` | Update all skills to latest |
+| `npx -y skills@1.5.3 check` | Check for available updates |
+| `npx -y skills@1.5.3 init [name]` | Initialize a new skill |
 
 > **Note:** The `npx -y` flag is for npx itself (auto-install the `skills` package). The `-y` flag on `skills add`/`remove` commands skips confirmation prompts — omit it in interactive contexts to let the user confirm before changes.
 
@@ -36,7 +38,7 @@ Manage agent skills using the `npx skills` CLI from vercel-labs/agent-skills.
 Install skills globally for the selected agent:
 
 ```bash
-npx -y skills add vercel-labs/agent-skills -g --agent <agent-name>
+npx -y skills@1.5.3 add vercel-labs/agent-skills -g --agent <agent-name>
 ```
 
 ### Install to Project
@@ -44,7 +46,7 @@ npx -y skills add vercel-labs/agent-skills -g --agent <agent-name>
 Install skills to the current project for the selected agent:
 
 ```bash
-npx -y skills add vercel-labs/agent-skills --agent <agent-name>
+npx -y skills@1.5.3 add vercel-labs/agent-skills --agent <agent-name>
 ```
 
 ### Install Specific Skills Only
@@ -52,7 +54,7 @@ npx -y skills add vercel-labs/agent-skills --agent <agent-name>
 Select specific skills from a repository:
 
 ```bash
-npx -y skills add vercel-labs/agent-skills --skill web-design-guidelines -g
+npx -y skills@1.5.3 add vercel-labs/agent-skills --skill web-design-guidelines -g
 ```
 
 ### List Available Skills Before Installing
@@ -60,7 +62,7 @@ npx -y skills add vercel-labs/agent-skills --skill web-design-guidelines -g
 Preview skills in a repository without installing:
 
 ```bash
-npx -y skills add vercel-labs/agent-skills --list
+npx -y skills@1.5.3 add vercel-labs/agent-skills --list
 ```
 
 ## Removal
@@ -68,13 +70,13 @@ npx -y skills add vercel-labs/agent-skills --list
 ### Remove by Name
 
 ```bash
-npx -y skills remove web-design-guidelines -g
+npx -y skills@1.5.3 remove web-design-guidelines -g
 ```
 
 ### Interactive Removal
 
 ```bash
-npx -y skills remove -g
+npx -y skills@1.5.3 remove -g
 ```
 
 ## Listing and Discovery
@@ -82,15 +84,15 @@ npx -y skills remove -g
 ### List Installed Skills
 
 ```bash
-npx -y skills list -g      # Global skills
-npx -y skills list         # Project skills
+npx -y skills@1.5.3 list -g      # Global skills
+npx -y skills@1.5.3 list         # Project skills
 ```
 
 ### Search for Skills
 
 ```bash
-npx -y skills find typescript    # Search by keyword
-npx -y skills find               # Interactive search
+npx -y skills@1.5.3 find typescript    # Search by keyword
+npx -y skills@1.5.3 find               # Interactive search
 ```
 
 ## Updates
@@ -98,13 +100,13 @@ npx -y skills find               # Interactive search
 ### Check for Updates
 
 ```bash
-npx -y skills check
+npx -y skills@1.5.3 check
 ```
 
 ### Update All Skills
 
 ```bash
-npx -y skills update
+npx -y skills@1.5.3 update
 ```
 
 ## Common Skill Sources
@@ -149,5 +151,5 @@ npx -y skills update
 - Skills are stored as SKILL.md files with YAML frontmatter
 - Global skills (`-g`) are available across all projects
 - Project skills are isolated to the current project
-- Run `npx -y skills --help` for complete documentation
+- Run `npx -y skills@1.5.3 --help` for complete documentation
 - Discover more skills at https://skills.sh/

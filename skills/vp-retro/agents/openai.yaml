@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Retro"
+  short_description: "Run session retrospectives for agents"
+  default_prompt: "Use $vp-retro to review this session and find workflow improvements."

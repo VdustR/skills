@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP macOS Clean Uninstall"
+  short_description: "Uninstall macOS apps and leftovers"
+  default_prompt: "Use $vp-macos-clean-uninstall to audit and remove this macOS app cleanly."
