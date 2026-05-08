@@ -93,6 +93,8 @@ doctor_output="$(HOME="$tmp_home" "$profilectl" doctor)" \
   || fail "chrome-profilectl doctor must pass in this repository test environment"
 printf '%s\n' "$doctor_output" | grep -Fq 'root:' \
   || fail "chrome-profilectl doctor must print the profile root"
+mkdir -p "$tmp_home/.agents/chrome-profiles"
+chmod 755 "$tmp_home/.agents/chrome-profiles"
 HOME="$tmp_home" "$profilectl" create test-profile >/dev/null
 [ "$(file_mode "$tmp_home/.agents/chrome-profiles")" = "700" ] \
   || fail "chrome-profilectl must create profile root with mode 700"

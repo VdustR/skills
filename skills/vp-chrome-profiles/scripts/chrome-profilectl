@@ -143,6 +143,7 @@ ensure_profile_root() {
 
 ensure_profile_dir() {
   local dir="$1"
+  ensure_profile_root
   umask 077
   mkdir -p "$dir"
   chmod 700 "$dir" 2>/dev/null || true
