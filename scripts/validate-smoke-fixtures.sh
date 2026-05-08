@@ -114,7 +114,7 @@ mkdir -p "$tmp_home/.agents/chrome-profiles/unmanaged"
 if HOME="$tmp_home" "$profilectl" delete unmanaged --yes >/dev/null 2>&1; then
   fail "chrome-profilectl delete must refuse unmanaged profiles"
 fi
-bash -c 'while [ -n "$1" ]; do shift; done; sleep 30' \
+bash -c 'trap "exit 0" TERM; while :; do sleep 1; done' \
   chrome-profilectl-test "--user-data-dir=$tmp_home/.agents/chrome-profiles/test-profile" &
 fake_profile_pid="$!"
 if HOME="$tmp_home" "$profilectl" launch test-profile --port 9344 --headless >/dev/null 2>&1; then
