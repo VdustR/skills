@@ -62,26 +62,15 @@ is_chrome_profile() {
 
 profile_in_use() {
   local dir="$1"
-  ps -ewwwo args 2>/dev/null | awk -v dir="$dir" '
-    function has_exact_arg(prefix,    needle, pos, next_char) {
-      needle = prefix dir
-      pos = index($0, needle)
-      if (!pos) {
+  local line
+  while IFS= read -r line; do
+    case "$line" in
+      *"--user-data-dir=$dir"|*"--user-data-dir=$dir "*|*"--user-data-dir $dir"|*"--user-data-dir $dir "*)
         return 0
-      }
-      next_char = substr($0, pos + length(needle), 1)
-      return next_char == "" || next_char == " "
-    }
-
-    has_exact_arg("--user-data-dir=") || has_exact_arg("--user-data-dir ") {
-      found = 1
-      exit
-    }
-
-    END {
-      exit found ? 0 : 1
-    }
-  '
+        ;;
+    esac
+  done < <(ps -ewwwo args 2>/dev/null)
+  return 1
 }
 
 iso_now() {
