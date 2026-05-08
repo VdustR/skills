@@ -37,6 +37,10 @@ Install to the current project instead of globally by omitting `-g`.
 
 Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
 
+### vp-chrome-profiles
+
+Manage persistent Chrome profiles for agent-assisted browser debugging.
+
 ### vp-cspell
 
 Handle cspell unknown word warnings with a prioritized decision tree and config bootstrapping.
