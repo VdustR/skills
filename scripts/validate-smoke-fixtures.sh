@@ -67,6 +67,8 @@ require_pattern "$chrome_profiles_fixture" 'delete.*marker|marker.*delete' \
   "vp-chrome-profiles fixture must cover marker-guarded deletion"
 require_pattern "$chrome_profiles_fixture" 'running profiles?.*not deleted|in use.*Chrome' \
   "vp-chrome-profiles fixture must cover in-use profile deletion refusal"
+require_pattern "$chrome_profiles_fixture" 'Refuse to launch|not relaunched' \
+  "vp-chrome-profiles fixture must cover in-use profile launch refusal"
 require_pattern "$chrome_profiles_fixture" 'browser-url|browserUrl' \
   "vp-chrome-profiles fixture must cover browser-url MCP connection"
 
@@ -83,11 +85,19 @@ profilectl="skills/vp-chrome-profiles/scripts/chrome-profilectl"
 
 [ -x "$profilectl" ] || fail "$profilectl is missing or not executable"
 
+file_mode() {
+  stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1" 2>/dev/null || printf 'unknown'
+}
+
 doctor_output="$(HOME="$tmp_home" "$profilectl" doctor)" \
   || fail "chrome-profilectl doctor must pass in this repository test environment"
 printf '%s\n' "$doctor_output" | grep -Fq 'root:' \
   || fail "chrome-profilectl doctor must print the profile root"
 HOME="$tmp_home" "$profilectl" create test-profile >/dev/null
+[ "$(file_mode "$tmp_home/.agents/chrome-profiles")" = "700" ] \
+  || fail "chrome-profilectl must create profile root with mode 700"
+[ "$(file_mode "$tmp_home/.agents/chrome-profiles/test-profile")" = "700" ] \
+  || fail "chrome-profilectl must create profiles with mode 700"
 grep -Fxq 'tool=vp-chrome-profiles' "$tmp_home/.agents/chrome-profiles/test-profile/.vp-chrome-profile" \
   || fail "chrome-profilectl create must write a tool marker"
 HOME="$tmp_home" "$profilectl" list | grep -Fq 'test-profile' \
@@ -107,6 +117,9 @@ fi
 bash -c 'exec -a "Google Chrome --user-data-dir=$1" sleep 30' \
   chrome-profilectl-test "$tmp_home/.agents/chrome-profiles/test-profile" &
 fake_profile_pid="$!"
+if HOME="$tmp_home" "$profilectl" launch test-profile --port 9344 --headless >/dev/null 2>&1; then
+  fail "chrome-profilectl launch must refuse profiles that appear in use"
+fi
 if HOME="$tmp_home" "$profilectl" delete test-profile --yes >/dev/null 2>&1; then
   fail "chrome-profilectl delete must refuse profiles that appear in use"
 fi

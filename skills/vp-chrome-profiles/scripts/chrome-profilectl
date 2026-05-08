@@ -62,7 +62,7 @@ is_chrome_profile() {
 
 profile_in_use() {
   local dir="$1"
-  ps -ewwo args 2>/dev/null | awk -v dir="$dir" '
+  ps -ewwwo args 2>/dev/null | awk -v dir="$dir" '
     function has_exact_arg(prefix,    needle, pos, next_char) {
       needle = prefix dir
       pos = index($0, needle)
@@ -146,6 +146,19 @@ launch_log_path() {
   printf '%s/chrome-profilectl-launch.log\n' "$dir"
 }
 
+ensure_profile_root() {
+  umask 077
+  mkdir -p "$PROFILE_ROOT"
+  chmod 700 "$PROFILE_ROOT" 2>/dev/null || true
+}
+
+ensure_profile_dir() {
+  local dir="$1"
+  umask 077
+  mkdir -p "$dir"
+  chmod 700 "$dir" 2>/dev/null || true
+}
+
 parse_port() {
   local port="$DEFAULT_PORT"
   while [ $# -gt 0 ]; do
@@ -218,7 +231,7 @@ cmd_root() {
 }
 
 cmd_list() {
-  mkdir -p "$PROFILE_ROOT"
+  ensure_profile_root
   printf 'name\tstate\tpath\n'
 
   local dir name state found=false
@@ -252,7 +265,7 @@ cmd_create() {
     return 0
   fi
 
-  mkdir -p "$dir"
+  ensure_profile_dir "$dir"
   write_marker "$dir" "$name"
   printf 'profile: created\n'
   printf 'path: %s\n' "$dir"
@@ -345,6 +358,7 @@ cmd_launch() {
   dir="$(profile_dir "$name")"
   [ -d "$dir" ] || die "$name does not exist; run create first"
   is_managed "$dir" || die "$name is not managed by this skill"
+  profile_in_use "$dir" && die "$name is already in use by Chrome; use status with the existing port or close it before launching again"
   chrome="$(find_chrome)" || die "Google Chrome or Chromium not found"
 
   local args=(
@@ -358,7 +372,7 @@ cmd_launch() {
 
   if $headless; then
     args+=("--headless=new" "--use-mock-keychain" "$url")
-    "$chrome" "${args[@]}" >"$log_file" 2>&1 &
+    nohup "$chrome" "${args[@]}" >"$log_file" 2>&1 &
   elif [ "$(uname -s)" = "Darwin" ] && command -v open >/dev/null 2>&1 \
     && [[ "$chrome" == "/Applications/"*".app/Contents/MacOS/"* ]]; then
     local app_name
@@ -366,7 +380,7 @@ cmd_launch() {
     open -na "$app_name" --args "${args[@]}" --new-window "$url" >"$log_file" 2>&1
   else
     args+=("--new-window" "$url")
-    "$chrome" "${args[@]}" >"$log_file" 2>&1 &
+    nohup "$chrome" "${args[@]}" >"$log_file" 2>&1 &
   fi
 
   local attempt
@@ -384,7 +398,7 @@ cmd_launch() {
   printf 'path: %s\n' "$dir"
   printf 'browser_url=http://127.0.0.1:%s\n' "$port"
   printf 'log: %s\n' "$log_file"
-  die "Chrome launched but debug endpoint is not available yet; inspect the launch log"
+  die "Chrome launched but debug endpoint is not available yet; inspect the launch log. On macOS GUI launches, Chrome may also write diagnostics to its own system logs."
 }
 
 cmd_status() {

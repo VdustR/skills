@@ -121,6 +121,10 @@ If the profile lacks a `.vp-chrome-profile` marker, stop. Do not bypass this by
 removing files manually. If Chrome is still using the profile, close that Chrome
 window first.
 
+If `launch` reports that a profile is already in use, do not retry with a new
+port. Use `status --port <existing-port>` when the debug port is known, or ask
+the user to close that Chrome window before launching the profile again.
+
 ## Migration Notes
 
 If the user wants to move an existing profile such as a Hermes profile, first
@@ -143,6 +147,9 @@ daily Chrome data directory.
   the dedicated managed profile, not a daily Chrome session.
 - **Launching Chrome directly on macOS**: use the helper; macOS GUI sessions are
   more reliable through `open -na "Google Chrome" --args`.
+- **Expecting full Chrome logs from macOS `open`**: the profile launch log
+  captures helper/open output. Chrome itself may write GUI diagnostics to system
+  Chrome logs.
 - **Using a temporary `HOME` for visible login**: macOS may show a Keychain
   prompt. Use the real user `HOME` for visible login, or `--headless` only for
   mechanical endpoint checks.
