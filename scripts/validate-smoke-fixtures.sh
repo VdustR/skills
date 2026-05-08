@@ -86,7 +86,7 @@ profilectl="skills/vp-chrome-profiles/scripts/chrome-profilectl"
 [ -x "$profilectl" ] || fail "$profilectl is missing or not executable"
 
 file_mode() {
-  stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1" 2>/dev/null || printf 'unknown'
+  stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1" 2>/dev/null || printf 'unknown'
 }
 
 doctor_output="$(HOME="$tmp_home" "$profilectl" doctor)" \
