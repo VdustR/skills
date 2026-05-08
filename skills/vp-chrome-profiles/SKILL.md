@@ -138,7 +138,9 @@ daily Chrome data directory.
 
 - **Using `--isolated` for login work**: that creates a temporary profile and
   loses state when Chrome closes.
-- **Connecting to `127.0.0.1:9222` by habit**: first verify the endpoint exists.
+- **Connecting to `127.0.0.1:9222` by habit**: avoid the default Chrome debug
+  port unless the user intentionally chose it and you verified the endpoint is
+  the dedicated managed profile, not a daily Chrome session.
 - **Launching Chrome directly on macOS**: use the helper; macOS GUI sessions are
   more reliable through `open -na "Google Chrome" --args`.
 - **Using a temporary `HOME` for visible login**: macOS may show a Keychain

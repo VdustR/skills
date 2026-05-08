@@ -83,11 +83,23 @@ profilectl="skills/vp-chrome-profiles/scripts/chrome-profilectl"
 
 [ -x "$profilectl" ] || fail "$profilectl is missing or not executable"
 
+doctor_output="$(HOME="$tmp_home" "$profilectl" doctor)" \
+  || fail "chrome-profilectl doctor must pass in this repository test environment"
+printf '%s\n' "$doctor_output" | grep -Fq 'root:' \
+  || fail "chrome-profilectl doctor must print the profile root"
 HOME="$tmp_home" "$profilectl" create test-profile >/dev/null
+grep -Fxq 'tool=vp-chrome-profiles' "$tmp_home/.agents/chrome-profiles/test-profile/.vp-chrome-profile" \
+  || fail "chrome-profilectl create must write a tool marker"
 HOME="$tmp_home" "$profilectl" list | grep -Fq 'test-profile' \
   || fail "chrome-profilectl list must show created profiles"
 HOME="$tmp_home" "$profilectl" mcp-args test-profile --port 9344 | grep -Fq -- '--browser-url=http://127.0.0.1:9344' \
   || fail "chrome-profilectl mcp-args must emit browser-url"
+mkdir -p "$tmp_home/.agents/chrome-profiles/adopted/Default"
+touch "$tmp_home/.agents/chrome-profiles/adopted/Local State"
+HOME="$tmp_home" "$profilectl" adopt adopted --yes >/dev/null
+grep -Fxq 'tool=vp-chrome-profiles' "$tmp_home/.agents/chrome-profiles/adopted/.vp-chrome-profile" \
+  || fail "chrome-profilectl adopt must write a tool marker"
+HOME="$tmp_home" "$profilectl" delete adopted --yes >/dev/null
 mkdir -p "$tmp_home/.agents/chrome-profiles/unmanaged"
 if HOME="$tmp_home" "$profilectl" delete unmanaged --yes >/dev/null 2>&1; then
   fail "chrome-profilectl delete must refuse unmanaged profiles"

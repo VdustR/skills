@@ -52,7 +52,7 @@ profile_dir() {
 
 is_managed() {
   local dir="$1"
-  [ -f "$dir/$MARKER" ]
+  [ -f "$dir/$MARKER" ] && grep -Fxq 'tool=vp-chrome-profiles' "$dir/$MARKER"
 }
 
 is_chrome_profile() {
@@ -62,10 +62,26 @@ is_chrome_profile() {
 
 profile_in_use() {
   local dir="$1"
-  ps -ewwo args 2>/dev/null \
-    | grep -E -- "--user-data-dir(=| )" \
-    | grep -F -- "$dir" \
-    | grep -v grep >/dev/null 2>&1
+  ps -ewwo args 2>/dev/null | awk -v dir="$dir" '
+    function has_exact_arg(prefix,    needle, pos, next_char) {
+      needle = prefix dir
+      pos = index($0, needle)
+      if (!pos) {
+        return 0
+      }
+      next_char = substr($0, pos + length(needle), 1)
+      return next_char == "" || next_char == " "
+    }
+
+    has_exact_arg("--user-data-dir=") || has_exact_arg("--user-data-dir ") {
+      found = 1
+      exit
+    }
+
+    END {
+      exit found ? 0 : 1
+    }
+  '
 }
 
 iso_now() {
@@ -123,6 +139,11 @@ print_endpoint_info() {
   printf 'browser_url=http://127.0.0.1:%s\n' "$port"
   curl -fsS --max-time 2 "http://127.0.0.1:${port}/json/version" 2>/dev/null \
     | grep -E '"Browser"|"webSocketDebuggerUrl"' || true
+}
+
+launch_log_path() {
+  local dir="$1"
+  printf '%s/chrome-profilectl-launch.log\n' "$dir"
 }
 
 parse_port() {
@@ -332,18 +353,20 @@ cmd_launch() {
     "--no-first-run"
     "--no-default-browser-check"
   )
+  local log_file
+  log_file="$(launch_log_path "$dir")"
 
   if $headless; then
     args+=("--headless=new" "--use-mock-keychain" "$url")
-    "$chrome" "${args[@]}" >/tmp/vp-chrome-profilectl.log 2>&1 &
+    "$chrome" "${args[@]}" >"$log_file" 2>&1 &
   elif [ "$(uname -s)" = "Darwin" ] && command -v open >/dev/null 2>&1 \
     && [[ "$chrome" == "/Applications/"*".app/Contents/MacOS/"* ]]; then
     local app_name
     app_name="$(basename "$(dirname "$(dirname "$(dirname "$chrome")")")" .app)"
-    open -na "$app_name" --args "${args[@]}" --new-window "$url" >/tmp/vp-chrome-profilectl.log 2>&1
+    open -na "$app_name" --args "${args[@]}" --new-window "$url" >"$log_file" 2>&1
   else
     args+=("--new-window" "$url")
-    "$chrome" "${args[@]}" >/tmp/vp-chrome-profilectl.log 2>&1 &
+    "$chrome" "${args[@]}" >"$log_file" 2>&1 &
   fi
 
   local attempt
@@ -360,7 +383,8 @@ cmd_launch() {
   printf 'profile: %s\n' "$name"
   printf 'path: %s\n' "$dir"
   printf 'browser_url=http://127.0.0.1:%s\n' "$port"
-  die "Chrome launched but debug endpoint is not available yet"
+  printf 'log: %s\n' "$log_file"
+  die "Chrome launched but debug endpoint is not available yet; inspect the launch log"
 }
 
 cmd_status() {
