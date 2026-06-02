@@ -84,15 +84,19 @@ function runSkillsList(scope) {
     stdio: ["ignore", "pipe", "pipe"],
   });
 
+  if (result.error) {
+    throw result.error;
+  }
   if (result.status !== 0) {
-    throw new Error(result.stderr.trim() || "skills list failed");
+    const stderr = typeof result.stderr === "string" ? result.stderr.trim() : "";
+    throw new Error(stderr || `skills list failed with status ${result.status}`);
   }
 
   return JSON.parse(result.stdout);
 }
 
 function normalizeAgent(input) {
-  return AGENT_NAMES.get(input) || input;
+  return AGENT_NAMES.get(input.toLowerCase()) || input;
 }
 
 function filterSkills(skills, pattern) {
@@ -130,7 +134,11 @@ function rowsMatrix(skills, options) {
     ["skill", ...agents.map((agent) => agent.toLowerCase().replaceAll(" ", "_")), "agent_count"],
     ...skills.map((skill) => [
       skill.name,
-      ...agents.map((agent) => (skill.agents.includes(agent) ? "yes" : ".")),
+      ...agents.map((agent) =>
+        skill.agents.some((installedAgent) => normalizeAgent(installedAgent) === agent)
+          ? "yes"
+          : ".",
+      ),
       String(skill.agents.length),
     ]),
   ];
