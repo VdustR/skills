@@ -18,6 +18,7 @@ require_pattern() {
 }
 
 required_skills=(
+  "vp-skills"
   "vp-pr-comment-resolver"
   "vp-stacked-pr-rebase"
   "vp-chrome-profiles"
@@ -44,6 +45,22 @@ done
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr-rebase.md"
 chrome_profiles_fixture="fixtures/smoke/vp-chrome-profiles.md"
+vp_skills_fixture="fixtures/smoke/vp-skills.md"
+
+require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
+  "vp-skills fixture must cover quoted all-agent defaults"
+require_pattern "$vp_skills_fixture" 'check.*dry-run|dry-run.*check' \
+  "vp-skills fixture must cover check is not a dry-run"
+require_pattern "$vp_skills_fixture" 'stale.*lock|lock.*stale' \
+  "vp-skills fixture must cover stale lock repair"
+require_pattern "$vp_skills_fixture" 'remove --all' \
+  "vp-skills fixture must cover destructive remove --all avoidance"
+require_pattern "$vp_skills_fixture" 'list -g --json|list --json' \
+  "vp-skills fixture must cover JSON listing"
+require_pattern "$vp_skills_fixture" 'add .*--list|--list.*add ' \
+  "vp-skills fixture must cover source preview with add --list"
+require_pattern "$vp_skills_fixture" 'skill-agent-table|agent inventory' \
+  "vp-skills fixture must cover agent inventory tables"
 
 require_pattern "$pr_resolver_fixture" 'resolve.*bot review thread|bot review thread.*resolve' \
   "vp-pr-comment-resolver fixture must cover bot-only resolution"

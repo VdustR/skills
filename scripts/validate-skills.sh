@@ -43,6 +43,7 @@ require_command comm
 require_command find
 require_command grep
 require_command mktemp
+require_command node
 require_command sort
 require_command tr
 require_command wc
@@ -139,6 +140,9 @@ while IFS= read -r skill_dir; do
       case "$script_file" in
         *.sh|*/envctl)
           bash -n "$script_file"
+          ;;
+        *.mjs)
+          node --check "$script_file" >/dev/null
           ;;
       esac
     done < <(find "$skill_dir/scripts" -type f | sort)
