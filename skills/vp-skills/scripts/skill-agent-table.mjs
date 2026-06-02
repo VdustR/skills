@@ -1,18 +1,47 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 const AGENT_NAMES = new Map([
   ["aider-desk", "AiderDesk"],
+  ["amp", "Amp"],
   ["antigravity", "Antigravity"],
   ["claude-code", "Claude Code"],
+  ["cline", "Cline"],
   ["codex", "Codex"],
   ["cursor", "Cursor"],
+  ["deep-agents", "Deep Agents"],
+  ["dexto", "Dexto"],
+  ["firebender", "Firebender"],
   ["gemini-cli", "Gemini CLI"],
   ["github-copilot", "GitHub Copilot"],
+  ["kimi-code-cli", "Kimi Code CLI"],
   ["kiro-cli", "Kiro CLI"],
   ["opencode", "OpenCode"],
+  ["replit", "Replit"],
+  ["universal", "Universal"],
+  ["warp", "Warp"],
   ["windsurf", "Windsurf"],
 ]);
+
+const UNIVERSAL_AGENT_NAMES = [
+  "Amp",
+  "Antigravity",
+  "Cline",
+  "Codex",
+  "Cursor",
+  "Deep Agents",
+  "Dexto",
+  "Firebender",
+  "Gemini CLI",
+  "GitHub Copilot",
+  "Kimi Code CLI",
+  "OpenCode",
+  "Replit",
+  "Warp",
+  "Universal",
+];
 
 function usage() {
   console.log(`Usage:
@@ -105,6 +134,23 @@ function filterSkills(skills, pattern) {
   return skills.filter((skill) => regex.test(skill.name));
 }
 
+function globalCanonicalSkillPath(skill) {
+  const canonicalDir = join(homedir(), ".agents", "skills", skill.name);
+  return skill.scope === "global" && skill.path === canonicalDir;
+}
+
+function effectiveAgents(skill) {
+  const agents = [...skill.agents];
+  if (globalCanonicalSkillPath(skill)) {
+    for (const agent of UNIVERSAL_AGENT_NAMES) {
+      if (!agents.some((installedAgent) => normalizeAgent(installedAgent) === agent)) {
+        agents.push(agent);
+      }
+    }
+  }
+  return agents;
+}
+
 function formatAgentList(agents, options) {
   if (agents.length === 0) return "not linked";
   if (options.fullAgents || agents.length <= options.maxAgents) {
@@ -117,12 +163,10 @@ function formatAgentList(agents, options) {
 function rowsCompact(skills, options) {
   return [
     ["skill", "scope", "agent_count", "agents"],
-    ...skills.map((skill) => [
-      skill.name,
-      skill.scope,
-      String(skill.agents.length),
-      formatAgentList(skill.agents, options),
-    ]),
+    ...skills.map((skill) => {
+      const agents = effectiveAgents(skill);
+      return [skill.name, skill.scope, String(agents.length), formatAgentList(agents, options)];
+    }),
   ];
 }
 
@@ -132,22 +176,25 @@ function rowsMatrix(skills, options) {
     : ["Codex", "Claude Code", "Gemini CLI", "GitHub Copilot", "Antigravity"];
   return [
     ["skill", ...agents.map((agent) => agent.toLowerCase().replaceAll(" ", "_")), "agent_count"],
-    ...skills.map((skill) => [
-      skill.name,
-      ...agents.map((agent) =>
-        skill.agents.some((installedAgent) => normalizeAgent(installedAgent) === agent)
-          ? "yes"
-          : ".",
-      ),
-      String(skill.agents.length),
-    ]),
+    ...skills.map((skill) => {
+      const installedAgents = effectiveAgents(skill);
+      return [
+        skill.name,
+        ...agents.map((agent) =>
+          installedAgents.some((installedAgent) => normalizeAgent(installedAgent) === agent)
+            ? "yes"
+            : ".",
+        ),
+        String(installedAgents.length),
+      ];
+    }),
   ];
 }
 
 function rowsSummary(skills) {
   const counts = new Map();
   for (const skill of skills) {
-    for (const agent of skill.agents) {
+    for (const agent of effectiveAgents(skill)) {
       counts.set(agent, (counts.get(agent) || 0) + 1);
     }
   }

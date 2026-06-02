@@ -61,6 +61,8 @@ require_pattern "$vp_skills_fixture" 'add .*--list|--list.*add ' \
   "vp-skills fixture must cover source preview with add --list"
 require_pattern "$vp_skills_fixture" 'skill-agent-table|agent inventory' \
   "vp-skills fixture must cover agent inventory tables"
+require_pattern "$vp_skills_fixture" 'universal.*Codex|Codex.*universal' \
+  "vp-skills fixture must cover universal agent table expansion"
 
 require_pattern "$pr_resolver_fixture" 'resolve.*bot review thread|bot review thread.*resolve' \
   "vp-pr-comment-resolver fixture must cover bot-only resolution"
