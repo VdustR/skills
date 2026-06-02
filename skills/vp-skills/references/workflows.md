@@ -91,7 +91,10 @@ npx -y skills@1.5.3 add <source> --list
 ## Agent Inventory Tables
 
 Use the bundled helper when the user wants to see which agents have each skill.
-It reads `skills list --json` and does not modify skill installs.
+It reads `skills list --json` and does not modify skill installs. For global
+skills whose canonical path is `~/.agents/skills/<skill>`, the helper also
+counts the universal agents that share that directory because `skills@1.5.3`
+JSON only lists the symlinked agent directories.
 
 ```bash
 # Compact table: skill, scope, agent count, shortened agent list.

@@ -67,9 +67,12 @@ npx -y skills@1.5.3 remove vp-skills -g --agent '*' -y
 | `-a`, `--agent <agents...>` | Filter by agent |
 | `--json` | Machine-readable JSON without ANSI codes |
 
-For strict reporting by agent, prefer `list --json` plus JSON filtering. The
-human list command may include other existing agent directories while resolving
-shared canonical paths.
+For strict reporting by agent, prefer `list --json` plus JSON filtering, or use
+`scripts/skill-agent-table.mjs`. The human list command may include other
+existing agent directories while resolving shared canonical paths. In
+`skills@1.5.3`, JSON for global skills stored in `~/.agents/skills/<skill>` can
+omit universal agents such as Codex, Gemini CLI, and GitHub Copilot; the bundled
+table helper expands those shared canonical installs for reporting.
 
 ## Experimental Sync Options
 
