@@ -140,10 +140,10 @@ function globalCanonicalSkillPath(skill) {
 }
 
 function effectiveAgents(skill) {
-  const agents = [...skill.agents];
+  const agents = skill.agents.map(normalizeAgent);
   if (globalCanonicalSkillPath(skill)) {
     for (const agent of UNIVERSAL_AGENT_NAMES) {
-      if (!agents.some((installedAgent) => normalizeAgent(installedAgent) === agent)) {
+      if (!agents.includes(agent)) {
         agents.push(agent);
       }
     }
@@ -180,11 +180,7 @@ function rowsMatrix(skills, options) {
       const installedAgents = effectiveAgents(skill);
       return [
         skill.name,
-        ...agents.map((agent) =>
-          installedAgents.some((installedAgent) => normalizeAgent(installedAgent) === agent)
-            ? "yes"
-            : ".",
-        ),
+        ...agents.map((agent) => (installedAgents.includes(agent) ? "yes" : ".")),
         String(installedAgents.length),
       ];
     }),
