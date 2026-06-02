@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Skills"
-  short_description: "Manage reusable agent skills"
-  default_prompt: "Use $vp-skills to install, update, or inspect agent skills."
+  short_description: "Manage agent skills with npx skills"
+  default_prompt: "Use $vp-skills to install, update, remove, query, or repair agent skills."
