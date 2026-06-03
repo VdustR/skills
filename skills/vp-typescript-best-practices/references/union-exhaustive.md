@@ -72,8 +72,8 @@ switch (event.type) {
   case "presence":
     return;
   default:
-    event.type satisfies never;
-    throw new Error(`Unhandled event type: ${String(event.type)}`);
+    event satisfies never;
+    throw new Error("Unhandled event");
 }
 ```
 
