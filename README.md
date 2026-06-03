@@ -103,7 +103,7 @@ Rebase stacked PRs after a parent PR is merged, preserving only your commits.
 
 ### vp-typescript-best-practices
 
-Apply TypeScript guidelines for type design, naming, and maintainable patterns.
+Review TypeScript safety, type boundaries, and fallback style preferences.
 
 ## Development
 

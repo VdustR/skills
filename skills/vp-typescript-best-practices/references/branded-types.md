@@ -1,65 +1,58 @@
 # Branded Types
 
-> **When to use:** To prevent mixing up incompatible types, such as different kinds of IDs (e.g., `UserId` vs `OrderId`), units of measurement (e.g., `Meters` vs `Feet`), or validated strings (e.g., `Email`, `UUID`).
+Use branded types when structurally identical values must not be mixed: user IDs
+vs order IDs, meters vs feet, raw strings vs validated URLs, or money in
+different currencies.
 
-Use branded types to create nominal types that prevent accidental mixing. **Avoid using `as` for branding** — use Zod or type-fest instead for proper runtime validation.
+## Prefer Runtime Branding
 
-## With Zod (Recommended)
+```ts
+const UserIdSchema = z.string().uuid().brand("UserId");
+const OrderIdSchema = z.string().uuid().brand("OrderId");
 
-```typescript
-import { z } from 'zod';
-
-// Define branded schemas (Schema suffix for clarity)
-const UserIdSchema = z.string().uuid().brand('UserId');
-const OrderIdSchema = z.string().uuid().brand('OrderId');
-
-// Infer branded types
-type UserId = z.infer<typeof UserIdSchema>;  // string & { __brand: 'UserId' }
+type UserId = z.infer<typeof UserIdSchema>;
 type OrderId = z.infer<typeof OrderIdSchema>;
 
-// Parse and validate with branding
-const userId = UserIdSchema.parse('550e8400-e29b-41d4-a716-446655440000');
-// userId is now typed as UserId, not just string
-
-// Use in functions
-function getUser(id: UserId): User { /* ... */ }
-
-getUser(userId);                        // OK - properly branded
-getUser('raw-string');                  // Error - not branded
-getUser(OrderIdSchema.parse('...'));    // Error - wrong brand
+const userId = UserIdSchema.parse(input);
 ```
 
-## With type-fest
+Branding should usually happen at the same boundary that validates the value.
+After that, the rest of the code can accept the branded type.
 
-[type-fest](https://github.com/sindresorhus/type-fest) provides `Tagged` for branding without runtime validation:
+## Factory Branding
 
-```typescript
-import type { Tagged } from 'type-fest';
+If the repo uses a type utility such as `Tagged` or `Brand`, hide the cast inside
+a validating factory.
 
-type UserId = Tagged<string, 'UserId'>;
-type OrderId = Tagged<string, 'OrderId'>;
+```ts
+type UserId = Tagged<string, "UserId">;
 
-// Create branded values through validated functions
-function createUserId(id: string): UserId {
-  if (!isValidUuid(id)) throw new Error('Invalid UUID');
-  return id as UserId;  // as is acceptable inside factory functions
+function createUserId(input: string): UserId {
+  if (!isUuid(input)) throw new Error("Invalid user id");
+  return input as UserId;
 }
-
-const userId = createUserId('550e8400-e29b-41d4-a716-446655440000');
 ```
 
-## DON'T: Use `as` directly
+The direct cast is acceptable only inside the factory because the runtime guard
+is adjacent to it.
 
-```typescript
-// DON'T: Direct casting bypasses validation
-const userId = 'invalid-string' as UserId;  // No validation!
+## Avoid Direct Casts
+
+```ts
+const unsafeUserId = input as UserId;
 ```
 
-## When to Use Branded Types
+This compiles even when `input` is invalid. It also makes tests and callsites
+look safer than they are.
 
-| Use Case | Example |
-|----------|---------|
-| IDs that shouldn't be mixed | `UserId`, `OrderId`, `ProductId` |
-| Units that shouldn't be mixed | `Meters`, `Feet`, `Celsius`, `Fahrenheit` |
-| Validated strings | `Email`, `URL`, `UUID` |
-| Money with different currencies | `USD`, `EUR`, `JPY` |
+## When Not to Brand
+
+Do not brand values just to make simple code look stricter. Avoid branding when:
+
+- the value never crosses a meaningful boundary
+- a discriminated union would model the domain better
+- the runtime value cannot be validated
+- the brand forces broad casts across the codebase
+
+If most callsites need `as Brand`, the brand is in the wrong place or is not
+worth carrying.

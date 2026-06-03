@@ -1,317 +1,184 @@
-# Type Design Patterns
+# Type Patterns
 
-## Type Declarations: interface vs type
+Use types to constrain the places where drift is costly. Do not turn every local
+variable into an annotation exercise.
 
-| Use | When |
-|-----|------|
-| `interface` | Object structures, class contracts, extensible APIs |
-| `type` | Union types, mapped types, conditional types, tuples |
+## Inference vs Annotation
 
-```typescript
-// DO: interface for objects
-interface User { id: string }
+| Situation | Prefer |
+| --- | --- |
+| Local intermediate value | Inference |
+| Exported function or public module API | Explicit signature |
+| Object literal passed into another API | `satisfies TargetType` or `: TargetType` |
+| Test fixture defaults | `const defaults: Model = {...}` |
+| Runtime schema output | `z.infer<typeof Schema>` |
+| Value transformed across a boundary | `z.input` / `z.output` or named boundary types |
 
-// DO: type for unions
-type Status = 'active' | 'inactive';
-
-// DO: type for mapped types
-type NullableProps<TObj> = { [TProp in keyof TObj]: TObj[TProp] | null };
-```
-
-## Array Type Syntax
-
-| DO | DON'T |
-|----|-------|
-| `Array<TItem>` | `TItem[]` |
-| `ReadonlyArray<TItem>` | `readonly TItem[]` |
-
-```typescript
-// DO: Generic syntax is more explicit
-type Users = Array<User>;
-type ReadonlyUsers = ReadonlyArray<User>;
-type Matrix = Array<Array<number>>;
-
-// DON'T: Bracket syntax is less visible
-type Users = User[];
-type Matrix = number[][];
-```
-
-**Why prefer `Array<T>`:**
-- More explicit and visible than `[]` suffix
-- Consistent with other generic types (`Map<K, V>`, `Set<T>`, `Promise<T>`)
-- Nested arrays are more readable: `Array<Array<T>>` vs `T[][]`
-
-## Object Type Syntax
-
-Avoid `{}` as it accepts almost anything. Use explicit types:
-
-| Use Case | DO | DON'T |
-|----------|-----|-------|
-| Empty object | `Record<string, never>` | `{}` |
-| Any object (extends) | `Record<string, any>` | `Record<string, unknown>` |
-| Any object (annotation) | `Record<string, unknown>` | `Record<string, any>` |
-| Non-primitive | `object` | `{}` |
-
-```typescript
-// DO: Empty object type
-type EmptyObject = Record<string, never>;
-
-// DO: Generic constraint (use any for extends)
-function merge<TObj extends Record<string, any>>(target: TObj, source: TObj): TObj;
-
-// DO: Type annotation (use unknown)
-const config: Record<string, unknown> = {};
-
-// DON'T: {} accepts almost anything
-type BadEmpty = {};
-const bad: BadEmpty = { unexpected: 'property' };  // No error!
-```
-
-## any Usage
-
-| DO | DON'T |
-|----|-------|
-| `<TFunc extends (...args: Array<any>) => any>` | `const data: any = response` |
-| Use `unknown` for truly unknown types | Use `any` to silence errors |
-| Parse with zod/arktype, then use inferred type | Cast with `as any` |
-
-```typescript
-// DO: Use any only in generic constraints
-function debounce<TFunc extends (...args: Array<any>) => any>(
-  func: TFunc,
-  wait: number
-): TFunc;
-
-// DO: Runtime validation for unknown data
-import { z } from 'zod';
-const UserSchema = z.object({ id: z.string(), name: z.string() });
-const user = UserSchema.parse(response); // typed as User
-
-// DON'T: Use any to bypass type checking
-const data: any = await fetch('/api/user').then(r => r.json());
-```
-
-## Avoid `as` and `!` Assertions
-
-`as` and `!` bypass type checking and create "type lies."
-
-| DO | DON'T |
-|----|-------|
-| Zod/arktype for runtime validation | `response as User` |
-| `satisfies` for compile-time checks | `value as unknown as Type` |
-| Type guards (`if ('prop' in obj)`) | `as any` to silence errors |
-| Explicit null checks | `x!` non-null assertion |
-
-```typescript
-// DO: Runtime validation
-const user = UserSchema.parse(response);
-
-// DO: satisfies for compile-time checking
-const config = { port: 3000 } satisfies ServerConfig;
-
-// DO: Type guard
-function isUser(value: unknown): value is User {
-  return typeof value === 'object' && value !== null && 'id' in value;
-}
-
-// DO: Explicit null check
-const element = document.getElementById('app');
-if (element === null) throw new Error('Element not found');
-element.textContent = 'Hello';
-
-// DON'T: Assertions without validation
-const unsafeUser = response as User;
-const unsafeElement = document.getElementById('app')!;
-```
-
-**When `as` is acceptable:**
-
-| Context | Example | Why OK |
-|---------|---------|--------|
-| `as const` | `{ key: 'value' } as const` | Narrows to literal, not a type lie |
-| Type test files | `anyObj as Result satisfies Expected` | Testing type behavior |
-| After exhaustive narrowing | `as never` in default case | Proves unreachable |
-
-## Function Declarations
-
-| DO | DON'T |
-|----|-------|
-| `const fn: MyType = (arg) => { }` | `const fn = (arg: ArgType): RetType => { }` |
-| `const fn = ((arg) => { }) satisfies MyType` | `function fn(arg: ArgType): RetType { }` |
-
-```typescript
-// DO: Type on the const, implementation infers params
-const myFunction: myFunction.Type = (options) => {
-  // options is typed from myFunction.Type
+```ts
+const defaults: User = {
+  id: "user-1",
+  name: "Test User",
 };
 
-// DO: satisfies when namespace doesn't exist
-const onClick = ((event) => {
-  // implementation
-}) satisfies React.ComponentProps<'button'>['onClick'];
-
-// DON'T: Redundant inline type annotations
-const bad = (options: myFunction.Options): myFunction.Ret => {};
+const routeConfig = {
+  path: "/users/:userId",
+  lazy: () => import("./UserPage"),
+} satisfies RouteConfig;
 ```
+
+## `satisfies` vs `: Type`
+
+| Need | Use |
+| --- | --- |
+| Keep literal inference and validate shape | `const value = {...} satisfies Type` |
+| Intentionally widen to the public contract | `const value: Type = {...}` |
+| Return a typed value from a callback | Callback return annotation |
+| Tighten an existing value without validation | Do not use `as`; add a guard or parser |
+
+`satisfies` is most useful when future additions should fail compilation: route
+tables, option maps, enum-like records, fixture defaults, and schema maps.
 
 ## Type Extraction
 
-| DO | DON'T |
-|----|-------|
-| `React.ComponentProps<'button'>['onClick']` | `(e: React.MouseEvent<HTMLButtonElement>) => void` |
-| `NonNullable<typeof config['timeout']>` | Manually redefine the type |
-| `Parameters<typeof fn>[0]` | Copy parameter types manually |
+Extract from the source of truth instead of copying.
 
-```typescript
-// DO: Extract from existing definitions
-type OnClick = React.ComponentProps<'button'>['onClick'];
-type ItemIds = Array<Item['id']>;
-type TimeoutType = NonNullable<typeof config['timeout']>;
-
-// DON'T: Redefine types that already exist
-type BadItemIds = Array<number>; // Won't update if Item.id changes
+```ts
+type SubmitPayload = Parameters<typeof submitUser>[0];
+type SubmitResult = Awaited<ReturnType<typeof submitUser>>;
+type ButtonClick = ComponentProps<typeof Button>["onClick"];
+type ErrorArgs = ConstructorParameters<typeof Error>;
+type Timeout = NonNullable<typeof config["timeout"]>;
 ```
 
-## Generic Constants
+Good extraction targets:
 
-| DO | DON'T |
-|----|-------|
-| `defineConfig<const TConfig>(config: TConfig)` | Lose literal types with regular generics |
-| `as const satisfies BaseConfig` | `as BaseConfig` (loses specificity) |
+- generated clients and SDK functions
+- schema objects and parser return values
+- component props and callback props
+- class constructors and built-in APIs
+- existing config objects and literal maps
 
-```typescript
-// DO: const generic for strict inference
-function defineConfig<const TConfig extends BaseConfig>(config: TConfig): TConfig {
-  return config;
-}
+## Function Typing
 
-const strictConfig = defineConfig({
-  routes: ['/home', '/about'], // readonly ['/home', '/about']
-  debug: true,
-});
+When a function value implements a known contract, put the contract on the const
+so parameters are typed from the receiving API.
 
-// DO: as const satisfies for one-off definitions
-const literalConfig = {
-  routes: ['/home', '/about'],
-} as const satisfies BaseConfig;
-
-// DON'T: Lose literal types
-const looseConfig: BaseConfig = {
-  routes: ['/home', '/about'], // widened to Array<string>
+```ts
+const onClick: ComponentProps<typeof Button>["onClick"] = (event) => {
+  trackClick(event.currentTarget);
 };
 ```
 
-## Namespace Pattern for Type Organization
+For exported helpers with a local contract, prefer a named type or colocated
+type-only namespace when the repo allows it.
 
-Group related types with function using namespace. Put documentation on the namespace.
-
-```typescript
-/**
- * Creates a debounced function that delays invoking `func` until after
- * `wait` milliseconds have elapsed since the last invocation.
- */
-namespace debounce {
+```ts
+namespace serializeData {
   export interface Options {
-    wait: number;
-    immediate: boolean;
+    includeEmptyFields?: boolean;
   }
-  export type Ret = () => void;
-  export type Type = (func: (...args: unknown[]) => void, options: Options) => Ret;
 }
 
-const debounce: debounce.Type = (func, options) => {
+function serializeData(value: unknown, options: serializeData.Options = {}) {
   // implementation
-};
-
-export { debounce };
-```
-
-| DO | DON'T |
-|----|-------|
-| `namespace myFunc { export interface Options {} }` | `namespace Utils { export function helper() {} }` |
-| Group types with their function | Use namespace for runtime code |
-| Types only in namespaces | Mix types and implementation |
-
-## Multiple Call Signatures
-
-When a function has overloads, define separate interfaces and extend.
-
-```typescript
-// DO: Extend separate interfaces
-namespace myFunction {
-  export interface TypeBasic {
-    (options: Options): Ret;
-  }
-  export interface TypeWithExtra {
-    (options: Options, extra: boolean): RetWithExtra;
-  }
-  export interface Type extends TypeBasic, TypeWithExtra {}
-}
-
-// DON'T: Define all signatures in one interface
-namespace myFunction {
-  export interface Type {
-    (options: Options): Ret;
-    (options: Options, extra: boolean): RetWithExtra;
-  }
 }
 ```
 
-**Why separate interfaces?**
-- Each signature can be reused independently
-- Simplifies runtime implementation
-- Better type inference for polymorphic components
+Use `function` declarations when hoisting, overloads, generators, or local repo
+style make them clearer. The preference is contract-first typing, not banning
+`function`.
 
-## Function with Additional Properties
+## `as const`
 
-For functions with properties (like `myFunc.defaultOptions`):
+Use `as const` when exact readonly literals are the source of truth.
 
-```typescript
-namespace myFunction {
-  export interface Options { wait: number; immediate: boolean; }
-  export type Ret = () => void;
-  export type TypeImpl = (options: Options) => Ret;
-  export interface AllInOneProps { defaultOptions: Options; }
-  export type Type = TypeImpl & AllInOneProps;
-}
-
-const myFunctionImpl: myFunction.TypeImpl = (options) => {};
-const myFunction: myFunction.Type = Object.assign(myFunctionImpl, {
-  defaultOptions: { wait: 300, immediate: false },
-});
+```ts
+const statuses = ["draft", "published", "archived"] as const;
+type Status = (typeof statuses)[number];
 ```
 
-### Tree-Shaking Considerations
+Do not add `as const` to values that already have a contextual type.
 
-| Pattern | When to Use |
-|---------|-------------|
-| All-in-one props | Features frequently used together (`Select.Option`) |
-| Separate exports | Independent features (`AutoComplete` - adds bundle size) |
+```ts
+const items: Array<MenuItem> = [];
+items.push({ type: "button", label: "Save" });
+```
 
-## Generic Defaults for Better DX
+`.map()` often loses contextual typing. Annotate the result or callback return.
 
-### Default Type for Narrowing
+```ts
+const items: Array<MenuItem> = labels.map((label) => ({
+  type: "button",
+  label,
+}));
+```
 
-```typescript
-function logError<TError = Error>(error: TError) {
-  if (error instanceof Error) {
-    console.error(error.message);
+## Array Syntax
+
+Follow the repo's lint rule if one exists. As a portable style preference, use
+generic array syntax for exported aliases, public API types, and nested arrays.
+
+```ts
+type Users = Array<User>;
+type ReadonlyUsers = ReadonlyArray<User>;
+type Matrix = Array<Array<number>>;
+```
+
+Local implementation code may use whichever syntax the file already uses. Do not
+mix styles in one edited area without a reason.
+
+## Object Types
+
+Follow the repo's lint rule when it chooses `interface` or `type`. As a portable
+default:
+
+- use `interface` for object shapes intended to be extended or implemented
+- use `type` for unions, tuples, mapped types, conditional types, and aliases
+- avoid `{}` as a data shape; it accepts most non-nullish values
+
+```ts
+type EmptyObject = Record<string, never>;
+type JsonObject = Record<string, unknown>;
+
+function cloneObject<TObject extends Record<string, any>>(value: TObject): TObject {
+  return structuredClone(value);
+}
+```
+
+`any` in a generic constraint can be appropriate when the implementation does
+not inspect the values. `any` in data flow is not a constraint; it is an escape
+hatch.
+
+## Generic Names
+
+Use descriptive, `T`-prefixed generic names for public or complex APIs.
+
+```ts
+function defineSchemaMap<TSchemaMap extends Record<string, Schema>>(map: TSchemaMap): TSchemaMap {
+  return map;
+}
+```
+
+Good fallback names: `TConfig`, `TItem`, `TResult`, `TError`, `TSchemaMap`.
+Short names such as `T`, `K`, and `V` are fine only when the meaning is obvious
+from a tiny, conventional generic like `Record<K, V>` or `Array<T>`.
+
+## Local Type Grouping
+
+For a function with related options and return types, colocate those types near
+the value. Fallback preference: use a type-only namespace when the repo permits
+that style; otherwise use exported types with a shared prefix.
+
+```ts
+namespace retryOperation {
+  export interface Options {
+    maxAttempts: number;
   }
 }
+
+function retryOperation(options: retryOperation.Options) {
+  // implementation
+}
 ```
 
-### StringOrLiteral Pattern
-
-Allow both known literal values (with autocomplete) and arbitrary strings:
-
-```typescript
-type StringOrLiteral<TLiteral extends string> = TLiteral | (string & {});
-
-function on<TEvent extends string = 'click' | 'focus' | 'blur'>(
-  event: StringOrLiteral<TEvent>,
-  handler: () => void,
-) {}
-
-on('click', () => {});   // Autocomplete suggests known values
-on('custom', () => {});  // Also accepts arbitrary strings
-```
+Never use namespaces for runtime organization in modern ESM code.

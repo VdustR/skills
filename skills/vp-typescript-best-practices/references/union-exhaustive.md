@@ -1,118 +1,112 @@
-# Union Types & Exhaustive Handling
+# Union Types and Exhaustive Handling
 
-> **When to use:** For defining types that can be one of several distinct shapes (e.g., for states, events, or API responses) and ensuring all cases are handled at compile time.
+Use unions when a value can be one of a known set of states, events, commands, or
+result shapes. Make future variants fail loudly at compile time.
 
 ## Discriminated Unions
 
-Use a common literal property to enable type narrowing:
-
-```typescript
-// DO: Discriminated union with literal discriminator
+```ts
 type Result<TData, TError> =
-  | { success: true; data: TData }
-  | { success: false; error: TError };
+  | { status: "success"; data: TData }
+  | { status: "error"; error: TError }
+  | { status: "loading" };
 
-function handleResult(result: Result<User, string>) {
-  if (result.success) {
-    // TypeScript knows: result.data is User
-    console.log(result.data.name);
-  } else {
-    // TypeScript knows: result.error is string
-    console.error(result.error);
-  }
-}
-
-// DO: Use 'type' or 'kind' as discriminator for events/actions
-type Action =
-  | { type: 'INCREMENT'; amount: number }
-  | { type: 'DECREMENT'; amount: number }
-  | { type: 'RESET' };
-
-function reducer(state: number, action: Action): number {
-  switch (action.type) {
-    case 'INCREMENT':
-      return state + action.amount;
-    case 'DECREMENT':
-      return state - action.amount;
-    case 'RESET':
-      return 0;
-  }
-}
-```
-
-**Best practices:**
-- Use `type`, `kind`, or `status` as discriminator names
-- Discriminator values should be string literals for readability
-- Use `satisfies never` for exhaustive handling (see below)
-
-## Exhaustive Handling
-
-Use `satisfies never` to ensure all cases are handled. TypeScript will error if any case is missed.
-
-### Switch Statement
-
-```typescript
-type Route = '/home' | '/about' | '/contact';
-
-function handleRoute(route: Route) {
-  switch (route) {
-    case '/home':
-      return <HomePage />;
-    case '/about':
-      return <AboutPage />;
-    case '/contact':
-      return <ContactPage />;
+function renderResult(result: Result<User, Error>) {
+  switch (result.status) {
+    case "success":
+      return renderUser(result.data);
+    case "error":
+      return renderError(result.error);
+    case "loading":
+      return renderSpinner();
     default:
-      route satisfies never; // Error if any route is unhandled
+      result satisfies never;
+      throw new Error(`Unhandled result: ${String(result)}`);
   }
 }
 ```
 
-### Ternary with IIFE
+Good discriminator names are `type`, `kind`, `status`, and `state`. Keep
+discriminator values readable string literals.
 
-For ternary expressions, use an IIFE to add exhaustive check:
+## When to Add Exhaustive Checks
 
-```typescript
-type MessageType = 'error' | 'warning' | 'info';
+| Scenario | Add check? |
+| --- | --- |
+| `switch` over a union discriminant | Yes |
+| `if` / `else if` handles every `typeof` or `instanceof` case | Yes |
+| Intentional no-op variants are listed | Yes |
+| `Record<Union, Value>` declaration | Already checked by the record |
+| Early filter such as `if (x !== "foo") return` | No, it is not handling every case |
+| Open-ended strings from user or network input | Validate first, then exhaust over the parsed union |
 
-const Component = messageType === 'error'
-  ? ErrorMessage
-  : messageType === 'warning'
-  ? WarningMessage
-  : messageType === 'info'
-  ? InfoMessage
-  : (() => {
-      messageType satisfies never;
-      throw new Error(`Unknown message type: ${messageType}`);
-    })();
+## Negative Branch Certainty
+
+Use an IIFE in expressions when only the remaining branch should be possible.
+
+```ts
+const teamId =
+  referrer.type === "team" || referrer.type === "user-in-team"
+    ? referrer.teamId
+    : (() => {
+        referrer.type satisfies "user";
+        return null;
+      })();
 ```
 
-### Partial Exhaustive (Subset Handling)
+If a new referrer variant is added, the negative branch must be revisited.
 
-When you need to handle a subset of types and explicitly allow others to pass through:
+## Intentional No-op Cases
 
-```typescript
-type ActionType = 'create' | 'update' | 'delete' | 'login' | 'signUp';
+List no-op cases explicitly. Do not hide them in `default`.
 
-// Define which actions bypass normal handling
-type PassthroughActions = readonly ['login', 'signUp'];
-const passthroughActions: PassthroughActions = ['login', 'signUp'] satisfies ReadonlyArray<ActionType>;
-type PassthroughAction = PassthroughActions[number];
-
-function handleAction(actionType: ActionType) {
-  switch (actionType) {
-    case 'create':
-      return createItem();
-    case 'update':
-      return updateItem();
-    case 'delete':
-      return deleteItem();
-    default:
-      // Ensure only PassthroughActions reach here, not forgotten cases
-      actionType satisfies PassthroughAction;
-      return handlePassthrough(actionType);
-  }
+```ts
+switch (event.type) {
+  case "created":
+    syncCreated(event);
+    return;
+  case "updated":
+    syncUpdated(event);
+    return;
+  case "heartbeat":
+  case "presence":
+    return;
+  default:
+    event satisfies never;
+    throw new Error("Unhandled event");
 }
 ```
 
-If you add a new `ActionType` but forget to handle it, the `satisfies PassthroughAction` will error unless you explicitly add it to `PassthroughActions`.
+## Record Coverage
+
+When every union member maps to a value, a record is often simpler than a switch.
+
+```ts
+const labelByStatus: Record<Status, string> = {
+  draft: "Draft",
+  published: "Published",
+  archived: "Archived",
+};
+```
+
+Use `satisfies Record<Status, Value>` when you want to preserve literal values.
+
+```ts
+const colorByStatus = {
+  draft: "gray",
+  published: "green",
+  archived: "red",
+} satisfies Record<Status, string>;
+```
+
+## Runtime Boundaries
+
+Do not exhaust over raw strings from network, storage, or user input. Parse them
+into a closed union first.
+
+```ts
+const StatusSchema = z.enum(["draft", "published", "archived"]);
+type Status = z.infer<typeof StatusSchema>;
+
+const status = StatusSchema.parse(input);
+```
