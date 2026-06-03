@@ -79,9 +79,9 @@ namespace serializeData {
   }
 }
 
-const serializeData = (value: unknown, options: serializeData.Options = {}) => {
+function serializeData(value: unknown, options: serializeData.Options = {}) {
   // implementation
-};
+}
 ```
 
 Use `function` declarations when hoisting, overloads, generators, or local repo
