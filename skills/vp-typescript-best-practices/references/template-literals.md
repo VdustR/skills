@@ -1,53 +1,51 @@
 # Template Literal Types
 
-> **When to use:** For creating type-safe string patterns, such as for event names, CSS values, route parameters, or i18n keys.
+Use template literal types for string patterns that are finite, meaningful, and
+worth checking at compile time.
 
-Use template literals for string pattern types:
+## Good Uses
 
-```typescript
-// DO: Type-safe event names
-type EventName = `on${Capitalize<'click' | 'focus' | 'blur'>}`;
-// Result: 'onClick' | 'onFocus' | 'onBlur'
+```ts
+type CssUnit = "px" | "rem" | "em" | "%";
+type CssValue = `${number}${CssUnit}`;
 
-// DO: Type-safe CSS properties
-type CSSUnit = 'px' | 'rem' | 'em' | '%';
-type CSSValue = `${number}${CSSUnit}`;
-// '10px', '1.5rem', '100%' are valid
+type EventName = `on${Capitalize<"click" | "focus" | "blur">}`;
 
-const width: CSSValue = '100px';  // OK
-const bad: CSSValue = '100';      // Error: missing unit
-
-// DO: Type-safe route parameters
-type Route = '/users/:userId' | '/posts/:postId';
-type ExtractParam<TRoute extends string> =
-  TRoute extends `${string}:${infer TParam}`
-    ? TParam
-    : never;
-
-type UserParam = ExtractParam<'/users/:userId'>;  // 'userId'
-
-// DO: Type-safe i18n keys
-type Locale = 'en' | 'ja' | 'zh';
-type I18nKey = 'greeting' | 'farewell';
-type LocalizedKey = `${Locale}.${I18nKey}`;
-// 'en.greeting' | 'en.farewell' | 'ja.greeting' | ...
+type Route = "/users/:userId" | "/posts/:postId";
+type RouteParam<TRoute extends string> = TRoute extends `${string}:${infer TParam}`
+  ? TParam
+  : never;
 ```
 
-## Common Patterns
+Good candidates:
 
-| Pattern | Description |
-|---------|-------------|
-| `Capitalize<T>` | First letter uppercase |
-| `Uppercase<T>` | All uppercase |
-| `Lowercase<T>` | All lowercase |
-| `${infer X}` | Extract parts of strings |
+- route patterns and route parameters
+- event names derived from a closed event union
+- i18n or feature keys generated from known segments
+- units such as CSS lengths or metric labels
+- namespaced storage keys
 
-## Use Cases
+## Keep Runtime and Type Sources Aligned
 
-| Scenario | Example |
-|----------|---------|
-| Event systems | `on${Capitalize<EventType>}` |
-| CSS-in-JS | `${number}${CSSUnit}` |
-| Route parameters | `${string}:${infer Param}` |
-| i18n keys | `${Locale}.${Key}` |
-| API endpoints | `/api/v${number}/${Resource}` |
+Prefer deriving the type from a runtime list when the strings are also used at
+runtime.
+
+```ts
+const resources = ["users", "posts"] as const;
+type Resource = (typeof resources)[number];
+type ApiPath = `/api/${Resource}`;
+```
+
+Do not maintain a runtime array and an unrelated template type by hand.
+
+## Avoid Clever Opaque Types
+
+Template literal types can become unreadable quickly. Avoid them when:
+
+- the runtime format is open-ended
+- a schema parser would communicate the constraint better
+- the type expands into a huge union
+- reviewers cannot tell which strings are valid without running TypeScript
+
+For external input, template literal types are not validation. Parse the string
+before trusting it.

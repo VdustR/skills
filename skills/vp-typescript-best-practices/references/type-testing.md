@@ -1,112 +1,69 @@
 # Type Testing
 
-Use `*.test-d.ts` files for type-level tests:
+Use `*.test-d.ts` files for type-level behavior that should fail or pass under
+`tsc --noEmit`. Keep them colocated with the type or helper under test.
 
-```typescript
-// myGeneric.test-d.ts
-import type { MyGenericType } from './MyGenericType';
+## Equality by Bidirectional `satisfies`
 
-const anyObj: any = {};
+```ts
+// file: infer-user.test-d.ts
+const anyValue: any = {};
 
-// Test 1: Extracts correct keys with basic types
-(() => {
-  type Input = {
-    key1: string;
-    key2: number;
-    other: boolean;
-  };
-  type Expected = {
-    key1: string;
-    key2: number;
-  };
-  type Result = MyGenericType<Input, 'key1' | 'key2'>;
-
-  // Bidirectional satisfies ensures strict equality
-  (anyObj as Result satisfies Expected);
-  (anyObj as Expected satisfies Result);
-})();
-
-// Test 2: Preserves optional modifiers
-(() => {
-  type Input = {
-    required: string;
-    optional?: number;
-  };
-  type Expected = {
-    required: string;
-    optional?: number;
-  };
-  type Result = MyGenericType<Input>;
-
-  (anyObj as Result satisfies Expected);
-  (anyObj as Expected satisfies Result);
-})();
-
-// Test 3: Handles nested objects
 (() => {
   type Expected = {
-    user: { id: string; name: string };
+    id: string;
+    name: string;
   };
-  type Result = MyGenericType<typeof anyObj, 'user'>;
+  type Result = InferUser<typeof UserSchema>;
 
-  (anyObj as Result satisfies Expected);
-  (anyObj as Expected satisfies Result);
+  anyValue as Result satisfies Expected;
+  anyValue as Expected satisfies Result;
 })();
-
-// Test 4: Handles union types in values
-(() => {
-  type Expected = {
-    status: 'active' | 'inactive';
-  };
-  type Result = MyGenericType<typeof anyObj, 'status'>;
-
-  (anyObj as Result satisfies Expected);
-  (anyObj as Expected satisfies Result);
-})();
-
-// Test 5: Empty keys returns empty object
-(() => {
-  type Expected = Record<string, never>;
-  type Result = MyGenericType<typeof anyObj, never>;
-
-  (anyObj as Result satisfies Expected);
-  (anyObj as Expected satisfies Result);
-})();
-
-// Add more test cases as needed to cover edge cases
 ```
 
-## Testing Negative Cases
+The two checks catch both missing fields and extra required fields.
 
-When a type is designed to **reject** certain inputs, test those rejections explicitly using `@ts-expect-error`:
+## Negative Cases
 
-```typescript
-// navigate.test-d.ts
-import { navigate } from './navigate';
+Use `@ts-expect-error` when invalid usage must remain invalid.
 
-// Test: Valid paths work
-navigate('/home');
-navigate('/about');
+```ts
+navigate("/users/123");
 
-// Test: Invalid paths should cause type errors
-// @ts-expect-error invalid path should cause a type error
-navigate('/path/not/exist');
+// @ts-expect-error -- Unknown route should be rejected.
+navigate("/missing");
 
-// @ts-expect-error numbers are not valid paths
-navigate(123);
-
-// @ts-expect-error empty string is not a valid path
-navigate('');
+// @ts-expect-error -- Route parameters must be strings.
+navigate({ path: "/users/123" });
 ```
 
-If the `@ts-expect-error` line does NOT produce an error, TypeScript will report an "Unused '@ts-expect-error' directive" error — this catches regressions where invalid inputs accidentally become valid.
+If the line stops producing an error, TypeScript reports an unused directive and
+the regression is caught.
 
-## Best Practices
+## Compatibility Checks
 
-1. **Use IIFE for test isolation** — Each test case in its own `(() => { ... })()` block prevents type leakage
-2. **Bidirectional satisfies** — Test both `Result satisfies Expected` AND `Expected satisfies Result` for strict equality
-3. **Test edge cases** — Empty inputs, union types, optional properties, nested objects
-4. **Test negative cases** — Use `@ts-expect-error` to verify type rejections
-5. **Descriptive comments** — Name each test case clearly
+For schema or generated-client compatibility, test both directions when the
+types should be identical.
 
-Write as many test cases as needed to thoroughly verify the generic type behavior. Each IIFE isolates the test scope and makes failures easy to locate.
+```ts
+(() => {
+  type SchemaUser = z.infer<typeof UserSchema>;
+  type ClientUser = Awaited<ReturnType<typeof client.getUser>>;
+
+  anyValue as SchemaUser satisfies ClientUser;
+  anyValue as ClientUser satisfies SchemaUser;
+})();
+```
+
+If one side is intentionally wider, test only the intended direction and document
+why.
+
+## Practices
+
+- Wrap each case in an IIFE to avoid name collisions.
+- Keep examples small; type tests are documentation.
+- Prefer direct `satisfies` checks over runtime assertion libraries for pure
+  type behavior.
+- Include edge cases: empty input, optional properties, unions, readonly arrays,
+  and transformed schema input/output.
+- Run the repository's normal typecheck command after editing type tests.
