@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP PR Briefing"
+  short_description: "Research a PR and present a structured briefing"
+  default_prompt: "Use $vp-pr-briefing to research this PR and give me a full briefing."
