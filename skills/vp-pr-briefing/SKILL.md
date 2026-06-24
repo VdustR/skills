@@ -1,0 +1,228 @@
+---
+name: vp-pr-briefing
+description: >-
+  Research a pull request and present a structured briefing so the reader
+  quickly grasps the full picture. Use when the user asks to "take over a PR",
+  "brief me on this PR", "what is this PR about", "help me understand PR #X",
+  "summarize this PR", provides a GitHub PR URL and wants context, checks out
+  someone else's branch and asks what's going on, or needs to review a PR they
+  have no prior context for. Also trigger when the user mentions picking up
+  someone else's work, onboarding onto a PR, or wants a structured overview
+  before diving into code.
+  Boundary: not for processing review comments (use vp-pr-comment-resolver),
+  not for writing code reviews (use code-review), not for rewriting PR
+  descriptions (use cl-rewrite-pr-description).
+---
+
+# PR Briefing
+
+Research a pull request and present a structured, progressive-disclosure
+briefing. The goal is to bring the reader from zero context to full
+understanding in one pass — shallow enough to skim, deep enough to act on.
+
+## Prerequisites
+
+Before starting, verify:
+
+- **`gh` CLI** is installed and authenticated (`gh auth status`)
+- **`git`** is available and the working directory is inside a repository
+
+If any tool is missing or not authenticated, guide the user through setup
+before proceeding.
+
+## Identify the PR
+
+Accept any of these inputs:
+
+| Input | Detection |
+|-------|-----------|
+| GitHub URL | Parse `owner/repo/pull/N` from the URL |
+| `#123` or bare number | Use the current repo context |
+| No number given | Run `gh pr list --head $(git branch --show-current)` to find the PR for the current branch |
+
+If the branch has no associated PR, say so and ask the user for a PR reference.
+
+## Gather Data
+
+Fetch everything before writing anything. Use `gh` CLI for all queries.
+
+```bash
+# Core metadata + body + linked issues
+gh pr view <N> --json number,title,body,author,state,labels,milestone,createdAt,updatedAt,baseRefName,headRefName,isDraft,mergeable,reviewDecision,url
+
+# Commits on the PR
+gh pr view <N> --json commits --jq '.commits[]|"\(.oid[:8]) \(.messageHeadline)"'
+
+# Diff stats (files changed, insertions, deletions)
+gh pr diff <N> --stat
+
+# Review threads and comments
+gh api graphql -f query='...'  # fetch review threads, comments, resolution state
+
+# CI checks
+gh pr checks <N>
+```
+
+For linked issues referenced in the PR body (`closes #X`, `fixes #X`, `refs #X`,
+or GitHub autolink URLs), fetch each issue's title, state, labels, and body
+summary.
+
+For referenced PRs (e.g. "depends on #Y", "follow-up to #Z", stacked on
+another branch), fetch their title, state, and URL.
+
+Read review threads to extract reviewer opinions, unresolved discussions, and
+requested changes. Capture enough to summarize — do not reproduce full
+conversations.
+
+## Present the Briefing
+
+Structure the output in this exact order. Each section adds one layer of depth
+so the reader can stop at any point and still have a coherent understanding.
+
+### 1. TL;DR
+
+One sentence. What this PR does and why, in plain language. If the PR type is
+obvious, prefix with a conventional tag: `[feat]`, `[fix]`, `[refactor]`,
+`[chore]`, `[docs]`.
+
+Example:
+> **TL;DR:** `[feat]` Add OAuth2 login flow so users can sign in with their
+> GitHub account instead of managing a separate password.
+
+### 2. Context & Requirements
+
+Why this PR exists. Connect it to the problem being solved.
+
+- Originating issue(s) with title, state, and link
+- Who requested or motivated the change
+- Acceptance criteria or definition of done, if stated
+- Constraints or requirements mentioned in the issue or PR body
+
+Keep this section focused on the **problem space**, not the solution.
+
+### 3. Design Decisions
+
+What approach was chosen and why. This section bridges the gap between "what
+problem" and "what code changed."
+
+- Architecture or approach chosen
+- Alternatives considered or discussed (from PR body, issue, or review threads)
+- Key tradeoffs acknowledged
+- Any open design questions still under discussion
+
+If the PR body or review threads contain no design discussion, infer the
+approach from the diff and state it as observed rather than documented.
+
+### 4. Implementation Summary
+
+What actually changed in the code. Present this at the right altitude — not a
+line-by-line diff walk, but enough to understand the shape of the change.
+
+- Group changed files by concern (e.g., "API layer", "UI components", "tests",
+  "config")
+- For each group: what changed and why, in 1–3 sentences
+- Call out new files, deleted files, or renamed files explicitly
+- Highlight any non-obvious changes (e.g., a migration, a schema change, a
+  new dependency added)
+
+Use a table for the file grouping when there are many files:
+
+```markdown
+| Area | Files | What changed |
+|------|-------|-------------|
+| API  | `src/api/auth.ts`, `src/api/routes.ts` | New OAuth2 endpoint, route registration |
+| UI   | `src/components/Login.tsx` | GitHub login button, OAuth callback handler |
+| Tests | `tests/auth.test.ts` | Integration tests for OAuth flow |
+```
+
+### 5. Review Status
+
+Where the PR stands in the review process.
+
+- Review decision: approved / changes requested / pending
+- Reviewer-by-reviewer summary: who said what, one line each
+- Unresolved discussion threads: summarize the core disagreement or question
+- Resolved threads worth noting: significant decisions made during review
+
+If there are no reviews yet, say so.
+
+### 6. Dependencies & References
+
+Everything connected to this PR.
+
+- **Linked issues:** issue number, title, state, relationship (closes/refs)
+- **Related PRs:** number, title, state, relationship (depends on / blocks /
+  follow-up to / stacked on)
+- **External references:** docs, RFCs, Slack threads, design docs mentioned in
+  the PR body or comments
+- **New dependencies:** any packages added or upgraded in the diff
+
+Use a compact table:
+
+```markdown
+| Type | Ref | Title | State | Relation |
+|------|-----|-------|-------|----------|
+| Issue | #45 | Users can't log in with SSO | open | closes |
+| PR | #120 | Add OAuth2 provider config | merged | depends on |
+```
+
+### 7. Risk Assessment
+
+What could go wrong or needs attention.
+
+- Breaking changes: API, schema, config, or behavior changes that affect
+  consumers
+- Affected systems or features beyond the immediate scope
+- Migration or deployment considerations
+- Test coverage gaps visible in the diff
+- Security considerations if the change touches auth, data handling, or
+  external APIs
+
+Rate the overall risk if helpful: **low** (isolated change, good test
+coverage), **medium** (touches shared code, some gaps), **high** (breaking
+change, migration required, or security-sensitive).
+
+### 8. Current Status & Next Steps
+
+Where things stand right now.
+
+- PR state: draft / open / approved / changes requested / merged
+- CI status: passing / failing (which checks)
+- Merge readiness: what's blocking merge, if anything
+- Remaining work: items the author mentioned as TODO or in-progress
+- Suggested next action: what the reader should do next (e.g., "address the
+  unresolved thread about error handling in auth.ts", "rebase onto main after
+  #120 merges", "ready to merge after CI passes")
+
+## Presentation Guidelines
+
+The briefing is designed for a human reader who needs to build a mental model
+quickly. Follow these principles:
+
+- **Progressive disclosure:** each section adds depth. A reader who stops after
+  section 3 should still understand the PR at a strategic level.
+- **Concrete over abstract:** use file names, function names, and specific
+  reviewer names. "Alice requested a retry mechanism for the OAuth callback"
+  beats "a reviewer suggested error handling improvements."
+- **Proportional depth:** a 5-file bugfix gets a shorter briefing than a
+  50-file feature. Scale each section to the PR's complexity. Skip sections
+  that would be empty or trivial (e.g., "Risk Assessment" for a typo fix).
+- **Link everything:** every issue, PR, and check reference should be a
+  clickable link.
+- **Separate fact from inference:** when design decisions are inferred from the
+  diff rather than documented, say "Based on the diff, the approach appears
+  to be..." rather than stating it as documented intent.
+
+## After the Briefing
+
+Once the briefing is delivered, ask the reader what they want to do next.
+Common follow-ups:
+
+- **Deep dive:** read specific files or review threads in detail
+- **Take over:** start working on the PR (check out the branch, understand
+  remaining TODOs)
+- **Review:** begin a code review with the context now established
+- **Resolve comments:** hand off to `vp-pr-comment-resolver` for review thread
+  processing
+
+Do not assume the next step. The briefing's job is to inform, not to act.
