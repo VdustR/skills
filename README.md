@@ -77,6 +77,10 @@ Use structured questions to align on requirements before planning or complex tas
 
 Cleanly uninstall macOS applications with research-backed residual file cleanup.
 
+### vp-pr-briefing
+
+Research a pull request and present a structured, progressive-disclosure briefing.
+
 ### vp-pr-comment-resolver
 
 Handle GitHub PR review comments with verification, focused fixes, and thread replies.
