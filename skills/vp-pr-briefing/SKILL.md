@@ -31,7 +31,7 @@ Accept any of these inputs:
 
 | Input | Detection |
 |-------|-----------|
-| GitHub URL | Parse the owner, repo, and PR number from the URL. If the URL repo differs from the local remote, pass the full repo identifier (including host when targeting GitHub Enterprise) to `gh` so commands reach the correct instance. |
+| GitHub URL | Parse the host, owner, repo, and PR number from the URL. If the URL repo differs from the local remote, pass the full repo identifier (including host when targeting GitHub Enterprise) to `gh` so commands reach the correct instance. |
 | `#123` or bare number | Use the current repo context |
 | No number given | Run `gh pr view --json number --jq .number` to find the PR for the current branch |
 
