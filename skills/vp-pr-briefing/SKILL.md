@@ -31,7 +31,7 @@ Accept any of these inputs:
 
 | Input | Detection |
 |-------|-----------|
-| GitHub URL | Parse `owner/repo/pull/N` from the URL. Use `-R owner/repo` if the URL repo differs from the local remote. |
+| GitHub URL | Parse the owner, repo, and PR number from the URL. If the URL repo differs from the local remote, pass the full repo identifier (including host when targeting GitHub Enterprise) to `gh` so commands reach the correct instance. |
 | `#123` or bare number | Use the current repo context |
 | No number given | Run `gh pr view --json number --jq .number` to find the PR for the current branch |
 
@@ -40,31 +40,28 @@ If the branch has no associated PR, or the PR belongs to a different repo
 
 ## Gather Data
 
-Fetch everything before writing anything. Use `gh` CLI for all queries.
+Fetch everything before writing anything. Use the `gh` CLI (and `gh api graphql`
+when needed) for all queries. When the PR URL points to a GitHub Enterprise host
+that differs from the current `gh` default, include that host in every `gh`
+invocation so commands reach the correct instance.
 
-```bash
-# Core metadata + body + linked issues
-gh pr view <N> --json number,title,body,author,state,labels,milestone,createdAt,updatedAt,baseRefName,headRefName,isDraft,mergeable,reviewDecision,url
+Do not memorize specific CLI flags or `--json` field names from this document —
+they can change across `gh` versions. Instead, use the intent list below to
+decide **what data you need**, then construct the appropriate commands at
+runtime. Check `gh pr view --help` or `gh api --help` if unsure about available
+fields.
 
-# Commits on the PR
-gh pr view <N> --json commits --jq '.commits[]|"\(.oid[:8]) \(.messageHeadline)"'
-
-# Per-file diff stats
-gh pr view <N> --json files --jq '.files[]|"\(.path)\t+\(.additions)\t-\(.deletions)"'
-
-# Review threads and comments (use gh api graphql to fetch threads,
-# resolution state, authors, and comment bodies)
-
-# CI checks
-gh pr checks <N>
-```
-
-For linked issues referenced in the PR body (`closes #X`, `fixes #X`, `refs #X`,
-or GitHub autolink URLs), fetch each issue's title, state, labels, and body
-summary.
-
-For referenced PRs (e.g. "depends on #Y", "follow-up to #Z", stacked on
-another branch), fetch their title, state, and URL.
+| Data needed | Used by | Notes |
+|---|---|---|
+| Core metadata: title, author, state, labels, milestone, dates, base/head branch, draft status, mergeability, review decision, URL, body | TL;DR, Context, Current Status | Single `gh pr view --json` call with the relevant fields |
+| Commit list: short hash + headline per commit | Implementation Summary | |
+| Per-file diff stats: path, additions, deletions | Implementation Summary | |
+| Full diff / patch content | Design Decisions, Implementation Summary, Risk Assessment | Needed to understand *what actually changed* — file stats alone are not enough. Use `gh pr diff` or equivalent |
+| Per-reviewer review state: each reviewer's latest submitted review (approved, changes requested, commented, dismissed) | Review Status | The aggregate `reviewDecision` only tells the overall outcome. Fetch individual reviews or latest reviews to support per-reviewer summaries |
+| Review threads: thread resolution state, path, line, author, comment bodies | Review Status | Use GraphQL when `gh pr view --json` does not expose thread-level detail |
+| CI / status check results | Current Status | |
+| Linked issues (`closes #X`, `fixes #X`, `refs #X`, autolink URLs) | Context, Dependencies | Fetch each issue's title, state, labels, and body summary |
+| Referenced PRs ("depends on #Y", "follow-up to #Z", stacked PRs) | Dependencies | Fetch title, state, and URL |
 
 Read review threads to extract reviewer opinions, unresolved discussions, and
 requested changes. Capture enough to summarize — do not reproduce full
