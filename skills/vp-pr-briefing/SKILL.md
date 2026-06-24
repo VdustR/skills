@@ -1,17 +1,12 @@
 ---
 name: vp-pr-briefing
 description: >-
-  Research a pull request and present a structured briefing so the reader
-  quickly grasps the full picture. Use when the user asks to "take over a PR",
-  "brief me on this PR", "what is this PR about", "help me understand PR #X",
-  "summarize this PR", provides a GitHub PR URL and wants context, checks out
-  someone else's branch and asks what's going on, or needs to review a PR they
-  have no prior context for. Also trigger when the user mentions picking up
-  someone else's work, onboarding onto a PR, or wants a structured overview
-  before diving into code.
-  Boundary: not for processing review comments (use vp-pr-comment-resolver),
-  not for writing code reviews (use code-review), not for rewriting PR
-  descriptions (use cl-rewrite-pr-description).
+  Use when the user asks to "take over a PR", "brief me on this PR", "what is
+  this PR about", "help me understand PR #X", "summarize this PR", provides a
+  GitHub PR URL and wants context, checks out someone else's branch, or needs
+  to onboard onto a PR they have no prior context for.
+  Not for: review comment processing (vp-pr-comment-resolver), writing code
+  reviews (code-review), PR description rewrites (cl-rewrite-pr-description).
 ---
 
 # PR Briefing
@@ -36,11 +31,12 @@ Accept any of these inputs:
 
 | Input | Detection |
 |-------|-----------|
-| GitHub URL | Parse `owner/repo/pull/N` from the URL |
+| GitHub URL | Parse `owner/repo/pull/N` from the URL. Use `-R owner/repo` if the URL repo differs from the local remote. |
 | `#123` or bare number | Use the current repo context |
 | No number given | Run `gh pr list --head $(git branch --show-current)` to find the PR for the current branch |
 
-If the branch has no associated PR, say so and ask the user for a PR reference.
+If the branch has no associated PR, or the PR belongs to a different repo
+(e.g., upstream fork), say so and ask the user for a PR URL or `-R` target.
 
 ## Gather Data
 
@@ -53,11 +49,11 @@ gh pr view <N> --json number,title,body,author,state,labels,milestone,createdAt,
 # Commits on the PR
 gh pr view <N> --json commits --jq '.commits[]|"\(.oid[:8]) \(.messageHeadline)"'
 
-# Diff stats (files changed, insertions, deletions)
-gh pr diff <N> --stat
+# Per-file diff stats
+gh pr view <N> --json files --jq '.files[]|"\(.path)\t+\(.additions)\t-\(.deletions)"'
 
-# Review threads and comments
-gh api graphql -f query='...'  # fetch review threads, comments, resolution state
+# Review threads and comments (use gh api graphql to fetch threads,
+# resolution state, authors, and comment bodies)
 
 # CI checks
 gh pr checks <N>
@@ -76,8 +72,10 @@ conversations.
 
 ## Present the Briefing
 
-Structure the output in this exact order. Each section adds one layer of depth
-so the reader can stop at any point and still have a coherent understanding.
+Use the following order as the default structure. Each section adds one layer of
+depth so the reader can stop at any point and still have a coherent
+understanding. Merge or skip sections when the PR is small enough that they
+would be empty or redundant.
 
 ### 1. TL;DR
 
@@ -226,3 +224,10 @@ Common follow-ups:
   processing
 
 Do not assume the next step. The briefing's job is to inform, not to act.
+
+## Error Handling
+
+If data is unavailable (PR not found, private repo without access, empty
+description, API rate limit), degrade gracefully: note what could not be
+fetched and continue with the data you have. Do not hallucinate missing
+information.
