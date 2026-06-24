@@ -33,7 +33,7 @@ Accept any of these inputs:
 |-------|-----------|
 | GitHub URL | Parse `owner/repo/pull/N` from the URL. Use `-R owner/repo` if the URL repo differs from the local remote. |
 | `#123` or bare number | Use the current repo context |
-| No number given | Run `gh pr list --head $(git branch --show-current)` to find the PR for the current branch |
+| No number given | Run `gh pr view --json number --jq .number` to find the PR for the current branch |
 
 If the branch has no associated PR, or the PR belongs to a different repo
 (e.g., upstream fork), say so and ask the user for a PR URL or `-R` target.
