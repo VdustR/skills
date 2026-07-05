@@ -12,7 +12,13 @@ description: >-
 
 # Checklist Runner
 
-Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification. Classifies each checklist item, runs the cheapest verification possible, and checks off what passes — asking the user only when truly necessary.
+Parse and verify GitHub PR/issue checklists, auto-checking items that pass
+verification. Classifies each checklist item, runs the cheapest verification
+possible, and checks off what passes — asking the user only when truly
+necessary.
+
+Accepted inputs: nothing (auto-detect the current branch's PR), a `#123`
+number, or a PR/issue URL.
 
 ## Core Principles
 
@@ -21,23 +27,6 @@ Parse and verify GitHub PR/issue checklists, auto-checking items that pass verif
 3. **Confidence-Based Automation** — HIGH confidence items auto-proceed; MEDIUM/LOW confidence items pause for user
 4. **Ownership-Aware Updates** — Respect GitHub permissions; never silently modify someone else's content
 5. **Safe Operations** — Use `updated_at` to prevent race conditions; default to comment mode for others' posts
-
-## Quick Start
-
-```text
-/checklist             # Auto-detect current branch's PR
-/checklist #123        # Specific PR or issue number
-/checklist <url>       # Specific PR or issue URL
-```
-
-## When to Use
-
-- User asks to "verify the checklist", "check off items", "run the checklist", "process checklist"
-- A PR or issue contains `- [ ]` unchecked items that need verification
-- User wants to auto-check items that pass verification before merging
-- User wants a verification report on checklist completion status
-
-**When NOT to use**: For creating new checklists from scratch (just write markdown). For PR review comments, use `vp-pr-comment-resolver` instead.
 
 ## Workflow Overview
 
@@ -51,7 +40,8 @@ Parse and verify GitHub PR/issue checklists, auto-checking items that pass verif
 
 ### Phase 1: Source Resolution + Permission Probe
 
-Determine the target PR/issue, fetch all checklist sources, and probe permissions upfront.
+Determine the target PR/issue, fetch all checklist sources, and probe
+permissions upfront.
 
 **Source Resolution Decision Tree:**
 
@@ -73,33 +63,46 @@ Input received
 
 **Fetch Checklist Sources:**
 
-Collect all checklist items from the PR/issue body and comments. Use `gh pr view` for the PR body and GraphQL for comments. See [verification-recipes.md](references/verification-recipes.md) for exact API endpoints and queries.
+Collect all checklist items from the PR/issue body and comments. Use
+`gh pr view` for the PR body and GraphQL for comments. See
+[verification-recipes.md](references/verification-recipes.md) for exact API
+endpoints, queries, and pagination handling (paginate when
+`pageInfo.hasNextPage` is true).
 
-> **Pagination**: Paginate when `pageInfo.hasNextPage` is true. See [verification-recipes.md](references/verification-recipes.md) for pagination handling.
-
-> **API field naming**: `gh pr view --json` uses camelCase (`updatedAt`), while REST `gh api` returns snake_case (`updated_at`). Normalize to `updated_at` internally.
+> **API field naming**: `gh pr view --json` uses camelCase (`updatedAt`),
+> while REST `gh api` returns snake_case (`updated_at`). Normalize to
+> `updated_at` internally.
 
 **Parse Checklist Items:**
 
 Extract all `- [ ]` and `- [x]` items from each source.
 
-**Important**: Before extracting, strip fenced code blocks (`` ``` ... ``` ``) and inline code spans to avoid parsing example checklists inside code as real items.
+**Important**: Before extracting, strip fenced code blocks
+(`` ``` ... ``` ``) and inline code spans to avoid parsing example checklists
+inside code as real items.
 
 Track for each item:
+
 - Item text (normalized, trimmed)
 - Checked state (unchecked = needs verification)
 - Source (body vs comment ID)
 - Source author
 - Source `updated_at` timestamp (for race condition prevention in Phase 4)
-- Nesting level (indented items are nested under a parent)
+- Nesting level — flatten nested checklists with parent context preserved;
+  verify each item independently but note its parent condition
 
 **Permission Probe:**
 
-Get current user (`gh api user`), check repo write access (`gh api repos/{o}/{r}`), and compare with each source author. See [checkbox-update-rules.md](references/checkbox-update-rules.md) for full ownership detection, bot detection rules, and permission commands.
+Get current user (`gh api user`), check repo write access
+(`gh api repos/{o}/{r}`), and compare with each source author. See
+[checkbox-update-rules.md](references/checkbox-update-rules.md) for full
+ownership detection, bot detection rules, permission commands, and the full
+permission matrix.
 
-> **Null permissions**: If `.permissions` is null or absent (e.g., fine-grained PAT without `metadata:read`), treat as no write access.
+> **Null permissions**: If `.permissions` is null or absent (e.g.,
+> fine-grained PAT without `metadata:read`), treat as no write access.
 
-**Output update mode to user** (see [checkbox-update-rules.md](references/checkbox-update-rules.md) for the full permission matrix):
+**Output update mode to user:**
 
 ```text
 Source Analysis:
@@ -108,15 +111,9 @@ Source Analysis:
 - Total: 11 unchecked items to verify
 ```
 
-**Edge Cases:**
-- PR is closed/merged → warn user; ask if proceed anyway
-- No checklist found → report "No checklist items found" and exit
-- All items already checked → report; offer to re-verify if user explicitly requests (re-classify and re-verify all items regardless of checked state)
-- Nested checklists → flatten with parent context preserved; verify each item independently but note its parent condition
-
 ### Phase 2: Item Classification
 
-Classify each unchecked item to determine verification strategy. See [classification-patterns.md](references/classification-patterns.md) for full pattern reference.
+Classify each unchecked item to determine verification strategy.
 
 **5 Classification Categories:**
 
@@ -128,38 +125,31 @@ Classify each unchecked item to determine verification strategy. See [classifica
 | **Scan** | Needs semantic understanding (subagent) | "No secrets in code", "Documentation updated", "Changelog entry added" |
 | **Human** | Cannot be automatically verified | "Design reviewed", "PM approved", "UX looks good" |
 
-**Classification**: Normalize item text → match against patterns in priority order (Auto > CI > Shell > Scan > Human) → assign confidence. See [classification-patterns.md](references/classification-patterns.md) for the full algorithm, regex patterns, and disambiguation rules.
+**Classification**: Normalize item text → match against patterns in priority
+order (Auto > CI > Shell > Scan > Human) → assign confidence. See
+[classification-patterns.md](references/classification-patterns.md) for the
+full algorithm, regex patterns, disambiguation rules, and confidence level
+definitions.
 
-- HIGH confidence → auto-proceed
-- MEDIUM/LOW → present classification to user for confirmation
-
-**Output:**
+Present the classification to the user as a compact table (item, category,
+confidence). Confidence describes how sure the classification is, not the
+verification result. HIGH confidence auto-proceeds; for MEDIUM/LOW items, ask
+the user to confirm or reclassify before verifying:
 
 ```text
-Item Classification (confidence = how sure we are about the category, not the verification result):
-┌───┬─────────────────────────────────────┬──────────┬────────────┐
-│ # │ Item                                │ Category │ Confidence │
-├───┼─────────────────────────────────────┼──────────┼────────────┤
-│ 1 │ SKILL.md has valid frontmatter      │ Auto     │ HIGH       │
-│ 2 │ Tests pass                          │ CI       │ HIGH       │
-│ 3 │ No console.log statements           │ Shell    │ HIGH       │
-│ 4 │ No secrets in code                  │ Scan     │ HIGH       │
-│ 5 │ Design reviewed by team             │ Human    │ HIGH       │
-│ 6 │ Code quality is good                │ Human    │ LOW        │
-└───┴─────────────────────────────────────┴──────────┴────────────┘
-
-⚠️ Item #6 has LOW confidence. Confirm category or reclassify? [Human/Shell/Scan]
+⚠️ Item #6 "Code quality is good" has LOW confidence. Confirm category or reclassify? [Human/Shell/Scan]
 ```
 
 ### Phase 3: Verification Execution
 
-Execute verifications in cost order: Auto (instant) → CI (one API call) → Shell (single command) → Scan (subagents, confirm first) → Human (batched questions).
-
-See [verification-recipes.md](references/verification-recipes.md) for specific commands and subagent prompts.
+Execute verifications in cost order: Auto (instant) → CI (one API call) →
+Shell (single command) → Scan (subagents, confirm first) → Human (batched
+questions). See [verification-recipes.md](references/verification-recipes.md)
+for specific commands, recipe guidelines, and subagent prompt templates.
 
 **Auto Verification:**
 
-Run specific file/field checks. Each produces a definitive PASS/FAIL. See [verification-recipes.md](references/verification-recipes.md) for common recipes and custom recipe construction.
+Run specific file/field checks. Each produces a definitive PASS/FAIL.
 
 **CI Verification (one-time check, NO polling):**
 
@@ -176,24 +166,19 @@ gh pr checks <N> --json name,state,bucket
 
 **Shell Verification:**
 
-Run single-command checks (grep, find, jq). Expected exit code 0 = PASS. See [verification-recipes.md](references/verification-recipes.md) for recipe guidelines (source directory detection, `--include` scoping).
+Run single-command checks (grep, find, jq). Expected exit code 0 = PASS.
 
 **Scan Verification (subagents):**
 
-For items requiring semantic understanding. **Must confirm with user before launching.**
+For items requiring semantic understanding. **Must confirm with user before
+launching**, listing the planned scans. Cap at 5 subagents per execution; each
+returns PASS/FAIL with evidence.
 
-```text
-Will launch 3 scan subagents for:
-1. Secret detection scan
-2. Documentation completeness check
-3. Changelog entry verification
-
-Proceed? [y/N]
-```
-
-- Max 5 subagents per execution; returns PASS/FAIL with evidence
-- See [verification-recipes.md](references/verification-recipes.md) for constraints and prompt templates
-- **Scan results always have MEDIUM confidence** (never HIGH) — subagents can hallucinate (e.g., confusing closing ``` with bare opening blocks); always verify scan findings with a targeted grep/command before accepting; require user confirmation before checking off Scan-verified items, even on own posts
+**Scan results always have MEDIUM confidence** (never HIGH) — subagents can
+hallucinate (e.g., confusing closing ``` with bare opening blocks). Always
+verify scan findings with a targeted grep/command before accepting, and
+require user confirmation before checking off Scan-verified items, even on
+own posts.
 
 **Human Verification:**
 
@@ -207,28 +192,34 @@ The following items need manual verification:
 For each, reply: pass / fail / skip
 ```
 
-**Confidence Scoring:** See [classification-patterns.md](references/classification-patterns.md) for full definitions of HIGH / MEDIUM / LOW levels.
-
 ### Phase 4: Checkbox Update
 
-Apply ownership rules determined in Phase 1 to update checkboxes. See [checkbox-update-rules.md](references/checkbox-update-rules.md) for full rules, update mechanics, and comment report template.
+Apply the ownership rules determined in Phase 1. See
+[checkbox-update-rules.md](references/checkbox-update-rules.md) for the full
+decision matrix, update mechanics, anti-patterns, interaction examples, and
+the comment report template. Exception to "own post → auto-check":
+Scan-verified items still need user confirmation first (Phase 3).
 
 **Update Flow (6 steps):**
 
 1. `gh api` GET current body/comment — fetch both `body` and `updated_at` in a **single API call**
 2. Compare `updated_at` with Phase 1 timestamp
 3. If changed → **abort update for this source**, notify user (continue with other unaffected sources)
-4. If unchanged → apply checkbox replacements via `jq` gsub (see [checkbox-update-rules.md](references/checkbox-update-rules.md) for mechanics)
+4. If unchanged → apply checkbox replacements via `jq` gsub
 5. Update body/comment (batch per source — one update per body/comment)
 6. **Post-update verification** — assert the updated body contains all expected `[x]` items; escalate to user if assertion fails
 
-> **Preferred method for PR/issue body**: Use `jq -r` to extract modified body to a temp file, then `gh pr edit --body-file` / `gh issue edit --body-file`. The CLI handles JSON encoding internally, eliminating double-encoding risks. Use the raw API method (`jq` pipeline → `gh api --input -`) only for **comments** (no CLI shortcut) or when CLI is unavailable. See [checkbox-update-rules.md](references/checkbox-update-rules.md) for both methods, anti-patterns, and post-update verification.
-
-Ownership rules from the Phase 1 permission probe determine update behavior. See [checkbox-update-rules.md](references/checkbox-update-rules.md) for the full decision matrix, interaction examples, and comment report template.
+> **Preferred method for PR/issue body**: Use `jq -r` to extract the modified
+> body to a temp file, then `gh pr edit --body-file` /
+> `gh issue edit --body-file`. The CLI handles JSON encoding internally,
+> eliminating double-encoding risks. Never pipe the body through shell
+> variables or `sed`. Use the raw API method (`jq` pipeline →
+> `gh api --input -`) only for **comments** (no CLI shortcut) or when the CLI
+> is unavailable.
 
 ### Phase 5: Summary Report
 
-Generate final report after all verifications and updates:
+Generate a final report after all verifications and updates:
 
 ```markdown
 ## Checklist Verification Summary
@@ -240,43 +231,22 @@ Generate final report after all verifications and updates:
 
 | # | Item | Category | Result | Confidence | Updated |
 |---|------|----------|--------|------------|---------|
-| 1 | SKILL.md has valid frontmatter | Auto | PASS | HIGH | ✅ Checked |
-| 2 | Tests pass | CI | PASS | HIGH | ✅ Checked |
-| 3 | No console.log | Shell | PASS | HIGH | ✅ Checked |
-| 4 | No secrets | Scan | FAIL | MEDIUM | — |
-| 5 | Design reviewed | Human | PASS | LOW | ✅ Checked |
-| 6 | Lint passes | CI | PENDING | — | — |
+| 1 | Tests pass | CI | PASS | HIGH | ✅ Checked |
+| 2 | No secrets | Scan | FAIL | MEDIUM | — |
+| 3 | Lint passes | CI | PENDING | — | — |
 
 ### Statistics
-- **Passed:** 4/6 verified items
-- **Failed:** 1 (with evidence above)
-- **Pending:** 1 (CI still running)
-- **Already checked:** 3 (skipped)
+- **Passed:** 1/3 verified items · **Failed:** 1 · **Pending:** 1 · **Already checked:** 3 (skipped)
 
 ### Failed Items
 1. **No secrets in code** — Found potential API key in `src/config.ts:42`. Please review and remove before merging.
 
 ### Next Steps
-- Fix the failed item (#4) and re-run `/checklist`
-- CI check (#6) is pending — re-run after CI completes
+- Fix the failed item (#2) and re-run the checklist
+- CI check (#3) is pending — re-run after CI completes
 ```
 
-## Important Guidelines
-
-### DO
-
-- **Confirm before launching scan subagents** — they consume resources
-- **Batch human questions** — one prompt for all Human items
-- **Report evidence** for every PASS and FAIL — traceability matters
-- **Confirm scan results with user** — scan subagents have MEDIUM confidence; never auto-check without user approval
-
-### DON'T
-
-- **Poll CI repeatedly** — one-time check only; offer to re-run later
-- **Auto-edit other people's posts** — always default to suggest or comment
-- **Launch unlimited subagents** — cap at 5 per execution
-- **Pipe PR body through shell variables or `sed`** — use the CLI method (`--body-file`) for PR/issue body, or `jq` pipeline with `gh api --input -` for comments
-- **Force-check on race condition** — abort the affected source and notify user
+Report evidence for every PASS and FAIL — traceability matters.
 
 ## Error Handling
 

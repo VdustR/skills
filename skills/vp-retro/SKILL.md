@@ -20,24 +20,6 @@ Review an AI agent session to find improvement opportunities. The retro works th
 
 The goal is improving the user's AI collaboration efficiency: better prompts, better docs, better tools, better workflows.
 
-## Quick Start
-
-> Let's retro this session
-
-> /retro
-
-> What could I improve from this session?
-
-> Session review — find optimization opportunities
-
-## When to Use
-
-- End of a work session to reflect and capture learnings
-- After a session with friction, corrections, or workarounds
-- When wanting to improve agent instructions, skills, hooks, or workflows
-- When curious about what community skills could help with patterns seen in the session
-- Periodically to maintain healthy development practices
-
 ## How It Works
 
 The flow below is typical guidance — adapt naturally to the conversation. Not every session needs every step; a short session with no issues might just need a quick observation and move on.

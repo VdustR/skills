@@ -16,18 +16,6 @@ description: >-
 
 Replace one library with another, or migrate deprecated API patterns within the same library.
 
-## Quick Start
-
-> Replace moment.js with date-fns
-
-> Migrate from webpack to vite
-
-> Remove deprecated forwardRef usage (React 19)
-
-> Switch from lodash to es-toolkit
-
-> Migrate Vue Options API to Composition API
-
 ## Scope
 
 | Type | Example | Trigger |
@@ -69,7 +57,10 @@ Consult all sources (use subagents for parallel lookup when possible; see [conte
 
 **Conflict resolution**: If sources disagree on API equivalence or behavior, use the most conservative conclusion and flag the discrepancy.
 
-Build an API mapping table:
+Build an API mapping table covering **every** source API in use — never assume
+equivalence; subtle behavioral differences exist (async vs sync, shallow vs
+deep copy). When there is no direct equivalent, document the gap and ask the
+user for a custom wrapper or an alternative approach:
 
 | Source | Target | Notes |
 |--------|--------|-------|
@@ -152,7 +143,8 @@ Present structured plan with [confidence index](references/confidence-index.md):
 ### Phase 6: Execute Migration
 
 1. Install target library (if library replacement)
-2. Apply transformations file by file using validated mapping
+2. Apply transformations file by file using validated mapping — migrate test
+   files alongside implementation (not last) to catch issues early
 3. **Checkpoint**: Verify all files have been transformed — grep for remaining source library imports. If any remain, do NOT proceed to removal
 4. **Check for peer dependency conflicts** — present options if found
 5. Clean up unused imports/types
@@ -177,29 +169,6 @@ Detect and follow project conventions (see [repo-conventions.md](references/repo
 7. Run install to update lockfile after removal
 - All pass → report success
 - Failures → analyze if migration-related, attempt fix, present remaining to user (source library is still installed, so rollback is straightforward)
-
-## Guidelines
-
-### DO
-
-- **Build a complete API mapping table** — map every source API to target equivalent before migrating
-- **Check for official codemods first** — search npm registry and migration guides before writing custom transforms
-- **Offer compat layers when available** — ask user preference (gradual vs full), never assume
-- **Test migration approach in /tmp first** — validate on representative samples before batch
-- **Use Context7 for both libraries** — query source and target library docs in parallel
-- **Handle "no equivalent" cases** — ask user, implement custom wrapper, or document manual step
-- **Always confirm before execution** — present migration plan, get user approval
-- **Follow repo conventions** — detect and comply with changesets, commit format, CI checks
-
-### DON'T
-
-- **Skip codemod detection** — always check for official tools first
-- **Skip test-first verification** — never execute batch migration without validating approach
-- **Remove source library prematurely** — verify all usage migrated before removing
-- **Assume API equivalence** — subtle behavioral differences exist (async vs sync, shallow vs deep copy)
-- **Force migration when tests fail** — present failure analysis, let user decide
-- **Assume compat layer preference** — always ask user (gradual vs clean break)
-- **Migrate test files last** — migrate tests alongside implementation to catch issues early
 
 ## Error Handling
 
@@ -228,4 +197,3 @@ Detect and follow project conventions (see [repo-conventions.md](references/repo
 - **Supported ecosystems**: npm, pnpm, yarn, bun, cargo, pip/uv/poetry, go, bundler, composer
 - **Limitations**: Private registry auth requires manual setup; no auto-handling of 2FA prompts
 - **Monorepos**: Detected automatically, but user may need to specify target package for large workspaces
-- **Boundary**: Use this skill when replacing one library with another or migrating API patterns. For version bumps (A v1 → A v2), use `vp-deps-upgrade` instead.

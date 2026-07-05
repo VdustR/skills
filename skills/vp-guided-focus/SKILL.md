@@ -14,41 +14,22 @@ description: >-
 
 Structured, one-at-a-time questioning to converge on requirements and decisions before planning or execution. Each question presents options with descriptions, trade-off differences, and a recommended choice with reasoning.
 
-## Quick Start
-
-> /guided-focus
-
-> /guided-focus 5
-
-> Help me clarify before we plan
-
-> Ask me questions first, then plan
-
-## When to Use
-
-- Complex tasks with multiple valid approaches that need alignment before planning
-- Ambiguous requirements where scope, goals, or constraints are unclear
-- High-impact decisions (architecture, tech stack, migration strategy) that benefit from structured exploration
-- User explicitly asks to clarify or align before starting work
-
-**When NOT to use**: Single-file edits, bug fixes with clear reproduction steps, tasks where the user provides explicit requirements, or when the user has already described a clear plan.
-
 ## Workflow
 
 ### Phase 0: Activation
 
-- **Manual**: User invokes `/guided-focus` or asks to clarify first
+- **Manual**: User invokes the skill or asks to clarify first
 - **Proactive**: When detecting a complex/ambiguous task, ask: "This task has multiple valid approaches. Want to run guided focus first to align on direction?" — proceed only if user confirms
 - **Do NOT trigger proactively for**: single-file edits, bug fixes with clear reproduction steps, tasks with explicit requirements, or when the user has already described a clear plan
 
 ### Phase 1: Configuration
 
-Defaults (user can override via arguments or during the session):
+Defaults (user can override via invocation arguments or during the session):
 
 | Parameter | Default | Override Example |
 |-----------|---------|------------------|
-| Question count | 10 | `/guided-focus 5` or `/guided-focus --questions 5` |
-| Min options per question | 3 | `/guided-focus --min-options 4` |
+| Question count | 10 | a bare number argument (`5`) or `--questions 5` |
+| Min options per question | 3 | `--min-options 4` |
 
 ### Phase 2: Questioning Loop
 
@@ -136,22 +117,12 @@ After presenting the summary:
 
 ## Guidelines
 
-### DO
-
-- **One question at a time** — never batch multiple questions
-- **Adapt questions dynamically** — use dependency awareness, not a fixed script
-- **Explain adjustments** — always tell the user why questions are added/removed/reordered
-- **Respect all response types** — selections, combinations, free-form, counter-questions, skips
-- **Show progress** — always display `[current]/[total]`
-- **Surface uncertainty** — mark low-confidence decisions visibly in the summary
-- **Wrap up early** — if requirements are clear before reaching the question count, propose to end and proceed to summary
-
-### DON'T
-
-- **Start without confirmation** when triggered proactively — always ask first
-- **Ask obvious questions** — skip questions where the answer is clearly implied by context
-- **Force linear order** — if a user's answer makes a later question urgent, reorder
-- **Over-question** — if requirements are clear, wrap up. The number of questions is dynamic but must not exceed the hard cap of 15
+- **Don't ask obvious questions** — skip questions where the answer is clearly
+  implied by context; never ask about facts detectable from the project
+- **Reorder freely** — if a user's answer makes a later question urgent,
+  reorder (and tell the user, as with any adjustment)
+- **Wrap up early** — if requirements are clear before reaching the question
+  count, propose to end and proceed to summary
 
 ## Notes
 

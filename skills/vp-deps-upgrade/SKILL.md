@@ -18,16 +18,6 @@ description: >-
 
 Upgrade dependencies with breaking change detection, test-first verification, and repo convention compliance.
 
-## Quick Start
-
-> Upgrade react to v19
-
-> Handle the dependabot PR #42
-
-> Check for outdated dependencies
-
-> Auto-resolve the renovate PR https://github.com/owner/repo/pull/99
-
 ## Workflow
 
 > **Non-linear execution**: Phases are numbered for reference, not strict order. If findings in any phase invalidate earlier assumptions, restart from the affected phase.
@@ -155,28 +145,8 @@ Detect and follow project conventions (see [repo-conventions.md](references/repo
 5. For complex migrations: run subagent Pass 3 (Critical Think) as final quality gate
 - All pass → report success
 - Failures → analyze if upgrade-related, attempt fix, present remaining to user
-- Bot PR → push + check CI via `gh pr checks`
-
-## Guidelines
-
-### DO
-
-- **Check for official codemods first** — search npm registry and migration guides before writing custom transforms
-- **Offer compat layers when available** — ask user preference (gradual vs full), never assume
-- **Test migration approach in /tmp first** — validate on representative samples before batch execution
-- **Use Context7 + changelog in parallel** — combine multiple doc sources for complete picture
-- **Analyze code changes for hidden breaks** — don't rely solely on changelogs; grep for deprecated API usage
-- **Always confirm before execution** — present migration plan, get user approval
-- **Follow repo conventions** — detect and comply with changesets, commit format, CI checks
-
-### DON'T
-
-- **Skip codemod detection** — always check for official tools first
-- **Skip test-first verification** — never execute batch migration without validating approach
-- **Auto-merge without checking** — even if CI passes, verify breaking changes are addressed
-- **Assume changelog is complete** — hidden breaking changes exist; analyze code diffs too
-- **Force upgrade when tests fail** — present failure analysis, let user decide
-- **Assume compat layer preference** — always ask user (gradual vs clean break)
+- Bot PR → push + check CI via `gh pr checks`. Never auto-merge just because
+  CI passes — confirm the breaking changes report is fully addressed first
 
 ## Error Handling
 

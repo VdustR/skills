@@ -32,33 +32,6 @@ base, and force-pushing only with explicit confirmation.
 6. **Report exact changes** - Show excluded commits, preserved commits, conflicts,
    verification, and next steps.
 
-## Quick Start
-
-```text
-User: My PR depends on PR #123 which just got merged. Help me rebase.
-```
-
-Default workflow:
-
-1. Inspect the current PR and branch status.
-2. Identify the parent PR automatically or ask the user.
-3. Confirm the parent PR is merged and detect the merge type.
-4. Classify commits as parent-owned, user-owned, or uncertain.
-5. Ask the user to confirm the classification and execution plan.
-6. Create a backup branch.
-7. Recreate the PR branch from the updated base and cherry-pick user-owned
-   commits.
-8. Resolve conflicts or ask for help on semantic conflicts.
-9. Verify the resulting branch.
-10. Ask before force-pushing with lease.
-11. Report the final state.
-
-With explicit parent:
-
-```text
-User: Rebase my PR, parent was PR #456.
-```
-
 ## Phase 1: Situation Analysis
 
 Gather:
@@ -84,7 +57,9 @@ gh pr list --state merged --head <baseRefName> --limit 5 \
 ```
 
 Read `references/parent-detection.md` for the detailed detection strategy,
-confidence rules, and user-facing option examples.
+confidence rules, and user-facing option examples. When the user names the
+parent PR explicitly, skip detection but still verify it: confirm the PR is
+merged and its head branch relates to the current PR's base.
 
 ## Phase 2: Merge Type Detection
 
@@ -143,7 +118,7 @@ High-level sequence:
 1. Fetch the latest base branch.
 2. Create `backup-pr<NUMBER>-<timestamp>` at the original branch HEAD.
 3. Create a temporary branch from `origin/<baseRefName>`.
-4. Cherry-pick user-owned commits.
+4. Cherry-pick user-owned commits, preserving commit messages and authorship.
 5. Resolve conflicts or ask for semantic conflicts.
 6. Replace the original branch with the temporary branch.
 7. Delete the temporary branch.
@@ -169,29 +144,8 @@ git push --force-with-lease origin <branch>
 ```
 
 Never use plain `--force`. Never delete the backup branch automatically.
-
-## Important Guidelines
-
-### Do
-
-- Verify parent PR identification before proceeding.
-- Use GitHub PR commit data to handle squash and rebase merges.
-- Ask when parent detection is not high confidence.
-- Show the full commit classification before execution.
-- Create a backup branch before rewriting.
-- Use `--force-with-lease`.
-- Preserve commit messages and authorship when cherry-picking.
-- Report conflicts, verification, and backup branch name.
-
-### Don't
-
-- Do not assume the parent PR without evidence.
-- Do not force-push without confirmation.
-- Do not discard uncertain commits without user selection.
-- Do not auto-resolve complex semantic conflicts.
-- Do not delete backup branches automatically.
-- Do not proceed if commit classification is unclear.
-- Do not use this skill for ordinary non-stacked rebases.
+In the final report, include conflicts encountered, verification results, and
+the backup branch name.
 
 ## Error Handling
 
@@ -208,7 +162,7 @@ Never use plain `--force`. Never delete the backup branch automatically.
 | Multiple parent PRs in chain | Collect commits from all parents, then keep only non-parent commits |
 | Parent PR has 250+ commits | Use pagination or manual commit selection |
 
-## Additional Resources
+## Reference Files
 
 - `references/parent-detection.md` - parent PR detection and confidence rules
 - `references/merge-strategies.md` - merge type detection and diagrams
