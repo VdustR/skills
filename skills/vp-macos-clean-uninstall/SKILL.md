@@ -12,155 +12,43 @@ description: >-
 
 # Clean Uninstall (macOS)
 
-Research-driven workflow for completely removing applications and all associated data from macOS.
-
-## Quick Start
-
-> Uninstall Docker from my Mac
-
-> Remove Slack and all its data
-
-> What files did Zoom leave behind?
-
-> Clean uninstall 1Password
-
-## When to Use
-
-- User asks to uninstall, remove, or delete a macOS application
-- User wants to check for residual data left by an app
-- User wants to free disk space by cleaning up after a removed app
-
-**When NOT to use:**
-- Linux or Windows uninstalls — this skill is macOS-only
-- Removing system-bundled apps (Safari, Mail, Finder) — these are SIP-protected
-- Clearing browser data or cookies only — not an app uninstall
-- Removing macOS system updates
+Research-driven workflow for completely removing applications and all
+associated data from macOS. Not for SIP-protected system apps (Safari, Mail,
+Finder) or macOS system updates.
 
 ## Workflow
 
 Execute these phases in order. Never skip the research and review phases.
 
-**Prerequisite**: If the app name cannot be determined unambiguously, ask the user to clarify. Never substitute an empty or whitespace-only string into any command.
+**Prerequisite**: If the app name cannot be determined unambiguously, ask the
+user to clarify. Never substitute an empty or whitespace-only string into any
+command.
 
 Define these variables once and use throughout:
+
 - `APP_NAME` — CLI/short name (e.g., `docker`, `slack`)
 - `APP_DISPLAY` — display name for `.app` bundle (e.g., `Docker`, `Slack`)
-- `BUNDLE_ID` — bundle identifier (e.g., `com.docker.docker`)
+- `BUNDLE_ID` — bundle identifier (e.g., `com.docker.docker`), resolved by
+  Phase 1
+
+Resolve `scripts/detect-app.sh` and `scripts/scan-residue.sh` from this skill
+directory. Both are read-only evidence collectors; run them instead of
+hand-writing detection shell.
 
 ### Phase 1: Identify Installation Method
 
-Determine how the app was installed — this dictates the correct removal procedure.
-
-**Run detection as a single consolidated script** — not as parallel sub-calls. One shell call with labeled sections prevents (a) short/empty outputs being misattributed across sections, and (b) a single failure (e.g., zsh `NOMATCH` glob) cancelling the rest of the batch.
-
-```bash
-# Phase 1 consolidated detection — run as a single Bash tool call
-set +e  # never abort; every section must print
-A="${APP_NAME:?APP_NAME required}"
-D="${APP_DISPLAY:-$A}"
-
-echo "=== Homebrew formula ==="
-brew list --formula 2>/dev/null | grep -i "$A" || echo "(none)"
-
-echo "=== Homebrew cask ==="
-brew list --cask 2>/dev/null | grep -i "$A" || echo "(none)"
-
-echo "=== Caskroom (direct, fallback) ==="
-found=$(find /opt/homebrew/Caskroom /usr/local/Caskroom -maxdepth 1 -iname "*${A}*" 2>/dev/null)
-[ -n "$found" ] && echo "$found" || echo "(none)"
-
-echo "=== /Applications bundle ==="
-[ -d "/Applications/${D}.app" ] && echo "/Applications/${D}.app" || echo "(none at /Applications/${D}.app)"
-
-echo "=== ~/Applications bundle (fallback) ==="
-found=$(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
-[ -n "$found" ] && echo "$found" || echo "(none)"
-
-echo "=== Bundle ID (mdls, with defaults fallback) ==="
-# Spotlight may be disabled or the app un-indexed, making mdls return empty
-# or "(null)". Fall back to reading Info.plist directly so downstream phases
-# never see an empty BUNDLE_ID (which would cause `find -iname "*${BUNDLE_ID}*"`
-# to match every path).
-emit_bid() {
-  app="$1"
-  raw=$(mdls -raw -name kMDItemCFBundleIdentifier "$app" 2>/dev/null)
-  if [ -z "$raw" ] || [ "$raw" = "(null)" ]; then
-    raw=$(defaults read "${app%/}/Contents/Info" CFBundleIdentifier 2>/dev/null)
-  fi
-  if [ -n "$raw" ]; then
-    echo "$app: $raw"
-  else
-    echo "$app: (bundle ID unavailable — Spotlight off or Info.plist unreadable; do NOT proceed with empty BUNDLE_ID to Phase 3)"
-  fi
-}
-bid_found=0
-if [ -d "/Applications/${D}.app" ]; then
-  emit_bid "/Applications/${D}.app"
-  bid_found=1
-fi
-while IFS= read -r app; do
-  [ -z "$app" ] && continue
-  emit_bid "$app"
-  bid_found=1
-done < <(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
-[ $bid_found -eq 0 ] && echo "(no .app found)"
-
-echo "=== PKG receipts ==="
-pkgutil --pkgs 2>/dev/null | grep -i "$A" || echo "(none)"
-
-echo "=== Mac App Store receipt ==="
-[ -e "/Applications/${D}.app/Contents/_MASReceipt" ] && echo "MAS receipt present" || echo "(not MAS)"
-
-echo "=== Bundled uninstaller (inside .app) ==="
-# Scan Contents of every candidate .app (both /Applications and ~/Applications)
-contents_list=""
-[ -d "/Applications/${D}.app/Contents" ] && contents_list="/Applications/${D}.app/Contents"
-while IFS= read -r app; do
-  [ -z "$app" ] && continue
-  [ -d "$app/Contents" ] && contents_list="${contents_list:+$contents_list
-}$app/Contents"
-done < <(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
-if [ -z "$contents_list" ]; then
-  echo "(no .app)"
-else
-  hits=""
-  while IFS= read -r c; do
-    [ -z "$c" ] && continue
-    more=$(find "$c" -maxdepth 3 \( -iname "*uninstall*" -o -iname "*remove*" \) 2>/dev/null | head -20)
-    [ -n "$more" ] && hits="${hits:+$hits
-}$more"
-  done <<< "$contents_list"
-  [ -n "$hits" ] && echo "$hits" || echo "(none)"
-fi
-
-echo "=== Sibling uninstaller apps (/Applications and ~/Applications) ==="
-# Symmetrical with the bundled-uninstaller scan: check both system and user app dirs.
-# find tolerates a missing ~/Applications via 2>/dev/null.
-found=$(find /Applications ~/Applications -maxdepth 1 \( -iname "*${A}*uninstall*" -o -iname "*${A}*remove*" \) 2>/dev/null)
-[ -n "$found" ] && echo "$found" || echo "(none)"
-
-echo "=== CLI in PATH ==="
-# Use `-- "$A"` so names starting with `-` are not parsed as options
-CMD=$(command -v -- "$A" 2>/dev/null || true)
-if [ -n "$CMD" ] && [ -x "$CMD" ]; then
-  echo "path: $CMD"
-  if [ -L "$CMD" ]; then
-    echo "symlink -> $(readlink "$CMD")"
-  fi
-else
-  echo "(not in PATH)"
-fi
-exit 0  # explicit clean exit so the consolidated script returns 0 regardless of individual section find/grep misses
-```
-
-**If every primary section above prints `(none)`/`(not ...)`**, also check CLI package managers:
+Determine how the app was installed — this dictates the correct removal
+procedure.
 
 ```bash
-echo "=== command path ==="; command -v -- "${APP_NAME}" 2>/dev/null || echo "(none)"
-echo "=== npm global ==="; npm list -g "${APP_NAME}" 2>/dev/null | grep -i "${APP_NAME}" || echo "(none)"
-echo "=== pip ==="; pip3 show "${APP_NAME}" 2>/dev/null || echo "(none)"
-echo "=== cargo ==="; command -v -- cargo >/dev/null && cargo install --list 2>/dev/null | grep -i "${APP_NAME}" || echo "(none)"
+scripts/detect-app.sh "$APP_NAME" "$APP_DISPLAY"
 ```
+
+One run prints every labeled evidence section: Homebrew formula/cask,
+Caskroom, `.app` bundles in `/Applications` and `~/Applications`, bundle ID
+(mdls with Info.plist fallback), PKG receipts, Mac App Store receipt, bundled
+and sibling uninstallers, CLI in PATH (with symlink target), and npm/pip/cargo
+global installs.
 
 **Gate before Phase 2** — explicitly declare in your response:
 
@@ -169,87 +57,103 @@ Installation method: <homebrew-cask | homebrew-formula | pkg | mas | direct-down
 Evidence: <the exact labeled section output line(s) that support this>
 ```
 
-Do not state a negative ("not Homebrew", "no bundle ID") without quoting the `(none)` line from the labeled output. If evidence is ambiguous or empty, rerun the script — never proceed on assumption.
+If evidence shows more than one method (e.g., formula and cask both
+matched), list every method that applies and plan removal for each.
 
-**Symlink handling**: If the `CLI in PATH` section reports a symlink, determine the relationship and ask the user:
+Do not state a negative ("not Homebrew", "no bundle ID") without quoting the
+`(none)` line from the labeled output. If evidence is ambiguous or empty,
+rerun the script — never proceed on assumption.
+
+**Symlink handling**: If the `CLI in PATH` section reports a symlink,
+determine the relationship first; ask the user only when the target is not
+the app being uninstalled:
 
 | Scenario | Action |
 |----------|--------|
+| Symlink into the app being uninstalled (e.g., Homebrew cask `binary` stanza) | No question needed — removed with the app (cask uninstall handles it) |
 | Symlink to a package manager binary (e.g., `npx` → npm) | Only remove the symlink |
 | Symlink to another app (e.g., `code` → VS Code) | Ask: remove alias only, or uninstall parent app + all aliases? |
 | Multiple symlinks to same app | List all; if uninstalling, remove all |
 
-**Bundled uninstaller**: If found, it takes priority over manual removal in Phase 6. Only use uninstallers from within the installed app bundle or the vendor's verified domain.
+**Bundled uninstaller**: If found, it takes priority over manual removal in
+Phase 6. Only use uninstallers from within the installed app bundle or the
+vendor's verified domain.
 
 ### Phase 2: Research Official Uninstall Method
 
-**Mandatory**: Understand the correct uninstall procedure before building a plan.
+**Mandatory**: Understand the correct uninstall procedure before building a
+plan.
 
-**Shortcut for Homebrew casks**: if Phase 1 identified a cask, `brew info --cask <token>` reveals the `zap` stanza (which lists the paths `--zap` will clean). Reviewing this output satisfies Phase 2 for standard casks. Web search is only additionally required when the app:
+**Shortcut for Homebrew casks**: if Phase 1 identified a cask,
+`brew info --cask <token>` reveals the `zap` stanza (which lists the paths
+`--zap` will clean). Reviewing this output satisfies Phase 2 for standard
+casks. Web search is only additionally required when the app:
 
-- installs kernel extensions, system extensions, or launch daemons (e.g., `docker`, `karabiner-elements`, `fuse`, VPN clients)
-- modifies system configuration (`/etc/hosts`, `/etc/shells`, PATH, shell integrations)
+- installs kernel extensions, system extensions, or launch daemons (e.g.,
+  `docker`, `karabiner-elements`, `fuse`, VPN clients)
+- modifies system configuration (`/etc/hosts`, `/etc/shells`, PATH, shell
+  integrations)
 - manages credentials or keychains at the system level (e.g., `1password`)
+
+If unsure whether these conditions apply, proceed and revisit this phase after
+the Phase 3 scan reveals launch agents, daemons, or system-level files.
 
 **For non-Homebrew apps, or when the above conditions apply**:
 
 1. **First search**: `"<app name>" official uninstall macOS site:<vendor-domain>`
 2. **Second search**: `"<app name>" uninstall macOS`
-3. **Evaluate sources** — prioritize: official vendor docs > vendor GitHub > Apple Support > community forums
-4. **Reject** blog spam, SEO-farm "cleaner" app promotions, and unverified guides
+3. **Evaluate sources** — prioritize: official vendor docs > vendor GitHub >
+   Apple Support > community forums
+4. **Reject** blog spam, SEO-farm "cleaner" app promotions, and unverified
+   guides
 
-**Critical**: Some apps have dedicated uninstallers or CLI commands. Missing these can leave kernel extensions, daemons, or system modifications behind.
+**Critical**: Some apps have dedicated uninstallers or CLI commands. Missing
+these can leave kernel extensions, daemons, or system modifications behind.
 
 ### Phase 3: Scan Associated Data
 
-**Safety preamble (always prepend to any Phase 3 script)** — an empty `BUNDLE_ID` would make `find -iname "*${BUNDLE_ID}*"` expand to `**` and match every file on disk. Guard against it:
-
 ```bash
-# Guard: block empty BUNDLE_ID from cascading into a match-everything scan
-: "${BUNDLE_ID:?BUNDLE_ID required for Phase 3. If Phase 1 could not resolve it (e.g., CLI-only install, no .app bundle, Spotlight disabled), either resolve it manually (defaults read <app>/Contents/Info CFBundleIdentifier) or remove BUNDLE_ID branches from the find expressions below and rely on APP_NAME + extra manual verification.}"
+scripts/scan-residue.sh "$APP_NAME" "$BUNDLE_ID"
 ```
 
-**If the app name is ambiguous** (shorter than 4 characters or a common word like `go`, `pro`, `mail`, `code`, `sync`, `file`, `app`), use bundle ID only:
+The script enforces the safety rules, refusing to run instead of producing a
+match-everything or false-positive-flooded scan:
 
-```bash
-find ~/Library /Library -maxdepth 3 -iname "*${BUNDLE_ID}*" 2>/dev/null
-find ~/.config ~/.local -maxdepth 2 -iname "*${BUNDLE_ID}*" 2>/dev/null
-```
+- An empty `BUNDLE_ID` is refused — resolve it first (Phase 1 output, or
+  `defaults read <app>/Contents/Info CFBundleIdentifier`).
+- Ambiguous names (shorter than 4 characters or common words like `code`,
+  `mail`) are matched by bundle ID only.
+- For CLI-only installs with no bundle ID at all, use
+  `scripts/scan-residue.sh --name-only "$APP_NAME"` — refused for ambiguous
+  names.
 
-**Otherwise**, scan with both app name and bundle ID:
-
-```bash
-echo "=== User Library ==="
-find ~/Library -maxdepth 3 \( -iname "*${APP_NAME}*" -o -iname "*${BUNDLE_ID}*" \) 2>/dev/null
-
-echo "=== System Library ==="
-find /Library -maxdepth 3 \( -iname "*${APP_NAME}*" -o -iname "*${BUNDLE_ID}*" \) 2>/dev/null
-
-echo "=== XDG Config ==="
-find ~/.config ~/.local -maxdepth 2 \( -iname "*${APP_NAME}*" -o -iname "*${BUNDLE_ID}*" \) 2>/dev/null
-
-echo "=== Dotfiles ==="
-ls -d ~/."${APP_NAME}" ~/."${APP_NAME}"rc 2>/dev/null
-```
-
-In both cases, require manual verification of every name-based match before including in the removal plan.
+Require manual verification of every name-based match before including it in
+the removal plan.
 
 ### Phase 4: Subagent Review of Removal Plan
 
-**Mandatory**: Before presenting the plan to the user, launch a subagent to review the entire removal plan.
+**Mandatory**: Before presenting the plan to the user, launch a read-only
+review subagent (no file modifications) to review the entire removal plan.
 
-**Red flags that mean you are rationalizing skipping this phase** — if you catch yourself thinking any of these, stop and invoke the subagent:
+**Red flags that mean you are rationalizing skipping this phase** — if you
+catch yourself thinking any of these, stop and invoke the subagent:
 
 - "This is a simple cask uninstall, review is overkill"
 - "All paths look safe, nothing under `/System` or `/usr`"
 - "`--zap` handles everything, there is nothing to review"
 - "I already ran Phase 1 myself, a second read adds nothing"
 
-The subagent's primary job is **not** catching dangerous paths — those are easy to spot. Its primary job is catching **misread evidence from Phase 1** (e.g., declaring "not Homebrew" when `brew list` actually matched the name, or missing a bundled uninstaller that was buried in a multi-section output).
+The subagent's primary job is **not** catching dangerous paths — those are
+easy to spot. Its primary job is catching **misread evidence from Phase 1**
+(e.g., declaring "not Homebrew" when `brew list` actually matched the name, or
+missing a bundled uninstaller that was buried in a multi-section output).
 
-Subagent prompt must include: app name, bundle ID, installation method, full file list, uninstall steps in order, the raw Phase 1 detection output, and research sources.
+Subagent prompt must include: app name, bundle ID, installation method, full
+file list, uninstall steps in order, the raw Phase 1 detection output, and
+research sources.
 
 **Subagent review checklist:**
+
 - [ ] Uninstall steps match official documentation
 - [ ] No vendor-provided uninstaller is being skipped
 - [ ] PKG apps: `pkgutil --files <pkg-id>` output reviewed for system-level files
@@ -275,11 +179,17 @@ Present a categorized table to the user:
 | Preferences | `~/Library/Preferences/com.foo.plist` | 4 KB | Trash |
 | Cache | `~/Library/Caches/com.foo` | 23 MB | Remove |
 
-**Default recommendation: remove everything** (clean uninstall). Flag items containing potentially irreplaceable user data (configuration, databases, project files) and ask explicitly.
+**Default recommendation: remove everything** (clean uninstall). Flag items
+containing potentially irreplaceable user data (configuration, databases,
+project files) and ask explicitly.
 
-**Recovery approach**: Move user data directories (Application Support, Preferences) to Trash instead of `rm -rf`. Use `rm -rf` only for caches and temporary files. To avoid name collisions in Trash, append a timestamp: `mv "<path>" ~/.Trash/"$(basename "<path>")_$(date +%s)"`.
+**Recovery approach**: Move user data directories (Application Support,
+Preferences) to Trash instead of `rm -rf`. Use `rm -rf` only for caches and
+temporary files. To avoid name collisions in Trash, append a timestamp:
+`mv "<path>" ~/.Trash/"$(basename "<path>")_$(date +%s)"`.
 
-Warn about: login items, browser extensions, privacy permissions, kernel extensions requiring reboot.
+Warn about: login items, browser extensions, privacy permissions, kernel
+extensions requiring reboot.
 
 ### Phase 6: Execute with Confirmation
 
@@ -295,7 +205,9 @@ Warn about: login items, browser extensions, privacy permissions, kernel extensi
    | Force kill | `killall "${APP_DISPLAY}"` (warn: may lose unsaved data) |
    | Remove auto-launch first, reboot later | Unload launch agents/daemons (step 3) + remove login items, then ask user to reboot and re-run removal |
 
-   **Note:** If a launch agent has `KeepAlive` enabled, the process will respawn after quit/kill. In that case, fall back to the "Remove auto-launch first" option.
+   **Note:** If a launch agent has `KeepAlive` enabled, the process will
+   respawn after quit/kill. In that case, fall back to the "Remove
+   auto-launch first" option.
 3. **Unload launch agents/daemons**:
    ```bash
    LABEL=$(/usr/libexec/PlistBuddy -c "Print :Label" "<plist-path>")
@@ -306,17 +218,25 @@ Warn about: login items, browser extensions, privacy permissions, kernel extensi
    sudo launchctl bootout "system/${LABEL}"
    sudo launchctl print "system/${LABEL}" 2>&1 | grep -q "Could not find" && echo "System daemon unloaded"
    ```
-4. **Use Homebrew** if applicable — use the **exact cask/formula token** from Phase 1 `brew list` output (not the user-provided name):
+4. **Use Homebrew** if applicable — use the **exact cask/formula token** from
+   Phase 1 `brew list` output (not the user-provided name):
    - Cask: `brew uninstall --zap --cask "<exact-token>"` (`--zap` removes all associated files)
    - Formula: `brew uninstall "<exact-token>"`
-   If multiple tokens matched `grep -i` in Phase 1, list all matches and ask the user to select the correct one
+   If multiple tokens matched `grep -i` in Phase 1, list all matches and ask
+   the user to select the correct one.
+   Zap stanzas may `delete:` rather than `trash:` — before running `--zap`,
+   move any user-data paths the Phase 5 plan promised to Trash into the Trash
+   yourself
 5. **Use vendor uninstaller** if one was found in Phase 1
-6. **Remove associated data** — Trash for user data, `rm -rf` for caches. Explicit paths only
-7. **Forget PKG receipts** — **ALWAYS after removing files** (once forgotten, file list is unrecoverable): `sudo pkgutil --forget <pkg-id>`
+6. **Remove associated data** — Trash for user data, `rm -rf` for caches.
+   Explicit paths only
+7. **Forget PKG receipts** — **ALWAYS after removing files** (once forgotten,
+   file list is unrecoverable): `sudo pkgutil --forget <pkg-id>`
 
 ### Phase 7: Post-Removal Verification
 
-**Targeted verification** — check only the specific paths from the removal plan:
+**Targeted verification** — check only the specific paths from the removal
+plan:
 
 ```bash
 # Check each removed path still exists

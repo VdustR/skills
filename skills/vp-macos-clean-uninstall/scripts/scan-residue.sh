@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# Phase 3 residue scan helper for vp-macos-clean-uninstall.
+#
+# Read-only: prints labeled candidate paths and never deletes anything.
+#
+# Usage:
+#   scan-residue.sh <app-name> <bundle-id>
+#   scan-residue.sh --name-only <app-name>
+#
+# Safety rules enforced here instead of trusting the caller:
+# - An empty bundle id is refused: `find -iname "*${BUNDLE_ID}*"` with an empty
+#   value would match every file on disk.
+# - Ambiguous app names (shorter than 4 characters, or common words such as
+#   "mail", "code", "sync", "file") are matched by bundle id only. --name-only
+#   mode refuses them entirely; resolve the bundle id first
+#   (defaults read <app>/Contents/Info CFBundleIdentifier).
+# Every match still requires manual verification before entering the removal
+# plan.
+
+set -u
+
+usage() {
+  sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//' >&2
+  exit 2
+}
+
+fail() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 2
+}
+
+nonblank() {
+  [ -n "$(printf '%s' "$1" | tr -d '[:space:]')" ]
+}
+
+is_ambiguous_name() {
+  name_lower="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  if [ "${#name_lower}" -lt 4 ]; then
+    return 0
+  fi
+  case "$name_lower" in
+    mail|code|sync|file) return 0 ;;
+  esac
+  return 1
+}
+
+section() {
+  # section <label> <command...> — print label, then output or "(none)"
+  label="$1"
+  shift
+  echo "=== $label ==="
+  found="$("$@" 2>/dev/null)"
+  [ -n "$found" ] && echo "$found" || echo "(none)"
+}
+
+APP_NAME=""
+BUNDLE_ID=""
+NAME_ONLY=0
+
+if [ "${1:-}" = "--name-only" ]; then
+  NAME_ONLY=1
+  shift
+  [ $# -eq 1 ] || usage
+  APP_NAME="$1"
+else
+  [ $# -eq 2 ] || usage
+  APP_NAME="$1"
+  BUNDLE_ID="$2"
+fi
+
+nonblank "$APP_NAME" || fail "app-name must not be empty or whitespace-only"
+
+if [ "$NAME_ONLY" -eq 1 ]; then
+  if is_ambiguous_name "$APP_NAME"; then
+    fail "app-name '$APP_NAME' is too short or too common for name-only scanning; resolve the bundle id first"
+  fi
+  section "User Library (name match)" find "$HOME/Library" -maxdepth 3 -iname "*${APP_NAME}*"
+  section "System Library (name match)" find /Library -maxdepth 3 -iname "*${APP_NAME}*"
+  section "XDG Config (name match)" find "$HOME/.config" "$HOME/.local" -maxdepth 2 -iname "*${APP_NAME}*"
+  section "Dotfiles" ls -d "$HOME/.${APP_NAME}" "$HOME/.${APP_NAME}rc"
+  exit 0
+fi
+
+nonblank "$BUNDLE_ID" || fail "bundle-id must not be empty or whitespace-only (use --name-only only when no bundle id exists)"
+
+if is_ambiguous_name "$APP_NAME"; then
+  echo "note: app-name '$APP_NAME' is ambiguous; matching by bundle id only" >&2
+  section "User Library (bundle id match)" find "$HOME/Library" -maxdepth 3 -iname "*${BUNDLE_ID}*"
+  section "System Library (bundle id match)" find /Library -maxdepth 3 -iname "*${BUNDLE_ID}*"
+  section "XDG Config (bundle id match)" find "$HOME/.config" "$HOME/.local" -maxdepth 2 -iname "*${BUNDLE_ID}*"
+  exit 0
+fi
+
+section "User Library" find "$HOME/Library" -maxdepth 3 \( -iname "*${APP_NAME}*" -o -iname "*${BUNDLE_ID}*" \)
+section "System Library" find /Library -maxdepth 3 \( -iname "*${APP_NAME}*" -o -iname "*${BUNDLE_ID}*" \)
+section "XDG Config" find "$HOME/.config" "$HOME/.local" -maxdepth 2 \( -iname "*${APP_NAME}*" -o -iname "*${BUNDLE_ID}*" \)
+section "Dotfiles" ls -d "$HOME/.${APP_NAME}" "$HOME/.${APP_NAME}rc"
+
+exit 0
