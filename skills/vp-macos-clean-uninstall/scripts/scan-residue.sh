@@ -37,6 +37,7 @@ nonblank() {
 }
 
 is_ambiguous_name() {
+  local name_lower
   name_lower="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
   if [ "${#name_lower}" -lt 4 ]; then
     return 0
@@ -49,9 +50,10 @@ is_ambiguous_name() {
 
 section() {
   # section <label> <command...> — print label, then output or "(none)"
-  label="$1"
+  local label="$1"
   shift
   echo "=== $label ==="
+  local found
   found="$("$@" 2>/dev/null)"
   [ -n "$found" ] && echo "$found" || echo "(none)"
 }
