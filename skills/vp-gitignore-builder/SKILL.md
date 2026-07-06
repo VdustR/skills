@@ -13,23 +13,16 @@ description: >-
 
 # Gitignore Builder
 
-Build and merge repository `.gitignore` files or global gitignore files using templates from [github/gitignore](https://github.com/github/gitignore) with smart target separation.
-
-## When to Use
-
-Invoke this skill when:
-
-- User explicitly requests `/gitignore` or asks to create/update a `.gitignore`
-- User asks to create/update a global gitignore or personal git excludes file
-- Detecting `git init` or a newly cloned repo without `.gitignore`
-- User mentions ignoring files, not wanting to track certain files
-- Observing `git status` output with files that should typically be ignored (e.g., `node_modules/`, `.env`, `__pycache__/`, `*.log`)
+Build and merge repository `.gitignore` files or global gitignore files using
+templates from [github/gitignore](https://github.com/github/gitignore) with
+smart target separation.
 
 ## Workflow
 
 ### Step 1: Determine Target Mode and Location
 
-Choose the target mode before detecting templates. Do not mix repo and global ignore rules by default.
+Choose the target mode before detecting templates. Do not mix repo and global
+ignore rules by default.
 
 | Target Mode | Default Location | Use When |
 |-------------|------------------|----------|
@@ -38,22 +31,16 @@ Choose the target mode before detecting templates. Do not mix repo and global ig
 
 Rules:
 
-- Inside a repo, default to repo mode unless the user explicitly asks for global ignore.
+- Inside a repo, default to repo mode unless the user explicitly asks for
+  global ignore.
 - Do not infer global mode from OS/editor detection alone.
-- Do not add `Global/...` templates to a repo `.gitignore` unless the user explicitly asks to commit those machine/editor/OS patterns to the repo.
-- Do not add project templates like `Node` or `Python` to a global gitignore unless the user explicitly asks for project-language patterns globally.
-
-1. Find the nearest `.git` directory to determine repo root
-2. If no `.git` found and the user did not explicitly ask for global ignore, ask whether they want a repo-local file in the current directory or a global gitignore
-
-**Location Rules:**
-
-| Situation | Action |
-|-----------|--------|
-| Inside a repo, project-level or ambiguous request | Use repo root (where `.git` is) |
-| Inside a repo, global requested | Use the global gitignore path; do not write the repo `.gitignore` unless the user changes target |
-| Not in a repo, global requested | Use the global gitignore path |
-| Not in a repo, ambiguous request | Ask whether to create a local `.gitignore` in the current directory or a global gitignore |
+- Do not add `Global/...` templates to a repo `.gitignore` unless the user
+  explicitly asks to commit those machine/editor/OS patterns to the repo.
+- Do not add project templates like `Node` or `Python` to a global gitignore
+  unless the user explicitly asks for project-language patterns globally.
+- If no `.git` directory is found and the user did not explicitly ask for
+  global ignore, ask whether they want a repo-local file in the current
+  directory or a global gitignore.
 
 ### Step 2: Detect Project Type
 
@@ -74,7 +61,10 @@ Rules:
 | `CMakeLists.txt` | CMake.gitignore |
 | `Makefile` with C/C++ files | C.gitignore or C++.gitignore |
 
-Do not recommend OS/editor global templates for repo mode just because `.vscode/`, `.idea/`, `.DS_Store`, or similar files are present. Instead, say those are usually global ignore candidates and offer a separate global gitignore only if the user wants it.
+Do not recommend OS/editor global templates for repo mode just because
+`.vscode/`, `.idea/`, `.DS_Store`, or similar files are present. Instead, say
+those are usually global ignore candidates and offer a separate global
+gitignore only if the user wants it.
 
 **For global gitignore (environment-aware detection):**
 
@@ -112,14 +102,15 @@ Not adding to repo by default:
 Proceed with these templates? [Y/n/edit]
 ```
 
-Allow user to:
-- Confirm (Y)
-- Cancel (n)
-- Edit the list (add/remove templates)
+Allow the user to confirm (Y), cancel (n), or edit the list (add/remove
+templates).
 
 ### Step 4: Fetch and Merge
 
-Use the bundled `scripts/merge-gitignore.sh` script from this skill directory:
+Use the bundled `scripts/merge-gitignore.sh` from this skill directory. It
+fetches templates from github/gitignore, detects EOL inconsistencies,
+concatenates templates with source attribution, and prints the merged result
+to stdout for the preview/confirmation workflow.
 
 ```bash
 # Repo .gitignore
@@ -127,17 +118,25 @@ scripts/merge-gitignore.sh --target repo Node Python
 
 # Global gitignore
 scripts/merge-gitignore.sh --target global Global/macOS Global/VisualStudioCode
+
+# Escape hatches, only when explicitly requested by the user:
+scripts/merge-gitignore.sh --target repo --allow-global-in-repo Global/macOS
+scripts/merge-gitignore.sh --target global --allow-project-in-global Node
 ```
 
-**Merge Order (later entries have higher priority in gitignore):**
+**Exit codes:**
 
-1. **Templates section** - github/gitignore templates with START/END markers (easiest to replace/update)
-2. **Local files section** - Project-specific ignores
-3. **Overrides section** - Custom overrides with highest priority (last wins in gitignore)
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Network error (failed to fetch) |
+| 2 | EOL conflict detected (info in stderr) |
+| 3 | Template rejected for the selected target |
 
 ### Step 5: Handle EOL Conflicts
 
-If the script detects mixed line endings:
+If the script detects mixed line endings (exit code 2), ask the user to
+choose before proceeding:
 
 ```
 ⚠️ EOL inconsistency detected:
@@ -151,46 +150,11 @@ Choose unified format:
 3. Keep as-is (no conversion)
 ```
 
-Wait for user confirmation before proceeding.
-
 ### Step 6: Show Diff Preview
 
-If target `.gitignore` already exists, show a diff:
-
-```diff
-📄 Will write to: /path/to/repo/.gitignore
-
---- Existing content
-+++ Merged content
-
-@@ -1,5 +1,60 @@
-+# ╔═══════════════════════════════════════════════════════════════════════╗
-+# ║ START - github/gitignore templates                                    ║
-+# ╚═══════════════════════════════════════════════════════════════════════╝
-+
-+# --------------------------------------------
-+# Source: Node.gitignore
-+# --------------------------------------------
-+node_modules/
-+...
-+
-+# ╔═══════════════════════════════════════════════════════════════════════╗
-+# ║ END - github/gitignore templates                                      ║
-+# ╚═══════════════════════════════════════════════════════════════════════╝
-+
-+# ============================================
-+# Local files (project-specific ignores)
-+# ============================================
-+
-+# ============================================
-+# Overrides (highest priority - last wins)
-+# ============================================
-+
- # User custom rules
- my-custom-file.txt
-
-Confirm write? [Y/n]
-```
+If the target file already exists, show a unified diff between the existing
+content and the merged content (structured as in "Output Structure" below),
+then ask `Confirm write? [Y/n]`.
 
 ### Step 7: Write File
 
@@ -200,33 +164,20 @@ After user confirms, write the file and report success:
 ✅ Created /path/to/repo/.gitignore (150 lines, 3 templates merged)
 ```
 
-## Important Notes
+## Output Structure
 
-### Always Recommend *.local Pattern
+Merged files have three sections, in order. Later entries have higher
+priority because in gitignore the last matching pattern wins.
 
-At the end of every gitignore generation, suggest:
+1. **Templates section** — github/gitignore templates wrapped in START/END
+   markers (easiest to replace on update)
+2. **Local files section** — project-specific ignores
+3. **Overrides section** — custom overrides with highest priority
 
-```
-💡 Tip: Consider adding these patterns for local configuration files:
-   *.local
-   *.local.*
-
-These patterns prevent accidentally committing local overrides.
-```
-
-### Gitignore Syntax Reminders
-
-When discussing or modifying gitignore:
-
-- **Negation**: The exclamation mark prefix negates a pattern, re-including previously excluded files. Order is important: the negation must come after the exclusion. Example: `!important.log` re-includes `important.log`.
-- **Order matters**: Later patterns override earlier ones.
-- **Comments**: Lines starting with `#` are comments.
-- **Directory**: Trailing `/` matches only directories (e.g., `build/`).
-- **Wildcards**: `*` matches anything except `/`, `**` matches everything including `/`.
-
-### Source Attribution & Structure
-
-Templates section must be wrapped with START/END markers:
+When merging with an existing `.gitignore`, preserve user-added content:
+clearly project-specific ignores go to the Local files section; everything
+else (including negations) goes to the Overrides section so its last-wins
+behavior is unchanged:
 
 ```gitignore
 # ╔═══════════════════════════════════════════════════════════════════════╗
@@ -234,31 +185,6 @@ Templates section must be wrapped with START/END markers:
 # ║           https://github.com/github/gitignore                         ║
 # ╠═══════════════════════════════════════════════════════════════════════╣
 # ║ START - Do not edit this section manually                             ║
-# ╚═══════════════════════════════════════════════════════════════════════╝
-
-# --------------------------------------------
-# Source: Node.gitignore
-# --------------------------------------------
-node_modules/
-...
-
-# ╔═══════════════════════════════════════════════════════════════════════╗
-# ║ END - github/gitignore templates                                      ║
-# ╚═══════════════════════════════════════════════════════════════════════╝
-```
-
-This makes it easy to:
-- Identify template content for updates (replace between START/END)
-- Understand where each rule comes from
-- Avoid accidental edits to generated content
-
-### Preserve User Content
-
-If merging with an existing `.gitignore`, preserve user-added content in the appropriate section:
-
-```gitignore
-# ╔═══════════════════════════════════════════════════════════════════════╗
-# ║ START - github/gitignore templates                                    ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 
 # --------------------------------------------
@@ -287,40 +213,37 @@ my-custom-rule.txt
 !important.log
 ```
 
-## Reference Files
+The START/END markers make it easy to identify template content for updates
+(replace between the markers), attribute each rule to its source, and avoid
+accidental edits to generated content.
 
-- **[examples.md](references/examples.md)** - Detailed workflow examples for various scenarios
+## Important Notes
 
-## Script Reference
+### Always Recommend *.local Pattern
 
-The `merge-gitignore.sh` script handles:
+At the end of every gitignore generation, suggest:
 
-1. Fetching templates from github/gitignore via raw.githubusercontent.com
-2. Detecting and reporting EOL inconsistencies
-3. Concatenating templates with source attribution
-4. Outputting to stdout for preview/confirmation workflow
+```
+💡 Tip: Consider adding these patterns for local configuration files:
+   *.local
+   *.local.*
 
-**Usage:**
-
-```bash
-# Fetch and merge templates
-scripts/merge-gitignore.sh --target repo <template1> [template2] ...
-scripts/merge-gitignore.sh --target global <template1> [template2] ...
-
-# Templates can be:
-# - Repo target: top-level templates such as Node, Python, Rust, Go
-# - Global target: Global/ templates such as Global/macOS, Global/VisualStudioCode
-
-# Escape hatches, only when explicitly requested by the user:
-scripts/merge-gitignore.sh --target repo --allow-global-in-repo Global/macOS
-scripts/merge-gitignore.sh --target global --allow-project-in-global Node
+These patterns prevent accidentally committing local overrides.
 ```
 
-**Exit Codes:**
+### Gitignore Syntax Reminders
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Network error (failed to fetch) |
-| 2 | EOL conflict detected (info in stderr) |
-| 3 | Template rejected for the selected target |
+When discussing or modifying gitignore:
+
+- **Negation**: The exclamation mark prefix negates a pattern, re-including
+  previously excluded files. Order is important: the negation must come after
+  the exclusion. Example: `!important.log` re-includes `important.log`.
+- **Comments**: Lines starting with `#` are comments.
+- **Directory**: Trailing `/` matches only directories (e.g., `build/`).
+- **Wildcards**: `*` matches anything except `/`, `**` matches everything
+  including `/`.
+
+## Reference Files
+
+- **[examples.md](references/examples.md)** - Detailed workflow examples for
+  various scenarios

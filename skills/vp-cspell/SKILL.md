@@ -24,16 +24,6 @@ Prioritized strategy for handling cspell unknown word warnings. Classify each fl
 
 > **Documentation**: Fetch cspell syntax and config details via Context7 (`/streetsidesoftware/cspell`) at runtime; never rely on hardcoded syntax.
 
-## When to Use
-
-- cspell flags an unknown word (IDE diagnostic or CI output)
-- User asks to fix cspell warnings, add words to dictionary, or suppress cspell errors
-- User wants to set up cspell in a project that doesn't have it
-- User asks why a word is flagged or wants to understand cspell behavior
-- Linting pipeline or pre-commit hook fails due to unrecognized words
-
-**When NOT to use**: For non-cspell spell checkers (typo, codespell, Vale, textlint). For other linting tools (ESLint, markdownlint), use their respective strategies.
-
 ## Workflow
 
 1. **Check for cspell config** — Search from the file's directory upward for cspell config files: `package.json` (`cspell` field), `.cspell.json`, `cspell.json`, `cspell.config.{json,mjs,js,cjs,yaml,yml,toml}`, `cspell.{yaml,yml}`, and their `.`/`.config/` prefixed variants (e.g., `.cspell.config.yaml`, `.config/cspell.json`). Also check `.vscode/cspell.json`. If none found: notify user, do NOT auto-fix, offer to bootstrap (see below). Note: `cspell.*` settings in `.vscode/settings.json` are IDE-local and do not count as project config.
@@ -56,21 +46,14 @@ See [config-bootstrapping.md](references/config-bootstrapping.md) for the full i
 
 ## Guidelines
 
-### DO
-
-- Check repo config before any action
-- Prefer text adjustment over dictionary pollution
-- Use narrowest scope directive that fits
 - Place `cspell:words` at file top for discoverability
-- Verify the flagged word is genuinely unknown (not a missing dictionary)
-
-### DON'T
-
-- Replace words with semantically different alternatives
-- Add one-off words to project dictionary (use inline directives)
-- Use `cspell:disable` to suppress large sections when individual words can be handled
-- Blindly accept all cspell suggestions — some flagged words are correct
-- Hyphenate or restructure runtime API identifiers, package names, or fixed external terms
+- Verify the flagged word is genuinely unknown — it may just need an existing
+  dictionary enabled, and some flagged words are correct as written
+- Never replace words with semantically different alternatives
+- Never hyphenate or restructure runtime API identifiers, package names, or
+  fixed external terms
+- Don't use `cspell:disable` to suppress large sections when individual words
+  can be handled
 
 ## Error Handling
 

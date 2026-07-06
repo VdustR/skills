@@ -36,23 +36,12 @@ by topic, replying with evidence, and resolving only the right review threads.
 
 ## Quick Start
 
-Interactive mode:
+Interactive mode (default) — walk through Phases 1-6 below, pausing for user
+judgment as each phase requires:
 
 ```text
 User: Handle the comments on this PR: https://github.com/owner/repo/pull/123
 ```
-
-Default workflow:
-
-1. Fetch unresolved review threads and PR discussion comments.
-2. Exclude comments from the current viewer and prior resolver replies.
-3. Classify each author as bot or human.
-4. Verify whether each suggestion is valid, already handled, incorrect, or
-   ambiguous.
-5. Fix valid issues with focused commits, or prepare an evidence-backed reply.
-6. Reply to each comment and resolve only bot review threads.
-7. Summarize commits, replies, unresolved human threads, skipped comments, and
-   verification.
 
 Auto mode:
 
@@ -192,21 +181,6 @@ Read `references/workflow.md` for the complete queue and processing details, and
 
 ## Important Guidelines
 
-### Do
-
-- Verify technical validity before implementing.
-- Classify each author before deciding whether to resolve.
-- Resolve bot review threads after any decided outcome.
-- Leave human review threads unresolved.
-- Treat bottom-of-PR discussion comments as reply-only.
-- Group commits by logical modification topic.
-- Use descriptive commit messages that describe the change.
-- Ask the user before disagreeing with a reviewer.
-- Include commit links and changed files in fix replies.
-- Run relevant verification before committing or reporting success.
-
-### Don't
-
 - Do not blindly accept every comment.
 - Do not auto-resolve human review threads.
 - Do not leave handled bot review threads open.
@@ -230,7 +204,7 @@ Read `references/workflow.md` for the complete queue and processing details, and
 | Push fails | Report error, suggest manual intervention |
 | GraphQL API error | Retry once, then use the fallback in `references/github-cli.md` |
 
-## Additional Resources
+## Reference Files
 
 - `references/workflow.md` - detailed fetch, queue, and processing workflow
 - `references/author-classification.md` - bot/human author classification rules

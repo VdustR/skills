@@ -125,7 +125,7 @@ current_updated_at=$(jq -r '.updated_at' "$tmpfile")
 if [ "$current_updated_at" != "$phase1_updated_at" ]; then
   echo "Source has been modified since we started."
   echo "Skipping checkbox update for THIS source."
-  echo "Please re-run /checklist to get fresh data for this source."
+  echo "Please re-run the checklist to get fresh data for this source."
   # abort: do not proceed to PATCH for this source
   # (continue with other unaffected sources in the outer loop)
   return 1  # or exit 1 if not in a function
