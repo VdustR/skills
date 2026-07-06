@@ -48,7 +48,8 @@ One run prints every labeled evidence section: Homebrew formula/cask,
 Caskroom, `.app` bundles in `/Applications` and `~/Applications`, bundle ID
 (mdls with Info.plist fallback), PKG receipts, Mac App Store receipt, bundled
 and sibling uninstallers, CLI in PATH (with symlink target), and npm/pip/cargo
-global installs.
+global installs (probed only when every earlier section missed — they print
+`(skipped: ...)` otherwise).
 
 **Gate before Phase 2** — explicitly declare in your response:
 
@@ -113,16 +114,17 @@ these can leave kernel extensions, daemons, or system modifications behind.
 ### Phase 3: Scan Associated Data
 
 ```bash
-scripts/scan-residue.sh "$APP_NAME" "$BUNDLE_ID"
+scripts/scan-residue.sh "$APP_NAME" <bundle-id> [bundle-id...]
 ```
 
-The script enforces the safety rules, refusing to run instead of producing a
-match-everything or false-positive-flooded scan:
+Pass every bundle ID Phase 1 emitted — multi-bundle apps (e.g., Docker) are
+scanned in a single walk. The script enforces the safety rules, refusing to
+run instead of producing a match-everything or false-positive-flooded scan:
 
-- An empty `BUNDLE_ID` is refused — resolve it first (Phase 1 output, or
+- An empty bundle ID is refused — resolve it first (Phase 1 output, or
   `defaults read <app>/Contents/Info CFBundleIdentifier`).
-- Ambiguous names (shorter than 4 characters or common words like `code`,
-  `mail`) are matched by bundle ID only.
+- Ambiguous names (too short or too common — see the script's usage output)
+  are matched by bundle ID only.
 - For CLI-only installs with no bundle ID at all, use
   `scripts/scan-residue.sh --name-only "$APP_NAME"` — refused for ambiguous
   names.

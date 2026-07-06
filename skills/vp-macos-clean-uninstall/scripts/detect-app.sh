@@ -4,21 +4,37 @@
 # Read-only: prints labeled evidence sections and never modifies anything.
 # Every section always prints a line, so short or empty results cannot be
 # misattributed and one failing probe cannot cancel the rest.
-#
-# Usage:
-#   detect-app.sh <app-name> [display-name]
-#
-#   app-name      CLI/short name, e.g. "docker", "slack"
-#   display-name  display name for the .app bundle, defaults to app-name,
-#                 e.g. "Docker", "Slack"
 
 set -u  # no -e: every section must print even when individual probes miss
 
 usage() {
-  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' >&2
+  cat <<'EOF' >&2
+Usage: detect-app.sh <app-name> [display-name]
+
+  app-name      CLI/short name, e.g. "docker", "slack"
+  display-name  display name for the .app bundle, defaults to app-name,
+                e.g. "Docker", "Slack"
+
+Prints labeled evidence sections: Homebrew formula/cask, Caskroom, .app
+bundles, bundle ID, PKG/MAS receipts, uninstallers, CLI in PATH, and
+npm/pip/cargo (probed only when every primary section misses).
+EOF
   exit 2
 }
 
+fail() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 2
+}
+
+nonblank() {
+  [ -n "$(printf '%s' "$1" | tr -d '[:space:]')" ]
+}
+
+case "${1:-}" in
+  -h|--help) usage ;;
+  -*) fail "app-name must not start with '-'" ;;
+esac
 [ $# -ge 1 ] && [ $# -le 2 ] || usage
 
 A="$1"
@@ -26,27 +42,42 @@ D="${2:-$A}"
 
 # Never accept an empty or whitespace-only app name: downstream globs would
 # silently match everything.
-if [ -z "$(printf '%s' "$A" | tr -d '[:space:]')" ]; then
-  printf 'Error: app-name must not be empty or whitespace-only\n' >&2
-  exit 2
-fi
+nonblank "$A" || fail "app-name must not be empty or whitespace-only"
+case "$D" in
+  -*) fail "display-name must not start with '-'" ;;
+esac
+
+# 1 while any primary section below produced evidence; gates the package
+# manager probes at the end (they are slow and only useful when everything
+# else missed).
+primary_hit=0
+
+# Single walk of ~/Applications, reused by the bundle listing, bundle-ID
+# resolution, and bundled-uninstaller sections so they can never disagree.
+user_apps=$(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
 
 echo "=== Homebrew formula ==="
-brew list --formula 2>/dev/null | grep -i "$A" || echo "(none)"
+found=$(brew list --formula 2>/dev/null | grep -i "$A")
+[ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== Homebrew cask ==="
-brew list --cask 2>/dev/null | grep -i "$A" || echo "(none)"
+found=$(brew list --cask 2>/dev/null | grep -i "$A")
+[ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== Caskroom (direct, fallback) ==="
 found=$(find /opt/homebrew/Caskroom /usr/local/Caskroom -maxdepth 1 -iname "*${A}*" 2>/dev/null)
-[ -n "$found" ] && echo "$found" || echo "(none)"
+[ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== /Applications bundle ==="
-[ -d "/Applications/${D}.app" ] && echo "/Applications/${D}.app" || echo "(none at /Applications/${D}.app)"
+if [ -d "/Applications/${D}.app" ]; then
+  echo "/Applications/${D}.app"
+  primary_hit=1
+else
+  echo "(none at /Applications/${D}.app)"
+fi
 
 echo "=== ~/Applications bundle (fallback) ==="
-found=$(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
-[ -n "$found" ] && echo "$found" || echo "(none)"
+[ -n "$user_apps" ] && { echo "$user_apps"; primary_hit=1; } || echo "(none)"
 
 echo "=== Bundle ID (mdls, with defaults fallback) ==="
 # Spotlight may be disabled or the app un-indexed, making mdls return empty
@@ -74,14 +105,20 @@ while IFS= read -r app; do
   [ -z "$app" ] && continue
   emit_bid "$app"
   bid_found=1
-done < <(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
+done <<< "$user_apps"
 [ $bid_found -eq 0 ] && echo "(no .app found)"
 
 echo "=== PKG receipts ==="
-pkgutil --pkgs 2>/dev/null | grep -i "$A" || echo "(none)"
+found=$(pkgutil --pkgs 2>/dev/null | grep -i "$A")
+[ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== Mac App Store receipt ==="
-[ -e "/Applications/${D}.app/Contents/_MASReceipt" ] && echo "MAS receipt present" || echo "(not MAS)"
+if [ -e "/Applications/${D}.app/Contents/_MASReceipt" ]; then
+  echo "MAS receipt present"
+  primary_hit=1
+else
+  echo "(not MAS)"
+fi
 
 echo "=== Bundled uninstaller (inside .app) ==="
 # Scan Contents of every candidate .app (both /Applications and ~/Applications)
@@ -91,7 +128,7 @@ while IFS= read -r app; do
   [ -z "$app" ] && continue
   [ -d "$app/Contents" ] && contents_list="${contents_list:+$contents_list
 }$app/Contents"
-done < <(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
+done <<< "$user_apps"
 if [ -z "$contents_list" ]; then
   echo "(no .app)"
 else
@@ -118,17 +155,27 @@ if [ -n "$CMD" ] && [ -x "$CMD" ]; then
   if [ -L "$CMD" ]; then
     echo "symlink -> $(readlink "$CMD")"
   fi
+  primary_hit=1
 else
   echo "(not in PATH)"
 fi
 
-echo "=== npm global ==="
-npm list -g "$A" 2>/dev/null | grep -i "$A" || echo "(none)"
-
-echo "=== pip ==="
-pip3 show "$A" 2>/dev/null || echo "(none)"
-
-echo "=== cargo ==="
-{ command -v -- cargo >/dev/null && cargo install --list 2>/dev/null | grep -i "$A"; } || echo "(none)"
+# CLI package manager probes are slow (npm loads node, pip spawns python) and
+# only informative when nothing above matched.
+if [ "$primary_hit" -eq 1 ]; then
+  echo "=== npm global ==="
+  echo "(skipped: primary evidence found above)"
+  echo "=== pip ==="
+  echo "(skipped: primary evidence found above)"
+  echo "=== cargo ==="
+  echo "(skipped: primary evidence found above)"
+else
+  echo "=== npm global ==="
+  npm list -g "$A" 2>/dev/null | grep -i "$A" || echo "(none)"
+  echo "=== pip ==="
+  pip3 show "$A" 2>/dev/null || echo "(none)"
+  echo "=== cargo ==="
+  { command -v -- cargo >/dev/null && cargo install --list 2>/dev/null | grep -i "$A"; } || echo "(none)"
+fi
 
 exit 0  # explicit clean exit regardless of individual section find/grep misses
