@@ -57,11 +57,11 @@ primary_hit=0
 user_apps=$(find ~/Applications -maxdepth 2 -iname "*${A}*.app" 2>/dev/null)
 
 echo "=== Homebrew formula ==="
-found=$(brew list --formula 2>/dev/null | grep -i "$A")
+found=$(brew list --formula 2>/dev/null | grep -Fi "$A")
 [ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== Homebrew cask ==="
-found=$(brew list --cask 2>/dev/null | grep -i "$A")
+found=$(brew list --cask 2>/dev/null | grep -Fi "$A")
 [ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== Caskroom (direct, fallback) ==="
@@ -85,7 +85,8 @@ echo "=== Bundle ID (mdls, with defaults fallback) ==="
 # never see an empty BUNDLE_ID (which would cause `find -iname "*${BUNDLE_ID}*"`
 # to match every path).
 emit_bid() {
-  app="$1"
+  local app="$1"
+  local raw
   raw=$(mdls -raw -name kMDItemCFBundleIdentifier "$app" 2>/dev/null)
   if [ -z "$raw" ] || [ "$raw" = "(null)" ]; then
     raw=$(defaults read "${app%/}/Contents/Info" CFBundleIdentifier 2>/dev/null)
@@ -109,7 +110,7 @@ done <<< "$user_apps"
 [ $bid_found -eq 0 ] && echo "(no .app found)"
 
 echo "=== PKG receipts ==="
-found=$(pkgutil --pkgs 2>/dev/null | grep -i "$A")
+found=$(pkgutil --pkgs 2>/dev/null | grep -Fi "$A")
 [ -n "$found" ] && { echo "$found"; primary_hit=1; } || echo "(none)"
 
 echo "=== Mac App Store receipt ==="
@@ -171,11 +172,11 @@ if [ "$primary_hit" -eq 1 ]; then
   echo "(skipped: primary evidence found above)"
 else
   echo "=== npm global ==="
-  npm list -g "$A" 2>/dev/null | grep -i "$A" || echo "(none)"
+  npm list -g "$A" 2>/dev/null | grep -Fi "$A" || echo "(none)"
   echo "=== pip ==="
   pip3 show "$A" 2>/dev/null || echo "(none)"
   echo "=== cargo ==="
-  { command -v -- cargo >/dev/null && cargo install --list 2>/dev/null | grep -i "$A"; } || echo "(none)"
+  { command -v -- cargo >/dev/null && cargo install --list 2>/dev/null | grep -Fi "$A"; } || echo "(none)"
 fi
 
 exit 0  # explicit clean exit regardless of individual section find/grep misses
