@@ -19,14 +19,23 @@ Find processes by project path instead of guessing ports. On macOS, use
 full-width process output so long commands are not truncated:
 
 ```bash
-ps -ewwo pid,args 2>/dev/null | grep -F "/current/project" | grep -v grep
+ps -ewwo pid,args 2>/dev/null | grep -F "$(pwd)" | grep -v grep
 ```
+
+Substitute another project's path for `$(pwd)` when checking a different
+project. Processes started with a relative path (e.g. `npm run dev`) may not
+show the project path in their arguments — also search by process or script
+name before concluding nothing is running.
 
 If a matching process is found, inspect its listening ports:
 
 ```bash
-lsof -p <PID> -a -iTCP -sTCP:LISTEN -Fn -P 2>/dev/null | grep '^n'
+lsof -nP -a -p <PID> -iTCP -sTCP:LISTEN
 ```
+
+Keep `-a`: lsof ORs its selection options by default, so without it the
+command lists every listening socket on the machine, not just the target
+PID's.
 
 ## Detection Rules
 
