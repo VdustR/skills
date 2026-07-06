@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Long-Running Processes"
+  short_description: "Reuse or safely stop long-running processes"
+  default_prompt: "Use $vp-long-running-processes before starting, stopping, or restarting dev servers, watchers, browser sessions, or background jobs."

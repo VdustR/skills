@@ -73,6 +73,10 @@ Build and merge `.gitignore` files using github/gitignore templates with smart p
 
 Use structured questions to align on requirements before planning or complex tasks.
 
+### vp-long-running-processes
+
+Find reusable dev servers and watchers by project path, and stop or restart processes safely.
+
 ### vp-macos-clean-uninstall
 
 Cleanly uninstall macOS applications with research-backed residual file cleanup.
