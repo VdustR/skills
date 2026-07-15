@@ -44,6 +44,30 @@ command, but adapt it to the normal defaults:
 npx -y skills@1.5.3 add <source> --skill <skill-name> -g --agent '*' -y
 ```
 
+## Large JSON Inventory Is Truncated
+
+In `skills@1.5.3`, the CLI prints the JSON inventory and then explicitly exits.
+When stdout is a pipe, a large inventory can therefore end mid-JSON before the
+pipe finishes flushing, commonly at 65,536 bytes. Consumers then fail with an
+`Unexpected end of JSON input` or `Unterminated string` error.
+
+Prefer the bundled inventory helper because it captures the CLI output through
+a temporary regular file and removes that file immediately after parsing:
+
+```bash
+scripts/skill-agent-table.mjs --filter '^vp-'
+```
+
+If the helper is unavailable, redirect JSON to a regular file before parsing it
+instead of piping it directly:
+
+```bash
+inventory_file="$(mktemp)"
+npx -y skills@1.5.3 list -g --json > "$inventory_file"
+jq 'map(select(.name | startswith("vp-")))' "$inventory_file"
+rm "$inventory_file"
+```
+
 ## Clone Timeout
 
 For large or slow repositories:

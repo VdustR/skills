@@ -156,4 +156,6 @@ while IFS= read -r skill_dir; do
   mentions_skill "$openai_yaml" "$skill_name" || fail "$openai_yaml default_prompt must mention \$$skill_name"
 done < <(find skills -mindepth 1 -maxdepth 1 -type d | sort)
 
+node --test tests/vp-skills/skill-agent-table.test.mjs
+
 printf 'Validated %s skills.\n' "$(wc -l < "$actual_skills" | tr -d ' ')"
