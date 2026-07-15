@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { homedir } from "node:os";
+import {
+  closeSync,
+  mkdtempSync,
+  openSync,
+  readFileSync,
+  rmSync,
+} from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 
 const AGENT_NAMES = new Map([
@@ -108,20 +115,36 @@ function runSkillsList(scope) {
   const args = ["-y", "skills@1.5.3", "list", "--json"];
   if (scope === "global") args.push("-g");
 
-  const result = spawnSync("npx", args, {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  // skills@1.5.3 can exit before a large piped stdout finishes flushing.
+  // Capturing to a regular file keeps the JSON complete before parsing.
+  const tempDir = mkdtempSync(join(tmpdir(), "vp-skills-list-"));
+  const outputPath = join(tempDir, "skills.json");
+  let outputFd;
 
-  if (result.error) {
-    throw result.error;
-  }
-  if (result.status !== 0) {
-    const stderr = typeof result.stderr === "string" ? result.stderr.trim() : "";
-    throw new Error(stderr || `skills list failed with status ${result.status}`);
-  }
+  try {
+    outputFd = openSync(outputPath, "w", 0o600);
+    const result = spawnSync("npx", args, {
+      encoding: "utf8",
+      stdio: ["ignore", outputFd, "pipe"],
+    });
 
-  return JSON.parse(result.stdout);
+    const completedOutputFd = outputFd;
+    outputFd = undefined;
+    closeSync(completedOutputFd);
+
+    if (result.error) {
+      throw result.error;
+    }
+    if (result.status !== 0) {
+      const stderr = typeof result.stderr === "string" ? result.stderr.trim() : "";
+      throw new Error(stderr || `skills list failed with status ${result.status}`);
+    }
+
+    return JSON.parse(readFileSync(outputPath, "utf8"));
+  } finally {
+    if (outputFd !== undefined) closeSync(outputFd);
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 }
 
 function normalizeAgent(input) {
