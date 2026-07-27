@@ -31,6 +31,13 @@ npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-git -g --agen
 
 Install to the current project instead of globally by omitting `-g`.
 
+When upgrading from a release that provided the superseded Git skills, remove
+them explicitly before installing `vp-git`:
+
+```bash
+npx -y skills@1.5.3 remove vp-git-cleanup vp-gitignore-builder vp-stacked-pr-rebase -g --agent '*' -y
+```
+
 ## Skills
 
 ### vp-checklist-runner

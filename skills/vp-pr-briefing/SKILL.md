@@ -10,6 +10,8 @@ description: >-
 
 Build the briefing from the current PR, full diff, linked context, checks, and
 review conversation. Do not treat the description as verified implementation.
+Resolve the exact host, owner, repository, and PR number from the user's URL or
+an unambiguous local remote before querying; never rely on the number alone.
 
 ## Briefing
 

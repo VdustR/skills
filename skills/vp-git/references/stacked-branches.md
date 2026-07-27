@@ -12,17 +12,20 @@ rebase merges leave different evidence.
 
 ## Preserve Work
 
+- Refresh the intended remote base and verify its exact current commit before
+  creating a reconstruction branch.
 - Classify each candidate commit as parent-owned, branch-owned, equivalent,
   already integrated, or uncertain.
 - Show every classification and its keep or exclude decision before rewriting
   history.
+- Require the user to decide every uncertain ownership classification.
 - Create a recoverable backup reference before execution.
 - Retain the backup after verification; deleting it is a separate cleanup action
   that requires target-specific approval.
 - Prefer reconstruction on a temporary branch when the surviving commit set is
   clearer than an in-place rebase.
-- Resolve conflicts semantically; do not choose a side globally without
-  reviewing the affected behavior.
+- Resolve conflicts semantically. When multiple behaviorally valid resolutions
+  exist, ask the user before choosing; never choose a side globally.
 
 Verify commit range, diff against the intended base, tests, and PR metadata.
 History rewriting and force pushing require separate explicit authorization.

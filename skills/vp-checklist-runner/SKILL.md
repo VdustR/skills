@@ -13,7 +13,8 @@ be accepted at face value.
 
 ## Workflow
 
-1. Resolve the exact PR or issue and confirm the current checklist text.
+1. Resolve the exact PR or issue and confirm the current checklist text. Exclude
+   fenced and inline code before identifying checkbox items.
 2. Classify items by verification method and identify ambiguous or manual-only
    requirements.
 3. Run the narrowest reliable verification for each item.

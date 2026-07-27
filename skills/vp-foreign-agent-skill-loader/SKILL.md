@@ -8,8 +8,10 @@ description: >-
 
 # Foreign Agent Skill Loader
 
-Discover candidate skill entrypoints with the bundled scanner, then read the
-selected instruction completely before acting.
+Discover candidate skill entrypoints with the bundled scanner, explicitly
+passing the current agent so its native skill root is excluded. Read the
+scanner's current help, then read the selected instruction completely before
+acting.
 
 Adapt incompatible tool names and platform assumptions to available
 capabilities. Preserve the skill's intent, safety boundaries, and referenced

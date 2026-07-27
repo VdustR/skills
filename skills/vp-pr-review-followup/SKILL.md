@@ -11,6 +11,8 @@ description: >-
 
 Re-evaluate the original concern against the current head and full conversation.
 An author reply, emoji, or changed line is not proof that the concern is fixed.
+Keep reviewer-side follow-up read-only with respect to the author's code and
+history: do not edit, commit, push, or rewrite the PR branch.
 
 ## Decisions
 

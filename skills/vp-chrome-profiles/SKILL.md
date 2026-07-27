@@ -15,15 +15,20 @@ controlled browser state without exposing the daily profile.
 ## Rules
 
 - Inspect existing profiles and processes before creating or launching another.
+- Reuse a running managed profile; do not relaunch it on another port.
 - Resolve profiles by their stored identity and path, not by a guessed port.
-- Let the user perform authentication and sensitive challenges.
+- Use a visible window for user authentication and sensitive challenges.
+  Reserve headless launches for mechanical checks.
 - Do not read cookies, Login Data, browser history, raw local storage, or profile
   databases unless the user explicitly requests a safe redacted diagnostic.
-- Verify the connected browser's profile and target before acting.
+- Connect only to the helper-reported endpoint, then verify the profile and
+  target before acting.
 - Warn that while the local debugging port is open, other local processes can
   inspect and control the authenticated browser session.
 - Treat profile deletion as destructive: inspect processes and stored data,
   confirm the exact target, then verify removal.
+- Delete or adopt only profiles inside the managed root with the helper's marker,
+  and never while Chrome is using them.
 
 Use the bundled profile helper and read its current help for operations and
 options. Do not manually reproduce its state-management logic.
