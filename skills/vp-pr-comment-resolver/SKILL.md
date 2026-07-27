@@ -21,8 +21,9 @@ current head, repository rules, code, and tests before deciding.
 3. Apply only validated fixes, verify them, and commit by coherent topic.
 4. Reply on the original surface with evidence. Review threads and PR discussion
    comments require different reply mechanisms.
-5. Resolve handled bot review threads; leave human review threads unresolved.
-   Discussion comments have no resolvable state.
+5. Resolve handled bot review threads. Leave human review threads unresolved
+   unless the user explicitly directs otherwise. Discussion comments have no
+   resolvable state.
 6. Re-fetch feedback and report remaining risk or required user judgment.
 
 Ask before disagreement, ambiguity, scope expansion, history rewriting, or any

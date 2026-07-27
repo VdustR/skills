@@ -10,7 +10,8 @@ For each feedback item:
    - If yes, implement and verify the smallest coherent fix.
    - If no, prepare a concise evidence-backed explanation.
 4. Is the author a bot, human, or ambiguous?
-   - Resolve only handled bot review threads.
+   - Resolve handled bot review threads. Human threads require explicit user
+     direction.
 5. Is this a review thread or PR discussion comment?
    - Reply on the matching surface; discussion comments cannot be resolved.
 

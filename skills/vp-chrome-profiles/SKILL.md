@@ -3,8 +3,8 @@ name: vp-chrome-profiles
 description: >-
   Manage dedicated persistent Chrome profiles for agent-assisted, login-required
   browser work. Use to list, create, launch, connect, migrate, or delete agent
-  profiles. Boundary: never attach to or extract credentials from the user's
-  daily Chrome profile.
+  profiles. Boundary: never attach to the user's daily Chrome profile or inspect
+  sensitive browser stores from any profile.
 ---
 
 # Chrome Profiles For Agents
@@ -17,7 +17,11 @@ controlled browser state without exposing the daily profile.
 - Inspect existing profiles and processes before creating or launching another.
 - Resolve profiles by their stored identity and path, not by a guessed port.
 - Let the user perform authentication and sensitive challenges.
+- Do not read cookies, Login Data, browser history, raw local storage, or profile
+  databases unless the user explicitly requests a safe redacted diagnostic.
 - Verify the connected browser's profile and target before acting.
+- Warn that while the local debugging port is open, other local processes can
+  inspect and control the authenticated browser session.
 - Treat profile deletion as destructive: inspect processes and stored data,
   confirm the exact target, then verify removal.
 

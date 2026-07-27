@@ -34,8 +34,9 @@ Re-read current code before editing. If the head changed since retrieval, refres
 the queue. Apply focused fixes, run proportionate verification, inspect the
 complete diff, and commit only when authorized.
 
-Reply after the evidence exists. Resolve only handled bot review threads; leave
-human threads open for the reviewer. PR discussion comments cannot be resolved.
+Reply after the evidence exists. Resolve handled bot review threads; leave human
+threads open for the reviewer unless the user explicitly directs otherwise. PR
+discussion comments cannot be resolved.
 
 ## Reconcile
 

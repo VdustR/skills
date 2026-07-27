@@ -8,8 +8,9 @@ description: >-
 
 # Agent Skills Management
 
-Use the repository-pinned CLI version when one exists; otherwise inspect the
-current CLI help before acting.
+Use the known-good `skills@1.5.3` CLI by default, including outside this
+repository. Use another or latest version only for an explicitly requested
+compatibility check. Inspect the selected version's current help before acting.
 
 ## Defaults
 
