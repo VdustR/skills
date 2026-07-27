@@ -35,7 +35,7 @@ When upgrading from a release that provided the superseded Git skills, remove
 them explicitly before installing `vp-git`:
 
 ```bash
-npx -y skills@1.5.3 remove vp-git-cleanup vp-gitignore-builder vp-stacked-pr-rebase -g --agent '*' -y
+npx -y skills@1.5.3 remove vp-git-cleanup vp-gitignore-builder vp-stacked-pr-rebase -g -y
 ```
 
 ## Skills

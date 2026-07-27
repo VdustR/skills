@@ -21,8 +21,10 @@ operation available, and compare the resulting installation.
 ## Remove Or Replace
 
 List exact installed names first. Remove superseded skills explicitly before or
-after installing the replacement according to the user's desired continuity.
-Do not use broad “all” removal when a targeted operation exists.
+after installing the replacement according to the user's desired continuity. In
+`skills@1.5.3`, omit the agent selector to remove named skills from all their
+existing links; the wildcard agent selector is invalid for removal. Do not use
+broad “all” removal when a targeted operation exists.
 
 ## Repair
 

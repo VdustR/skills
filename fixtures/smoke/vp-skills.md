@@ -34,7 +34,9 @@ Assume the user wants the default personal setup unless they say otherwise.
   agent inventory; Codex, Gemini CLI, GitHub Copilot, and other universal
   agents may share that canonical path instead of appearing in JSON `agents`.
 - Remove only the requested skills:
-  `remove agent-browser portless -g --agent '*' -y`.
+  `remove agent-browser portless -g -y`.
+- Do not pass `--agent '*'` to `skills@1.5.3 remove`; omit the agent selector to
+  remove named skills from all existing links.
 - Avoid `remove --all` unless the user explicitly asks to remove everything.
 - Repair the stale `impeccable` lock by fresh discovery and reinstall:
   `add pbakaus/impeccable --list`, then
@@ -44,6 +46,7 @@ Assume the user wants the default personal setup unless they say otherwise.
 ## Regression Coverage
 
 - all-agent default uses quoted `--agent '*'`
+- targeted removal omits the unsupported wildcard agent selector
 - `check` is not treated as a dry-run
 - stale lock path failures are repaired by rediscovery and reinstall
 - removal avoids destructive `--all`
