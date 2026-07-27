@@ -20,7 +20,7 @@ require_pattern() {
 required_skills=(
   "vp-skills"
   "vp-pr-comment-resolver"
-  "vp-stacked-pr-rebase"
+  "vp-git"
   "vp-chrome-profiles"
 )
 
@@ -43,7 +43,7 @@ for skill_name in "${required_skills[@]}"; do
 done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
-stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr-rebase.md"
+stacked_rebase_fixture="fixtures/smoke/vp-git.md"
 chrome_profiles_fixture="fixtures/smoke/vp-chrome-profiles.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 
@@ -74,11 +74,11 @@ require_pattern "$pr_resolver_fixture" 'outdated unresolved review thread' \
   "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
 
 require_pattern "$stacked_rebase_fixture" 'squash[[:space:]-]*merge' \
-  "vp-stacked-pr-rebase fixture must cover squash merges"
+  "vp-git fixture must cover squash merges"
 require_pattern "$stacked_rebase_fixture" 'force-with-lease' \
-  "vp-stacked-pr-rebase fixture must cover force-with-lease confirmation"
+  "vp-git fixture must cover force-with-lease confirmation"
 require_pattern "$stacked_rebase_fixture" 'backup branch' \
-  "vp-stacked-pr-rebase fixture must cover backup retention"
+  "vp-git fixture must cover backup retention"
 
 require_pattern "$chrome_profiles_fixture" 'dedicated managed profiles?' \
   "vp-chrome-profiles fixture must cover dedicated managed profiles"

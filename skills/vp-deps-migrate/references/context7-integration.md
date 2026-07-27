@@ -1,11 +1,12 @@
-<!-- Shared: vp-deps-upgrade (source of truth) / vp-deps-migrate (copy). Keep in sync. -->
+# Documentation Lookup
 
-# Context7 Integration
+Use current primary documentation for the exact source and target versions.
+Prioritize official migration guides, API references, compatibility tables, and
+release notes.
 
-Context7 provides up-to-date documentation lookup for migration guides and breaking changes. If Context7 is not available, suggest the user install it:
+Documentation aggregators can accelerate discovery but do not override primary
+sources. Verify examples against the repository's runtime, framework, module
+system, and configured version.
 
-```
-Install Context7 through the current agent's MCP or tool setup flow before using it.
-```
-
-When available, use `resolve-library-id` + `query-docs` to look up migration guides and breaking changes for the relevant libraries. Context7 results supplement (not replace) changelog and code analysis.
+Record uncertainty when documentation does not cover the repository's usage
+pattern; do not fill the gap with a blind replacement.

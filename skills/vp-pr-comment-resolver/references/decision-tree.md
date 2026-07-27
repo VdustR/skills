@@ -1,52 +1,19 @@
 # Decision Tree
 
-Use this flow after fetching and queuing PR review-thread comments and PR
-discussion comments.
+For each feedback item:
 
-```text
-Comment received
-      |
-      v
-Classify author
-  - Tier 1: GraphQL __typename
-  - Tier 2: profile
-  - Tier 2b: public activity
-  - Tier 3: ask user
-      |
-      v
-Is the comment clear?
-  - No: ask user for clarification
-  - Yes: continue
-      |
-      v
-Does the comment pass the validity checklist?
-  - No: discuss with user before disagreeing
-  - Yes: continue
-      |
-      v
-Is a code change needed?
-  - Yes: fix, verify, commit, push if authorized, reply
-  - No: reply with explanation
-      |
-      v
-What kind of comment is it?
-  - PR discussion comment: post mention + quote reply only
-  - Review thread: continue
-      |
-      v
-Is the author a bot?
-  - Yes: resolve thread after replying
-  - No: leave unresolved for the human reviewer
-```
+1. Does it still apply to the current head?
+   - If not, identify whether it was already handled or became obsolete.
+2. Is the underlying claim correct?
+   - If uncertain, gather evidence or ask before replying.
+3. Is a change required and within scope?
+   - If yes, implement and verify the smallest coherent fix.
+   - If no, prepare a concise evidence-backed explanation.
+4. Is the author a bot, human, or ambiguous?
+   - Resolve handled bot review threads. Human threads require explicit user
+     direction.
+5. Is this a review thread or PR discussion comment?
+   - Reply on the matching surface; discussion comments cannot be resolved.
 
-Terminal outcomes:
-
-| Outcome | Reply | Resolve? |
-|---------|-------|----------|
-| Bot review thread fixed | commit link and files | yes |
-| Bot review thread no-fix | reason | yes |
-| Bot review thread disagreed | evidence-backed reply after user review | yes |
-| Human review thread fixed | commit link and files | no |
-| Human review thread no-fix | reason | no |
-| Human review thread disagreed | evidence-backed reply after user review | no |
-| PR discussion comment | mention + quote + reply body | not resolvable |
+Pause for disagreement, multiple valid product interpretations, architectural
+scope expansion, or history rewriting.

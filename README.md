@@ -25,11 +25,18 @@ npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent claude-code
 Install selected skills:
 
 ```bash
-npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-gitignore-builder -g --agent codex
-npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-gitignore-builder -g --agent claude-code
+npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-git -g --agent codex
+npx -y skills@1.5.3 add VdustR/skills --skill vp-cspell --skill vp-git -g --agent claude-code
 ```
 
 Install to the current project instead of globally by omitting `-g`.
+
+When upgrading from a release that provided the superseded Git skills, remove
+them explicitly before installing `vp-git`:
+
+```bash
+npx -y skills@1.5.3 remove vp-git-cleanup vp-gitignore-builder vp-stacked-pr-rebase -g --agent '*' -y
+```
 
 ## Skills
 
@@ -61,13 +68,9 @@ Safely list, choose, load, stage, and persist sensitive `.env*` variables using 
 
 Index repository-local skills written for other agent systems without converting them.
 
-### vp-git-cleanup
+### vp-git
 
-Audit and safely clean up local Git branches, worktrees, stashes, and stale refs.
-
-### vp-gitignore-builder
-
-Build and merge `.gitignore` files using github/gitignore templates with smart project detection.
+Handle commits, repository setup, gitignore files, cleanup, stacked branches, and PR lifecycle decisions.
 
 ### vp-guided-focus
 
@@ -105,10 +108,6 @@ Review recent agent work to discover workflow, instruction, and skill improvemen
 
 Manage agent skills using the `npx skills` CLI.
 
-### vp-stacked-pr-rebase
-
-Rebase stacked PRs after a parent PR is merged, preserving only your commits.
-
 ### vp-typescript-best-practices
 
 Review TypeScript safety, type boundaries, and fallback style preferences.
@@ -140,7 +139,7 @@ Validation layers:
 
 Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
 prove with static validation, such as PR comment resolution policy and stacked
-PR history-rewrite safety.
+branch history-rewrite safety.
 
 ## License
 
