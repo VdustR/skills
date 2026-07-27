@@ -27,8 +27,9 @@ controlled browser state without exposing the daily profile.
   inspect and control the authenticated browser session.
 - Treat profile deletion as destructive: inspect processes and stored data,
   confirm the exact target, then verify removal.
-- Delete or adopt only profiles inside the managed root with the helper's marker,
-  and never while Chrome is using them.
+- Delete only profiles inside the managed root with the helper's marker. Adopt
+  only unmarked Chrome profiles already copied into the managed root, letting the
+  helper create the marker. Never delete or adopt while Chrome is using them.
 
 Use the bundled profile helper and read its current help for operations and
 options. Do not manually reproduce its state-management logic.

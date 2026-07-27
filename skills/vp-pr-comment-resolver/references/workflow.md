@@ -35,6 +35,10 @@ a safe matching checkout with the required authorization. If the head changed
 since retrieval, refresh the queue. Apply focused fixes, run proportionate
 verification, inspect the complete diff, and commit only when authorized.
 
+For fixes, push only when authorized and verify the PR's remote head contains the
+commit before replying or resolving. If the fix is not on the PR head, leave the
+thread open and report the pending push.
+
 Reply after the evidence exists. Resolve handled bot review threads; leave human
 threads open for the reviewer unless the user explicitly directs otherwise. PR
 discussion comments cannot be resolved.
