@@ -5,9 +5,10 @@ classes. Present exact candidates before deleting anything.
 
 ## Protect
 
-Never remove the current branch, the default branch, checked-out or dirty
-worktrees, locked worktrees, uninspected stashes, open-PR branches, or user
-protected patterns.
+Never remove the current or default branch; current, dirty, locked, or otherwise
+active worktrees; uninspected stashes; open-PR branches; or user-protected
+patterns. A clean, unlocked, inactive worktree with a safely merged branch may
+be removed only after exact approval.
 
 ## Evidence
 
