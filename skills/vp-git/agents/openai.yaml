@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Git"
+  short_description: "Handle safe Git and GitHub workflows"
+  default_prompt: "Use $vp-git to plan and execute this Git workflow safely."

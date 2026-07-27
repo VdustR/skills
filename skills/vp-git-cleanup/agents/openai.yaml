@@ -1,4 +1,0 @@
-interface:
-  display_name: "VP Git Cleanup"
-  short_description: "Clean local Git branches and worktrees"
-  default_prompt: "Use $vp-git-cleanup to audit stale local branches, worktrees, and stashes."
