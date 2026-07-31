@@ -18,12 +18,14 @@ for any one platform's stacking feature.
 - To keep an unmerged local stack consistent after editing a lower branch, prefer
   `git rebase --update-refs` (or set `rebase.updateRefs=true`); it moves every
   intermediate branch ref in a single rebase. Requires Git 2.38 or newer.
-- When the parent was integrated but its old tip is still cleanly identifiable and
-  was not collapsed, `git rebase --onto <new-base> <old-parent-tip>` drops the
-  parent-owned commits directly.
-- Reserve the full reconstruction below for squash or rebase merges, patch-
-  equivalent commits, or uncertain ownership, where a plain rebase would reapply
-  or duplicate already-integrated work.
+- When the child's original parent tip is still identifiable,
+  `git rebase --onto <new-base> <old-parent-tip>` replays only the child's own
+  commits onto the new base and drops the parent-owned ones directly. This handles
+  squash and rebase merges, where a plain `git rebase` would instead try to reapply
+  the already-integrated parent commits.
+- Reserve the full reconstruction below for when the old parent tip is not cleanly
+  identifiable, or commits are patch-equivalent, interleaved, or of uncertain
+  ownership.
 
 ## Establish The Stack
 

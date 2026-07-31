@@ -32,8 +32,10 @@ Verify before starting:
   web merge button; GitHub requires the stack merge API. Use `gh stack merge`.
 - Merging a lower layer auto-rebases and retargets the PRs above it server-side,
   including across squash merges: the parent's now-integrated commits are dropped
-  without duplication or conflict, and the next PR retargets the trunk. No manual
-  restack is needed on GitHub.
+  rather than replayed, so the squash-orphan problem does not occur and the next
+  PR retargets the trunk automatically. Genuine content conflicts with the updated
+  base still surface — resolve them with `gh stack rebase` (`--continue` /
+  `--abort`).
 
 ## Authoritative Reference
 
