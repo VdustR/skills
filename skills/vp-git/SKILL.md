@@ -2,10 +2,11 @@
 name: vp-git
 description: >-
   Handle personal Git and GitHub workflows, including commits, repository
-  setup, gitignore files, cleanup, stacked branches, and pull request lifecycle
-  decisions. Use for Git changes that need safety, repository conventions, or
-  host-aware evidence. Boundary: use specialized PR skills for briefing,
-  checklist verification, review follow-up, or comment resolution.
+  setup, gitignore files, cleanup, stacked pull requests, dependent-branch
+  repair, and pull request lifecycle decisions. Use for Git changes that need
+  safety, repository conventions, or host-aware evidence. Boundary: use
+  specialized PR skills for briefing, checklist verification, review follow-up,
+  or comment resolution.
 ---
 
 # Git Workflows
@@ -29,7 +30,11 @@ remote state, and hosting-platform state as separate sources of truth.
 - Clone and repository setup: read `references/repositories.md`.
 - `.gitignore` creation or repair: read `references/gitignore.md`.
 - Branch, worktree, stash, and ref cleanup: read `references/cleanup.md`.
-- Dependent or stacked branch repair: read `references/stacked-branches.md`.
+- GitHub stacked pull requests (build, submit, and merge a stack): read
+  `references/stacked-prs.md`.
+- Dependent-branch repair when native stacking does not apply (non-GitHub hosts,
+  cross-fork, or unregistered branches): read
+  `references/dependent-branch-rebase.md`.
 - Draft, ready, review, and merge decisions: read
   `references/pull-requests.md`.
 
