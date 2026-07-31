@@ -79,6 +79,12 @@ require_pattern "$stacked_rebase_fixture" 'force-with-lease' \
   "vp-git fixture must cover force-with-lease confirmation"
 require_pattern "$stacked_rebase_fixture" 'backup branch' \
   "vp-git fixture must cover backup retention"
+require_pattern "$stacked_rebase_fixture" 'gh stack (init|add|submit|merge)' \
+  "vp-git fixture must cover the native gh stack workflow"
+require_pattern "$stacked_rebase_fixture" 'stack merge API' \
+  "vp-git fixture must cover stacked members requiring the stack merge API"
+require_pattern "$stacked_rebase_fixture" 'native.*not.*(reconstruction|manual)|not manual reconstruction' \
+  "vp-git fixture must cover routing GitHub stacks to the native workflow"
 
 require_pattern "$chrome_profiles_fixture" 'dedicated managed profiles?' \
   "vp-chrome-profiles fixture must cover dedicated managed profiles"

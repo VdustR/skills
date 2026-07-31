@@ -2,11 +2,16 @@
 
 ## Prompt
 
-Use `$vp-git` to repair merge request !456 on a self-managed GitLab host after
-its parent MR !123 was squash-merged into `main`. This host has no native stacked
-pull requests, so the dependent branch must be rebased by hand.
+Use `$vp-git` for two stacked-change situations and route each to the correct
+reference before acting:
 
-The child branch contains these commits, oldest first:
+**Situation 1 — GitHub, same repository.** Build and land a three-layer stack of
+dependent pull requests, then merge it.
+
+**Situation 2 — self-managed GitLab host.** A dependent branch broke after its
+parent MR !123 was squash-merged into `main`. This host has no native stacked
+pull requests, so the dependent branch must be rebased by hand. The child branch
+contains these commits, oldest first:
 
 ```text
 aaa1111 feat(parent): add shared auth helper
@@ -22,9 +27,20 @@ The host reports `aaa1111` and `bbb2222` as the original commits from parent MR
 current `main`. Commit `fff6666` overlaps both parent and child changes, and the
 available metadata does not establish its ownership.
 
-Assume the working tree is clean and authenticated host metadata is available.
+Assume each working tree is clean and authenticated host metadata is available.
 
 ## Expected Behavior
+
+Situation 1 (GitHub native stack) routes to `references/stacked-prs.md`:
+
+- Build with `gh stack init`, then `gh stack add` per layer, and open the PRs with
+  `gh stack submit`; do not hand-rebuild history for a GitHub same-repo stack.
+- Land bottom up with `gh stack merge`; a member of a registered stack cannot be
+  merged with plain `gh pr merge` and must go through the stack merge API.
+- Rely on the server-side auto-rebase and retarget of upper PRs rather than a
+  manual reconstruction.
+
+Situation 2 (non-GitHub manual repair) routes to `references/dependent-branch-rebase.md`:
 
 - Confirm the intended parent and detect the squash-merge.
 - Exclude `aaa1111` and `bbb2222` as parent-owned commits.
@@ -41,6 +57,10 @@ Assume the working tree is clean and authenticated host metadata is available.
 
 ## Regression Coverage
 
+- GitHub same-repo stacks route to the native `gh stack` workflow, not manual
+  reconstruction;
+- a stacked member merges only through the stack merge API, never plain
+  `gh pr merge`;
 - native GitHub stacking is not assumed on a non-GitHub host;
 - squash-merge evidence is not mistaken for ancestry;
 - uncertain ownership remains a user decision;
