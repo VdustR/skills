@@ -15,9 +15,13 @@ for any one platform's stacking feature.
 
 ## Prefer Native Git First
 
-- To keep an unmerged local stack consistent after editing a lower branch, prefer
-  `git rebase --update-refs` (or set `rebase.updateRefs=true`); it moves every
-  intermediate branch ref in a single rebase. Requires Git 2.38 or newer.
+- To keep an unmerged local stack consistent, rebase from the top branch of the
+  stack — so every intermediate commit is in the rebased range — with
+  `git rebase --update-refs` (or set `rebase.updateRefs=true`). It force-updates
+  only branches that point at commits being rebased, so rebasing a lower branch
+  alone leaves the upper layers stale; branches checked out in another worktree
+  are skipped and must be moved by hand. Requires Git 2.38 or newer. Confirm each
+  intermediate ref moved as intended before force-pushing.
 - When the child's original parent tip is still identifiable,
   `git rebase --onto <new-base> <old-parent-tip>` replays only the child's own
   commits onto the new base and drops the parent-owned ones directly. This handles

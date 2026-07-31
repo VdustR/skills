@@ -20,8 +20,9 @@ Verify before starting:
 - Start the stack before adding layers: `gh stack init <branch>`. `gh stack add`
   and `gh stack view` fail on a branch that is not yet part of a stack.
 - Commit each layer, then stack the next: `gh stack add -Am "<message>" <branch>`.
-- Create or update the PRs with `gh stack submit`. Non-interactive runs need
-  `--auto`; add `--open` to mark new PRs ready instead of draft.
+- Create or update the PRs with `gh stack submit`. Use `--auto` to skip the
+  editor (implicit in non-interactive runs); add `--open` to mark new PRs ready
+  instead of draft.
 - Each PR targets the layer below it, and GitHub records the set as one stack.
 
 ## Merge And Restack
