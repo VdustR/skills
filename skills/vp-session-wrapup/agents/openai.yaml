@@ -1,4 +1,4 @@
 interface:
-  display_name: "VP Session Wrapup"
+  display_name: "VP Session Wrap-Up"
   short_description: "Summarize and clean up a session before archiving it"
   default_prompt: "Use $vp-session-wrapup to summarize this session and clear risk-free leftovers."
