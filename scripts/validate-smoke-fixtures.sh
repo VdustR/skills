@@ -22,6 +22,7 @@ required_skills=(
   "vp-pr-comment-resolver"
   "vp-git"
   "vp-chrome-profiles"
+  "vp-session-wrapup"
 )
 
 for skill_name in "${required_skills[@]}"; do
@@ -46,6 +47,7 @@ pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
 stacked_rebase_fixture="fixtures/smoke/vp-git.md"
 chrome_profiles_fixture="fixtures/smoke/vp-chrome-profiles.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
+session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"
@@ -96,6 +98,17 @@ require_pattern "$chrome_profiles_fixture" 'Refuse to launch|not relaunched' \
   "vp-chrome-profiles fixture must cover in-use profile launch refusal"
 require_pattern "$chrome_profiles_fixture" 'browser-url|browserUrl' \
   "vp-chrome-profiles fixture must cover browser-url MCP connection"
+
+require_pattern "$session_wrapup_fixture" 'risk-free cleanup authorization does not extend' \
+  "vp-session-wrapup fixture must cover bounded risk-free cleanup authorization"
+require_pattern "$session_wrapup_fixture" 'pre-existing.*(not remove|reported)|predates' \
+  "vp-session-wrapup fixture must cover pre-existing state protection"
+require_pattern "$session_wrapup_fixture" 'credential files? are not deleted|Do not delete the credential file' \
+  "vp-session-wrapup fixture must cover credential file protection"
+require_pattern "$session_wrapup_fixture" 'uncertainty.*report|report, not remove' \
+  "vp-session-wrapup fixture must cover report-on-uncertainty"
+require_pattern "$session_wrapup_fixture" 'Name each item before removing|named before execution' \
+  "vp-session-wrapup fixture must cover naming removals before execution"
 
 tmp_home="$(mktemp -d)"
 fake_profile_pid=""

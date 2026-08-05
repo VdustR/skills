@@ -104,6 +104,10 @@ Generate concise session titles based on the whole conversation theme.
 
 Review recent agent work to discover workflow, instruction, and skill improvements.
 
+### vp-session-wrapup
+
+Summarize a session before archiving it and clear leftover files, processes, and state.
+
 ### vp-skills
 
 Manage agent skills using the `npx skills` CLI.
@@ -138,8 +142,8 @@ Validation layers:
 - `npm run validate:latest` checks compatibility with the latest `skills` CLI for monitoring only.
 
 Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
-prove with static validation, such as PR comment resolution policy and stacked
-branch history-rewrite safety.
+prove with static validation, such as PR comment resolution policy, stacked
+branch history-rewrite safety, and session cleanup authorization limits.
 
 ## License
 
