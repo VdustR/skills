@@ -104,6 +104,10 @@ Generate concise session titles based on the whole conversation theme.
 
 Review recent agent work to discover workflow, instruction, and skill improvements.
 
+### vp-session-wrapup
+
+Close out a session with a summary and a judgment-based sweep for leftover files, processes, and state.
+
 ### vp-skills
 
 Manage agent skills using the `npx skills` CLI.
