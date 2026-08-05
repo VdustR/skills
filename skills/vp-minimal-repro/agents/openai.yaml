@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Minimal Repro"
   short_description: "Reduce an observed failure to a re-runnable reproduction"
-  default_prompt: "Use $vp-minimal-repro to turn this failure into a reproduction that fails on demand and passes once fixed."
+  default_prompt: "Use $vp-minimal-repro to turn this failure into a reproduction that fails on demand."

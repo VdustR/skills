@@ -40,7 +40,9 @@ can be shown as a printed sequence.
 The same reasoning argues against copying files out of the original repository.
 An export carries configuration, plugins, and defaults that stay on the reader's
 list of suspects, so write the case again from scratch with the smallest
-dependency set that still fails.
+dependency set that still fails. Everything the reproduction needs is installed
+inside its own directory; nothing is added to the original repository or its
+lock file to serve the reproduction.
 
 Then confirm the redesigned exhibit still fails in both directions, for the same
 reason. A redesign that fails for a different reason demonstrates a different
@@ -73,3 +75,7 @@ Carry the evidence ledger into the artifact: what was observed, what is
 inference, and every source consulted with a link, including documentation,
 changelogs, and existing issues. A demonstration that presents inference in the
 same voice as observation invites the reader to discard both.
+
+Because this level is kept rather than discarded, report where it ended up and
+what it installed or left running, so it is accounted for instead of abandoned
+at a path nobody remembers.
