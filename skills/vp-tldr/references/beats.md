@@ -34,15 +34,17 @@ watch-out list stays in the body.
 
 ## Length budget
 
-| Scope             | Target       | Hard cap |
-| ----------------- | ------------ | -------- |
-| Whole block       | 250-400 units | 500 units |
-| Prose beat (1-3)  | 1-3 sentences | 3 sentences |
-| One sentence      | ≤ 50 units   | 60 units |
-| Bullet list (4-6) | ≤ 3 bullets  | 3        |
-| One bullet        | 1 line       | 60 units |
+Length is measured in the summary's own script, so the two columns describe the
+same amount of reading rather than the same count.
 
-A unit is a word in an alphabetic script or a character in a logographic one.
+| Scope             | Logographic script  | Alphabetic script   |
+| ----------------- | ------------------- | ------------------- |
+| Whole block       | 250-400 characters, cap 500 | 150-250 words, cap 300 |
+| Prose beat (1-3)  | 1-3 sentences, cap 3 | 1-3 sentences, cap 3 |
+| One sentence      | ≤ 50 characters, cap 60 | ≤ 30 words, cap 35 |
+| Bullet list (4-6) | ≤ 3 bullets         | ≤ 3 bullets         |
+| One bullet        | 1 line, ≤ 60 characters | 1 line, ≤ 35 words |
+
 Paths, URLs, and code identifiers do not count: a Verified bullet is required
 to name a test file, so charging it for the full path would price the rule out
 of the thing it exists to encourage.
@@ -57,8 +59,9 @@ change the reader's decision.
   form rather than translating them into the summary language.
 - When the text mixes scripts, follow the target language's own convention for
   punctuation and for spacing between scripts, and apply it consistently.
-- Keep the epistemic tags and the evidence-form prefixes verbatim, including
-  their punctuation, so they stay skimmable.
+- Fix one wording per epistemic tag and per evidence-form prefix in the summary
+  language, punctuation included, and reuse it verbatim across artifacts. The
+  tags are skimmable only because they are identical every time.
 
 ## Boundaries with the rest of the artifact
 

@@ -13,10 +13,10 @@ description: >-
 
 # TL;DR Summary
 
-The summary is the first block of the artifact and the only part most people
-read. It does two jobs: it lets a reader decide within seconds whether the work
-concerns them, and it separates what has been verified from what has not, so a
-reader can tell where to spend their attention.
+The summary is the first block of the artifact, and for most readers it is
+where they stop. It does two jobs: it lets a reader decide within seconds
+whether the work concerns them, and it separates what has been verified from
+what has not, so the readers who continue know where to spend their attention.
 
 ## Who reads it
 
@@ -61,16 +61,19 @@ they are writing to you in unless their instructions name a different one.
 Plain language for the actual readers is the point of the block, so it does not
 inherit the language of the surrounding artifact or of the codebase.
 
+- A documented convention wins over the default. When a repository, team, or
+  user instruction fixes the language of this kind of artifact, follow it. The
+  block can be an exception to that convention, but only once the exception is
+  agreed, and it is then recorded where the convention lives so the next person
+  does not read it as a mistake.
+- If the readers do not share the default language, ask before writing rather
+  than guessing. A public repository, an open source project, or a mixed-language
+  team is the usual case.
 - Keep identifiers, paths, flags, commands, and product terms in their original
   form. Do not translate them.
 - Translate the six beat labels and the epistemic tags into the summary
   language, and keep one wording per label across artifacts. The set and the
   order never change.
-- If the readers do not share that language, ask before writing rather than
-  guessing.
-- If a repository or team convention fixes a different language for the
-  artifact, this block is an exception to it. Record the exception where that
-  convention lives, so the next person does not read it as a mistake.
 
 ## Evidence and epistemic status
 
