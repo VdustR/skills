@@ -39,4 +39,5 @@ remote state, and hosting-platform state as separate sources of truth.
   `references/pull-requests.md`.
 
 Load only the references needed for the request. Specialized PR skills remain
-authoritative for their narrower workflows.
+authoritative for their narrower workflows, and vp-tldr covers the summary block
+that opens a pull request description.
