@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP TL;DR"
+  short_description: "Write a reader-first summary block that separates verified facts from open questions"
+  default_prompt: "Use $vp-tldr to write the summary block that opens this pull request or document."

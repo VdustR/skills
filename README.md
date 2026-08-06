@@ -116,6 +116,10 @@ Summarize a session before archiving it and clear leftover files, processes, and
 
 Manage agent skills using the `npx skills` CLI.
 
+### vp-tldr
+
+Write the summary block that opens a pull request or document, separating verified facts from open questions.
+
 ### vp-typescript-best-practices
 
 Review TypeScript safety, type boundaries, and fallback style preferences.
