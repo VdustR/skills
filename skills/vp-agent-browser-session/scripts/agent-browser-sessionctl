@@ -1,0 +1,316 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROFILE_ROOT="${HOME:?HOME is required}/.agents/chrome-profiles"
+MARKER=".vp-chrome-profile"
+CURRENT_TOOL="vp-agent-browser-session"
+LEGACY_TOOL="vp-chrome-profiles"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  agent-browser-sessionctl doctor
+  agent-browser-sessionctl core-skill
+  agent-browser-sessionctl root
+  agent-browser-sessionctl list
+  agent-browser-sessionctl create NAME
+  agent-browser-sessionctl adopt NAME --yes
+  agent-browser-sessionctl path NAME
+  agent-browser-sessionctl session-id NAME
+  agent-browser-sessionctl run NAME AGENT_BROWSER_ARGS...
+  agent-browser-sessionctl delete NAME --yes
+
+Profiles live under ~/.agents/chrome-profiles and deletion only works for
+profiles with a .vp-chrome-profile marker.
+EOF
+}
+
+die() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+validate_name() {
+  local name="$1"
+  [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || die "invalid profile name: $name"
+  case "$name" in
+    .|..|*/*|*-)
+      die "invalid profile name: $name"
+      ;;
+  esac
+}
+
+profile_dir() {
+  local name="$1"
+  validate_name "$name"
+  printf '%s/%s\n' "$PROFILE_ROOT" "$name"
+}
+
+is_managed() {
+  local dir="$1"
+  [ -f "$dir/$MARKER" ] \
+    && grep -Eq "^tool=(${CURRENT_TOOL}|${LEGACY_TOOL})$" "$dir/$MARKER"
+}
+
+is_chrome_profile() {
+  local dir="$1"
+  [ -f "$dir/Local State" ] || [ -f "$dir/Default/Preferences" ]
+}
+
+profile_in_use() {
+  local dir="$1"
+  local line
+  while IFS= read -r line; do
+    case "$line" in
+      *"--user-data-dir=$dir"|*"--user-data-dir=$dir "*|*"--user-data-dir $dir"|*"--user-data-dir $dir "*)
+        return 0
+        ;;
+    esac
+  done < <(ps -ewwwo args 2>/dev/null)
+  return 1
+}
+
+iso_now() {
+  date -u '+%Y-%m-%dT%H:%M:%SZ'
+}
+
+write_marker() {
+  local dir="$1"
+  local name="$2"
+  umask 077
+  {
+    printf 'name=%s\n' "$name"
+    printf 'created_at=%s\n' "$(iso_now)"
+    printf 'tool=%s\n' "$CURRENT_TOOL"
+  } > "$dir/$MARKER"
+}
+
+ensure_profile_root() {
+  umask 077
+  mkdir -p "$PROFILE_ROOT"
+  chmod 700 "$PROFILE_ROOT" 2>/dev/null || true
+}
+
+ensure_profile_dir() {
+  local dir="$1"
+  ensure_profile_root
+  umask 077
+  mkdir -p "$dir"
+  chmod 700 "$dir" 2>/dev/null || true
+}
+
+cmd_doctor() {
+  local status=0
+  printf 'root: %s\n' "$PROFILE_ROOT"
+
+  if command -v agent-browser >/dev/null 2>&1; then
+    printf 'agent_browser: found\n'
+    printf 'agent_browser_path: %s\n' "$(command -v agent-browser)"
+    printf 'agent_browser_version: '
+    agent-browser --version
+    if agent-browser skills path core >/dev/null 2>&1; then
+      printf 'core_skill: bundled\n'
+    else
+      printf 'core_skill: unavailable\n'
+      status=1
+    fi
+  else
+    printf 'agent_browser: missing\n'
+    status=1
+  fi
+
+  return "$status"
+}
+
+cmd_core_skill() {
+  command -v agent-browser >/dev/null 2>&1 \
+    || die "agent-browser is missing; obtain user authorization before installing it"
+  agent-browser skills get core --full
+}
+
+cmd_root() {
+  printf '%s\n' "$PROFILE_ROOT"
+}
+
+cmd_list() {
+  ensure_profile_root
+  printf 'name\tstate\tpath\n'
+
+  local dir name state found=false
+  for dir in "$PROFILE_ROOT"/*; do
+    [ -d "$dir" ] || continue
+    found=true
+    name="$(basename "$dir")"
+    if is_managed "$dir"; then
+      state="managed"
+    elif is_chrome_profile "$dir"; then
+      state="unmanaged-chrome-profile"
+    else
+      state="unmanaged-directory"
+    fi
+    printf '%s\t%s\t%s\n' "$name" "$state" "$dir"
+  done
+
+  $found || true
+}
+
+cmd_create() {
+  [ $# -eq 1 ] || die "create requires NAME"
+  local name="$1"
+  local dir
+  dir="$(profile_dir "$name")"
+
+  if [ -e "$dir" ]; then
+    is_managed "$dir" || die "$dir exists but is not managed by this skill"
+    printf 'profile: exists\n'
+    printf 'path: %s\n' "$dir"
+    return 0
+  fi
+
+  ensure_profile_dir "$dir"
+  write_marker "$dir" "$name"
+  printf 'profile: created\n'
+  printf 'path: %s\n' "$dir"
+}
+
+cmd_adopt() {
+  local yes=false
+  [ $# -ge 1 ] || die "adopt requires NAME --yes"
+  local name="$1"
+  shift
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --yes)
+        yes=true
+        shift
+        ;;
+      -h|--help)
+        usage
+        return 0
+        ;;
+      *)
+        die "unknown adopt option: $1"
+        ;;
+    esac
+  done
+  $yes || die "adopt requires --yes after user confirmation"
+
+  local dir
+  dir="$(profile_dir "$name")"
+  [ -d "$dir" ] || die "$dir does not exist"
+  is_managed "$dir" && die "$name is already managed"
+  is_chrome_profile "$dir" || die "$dir does not look like a Chrome user data directory"
+  write_marker "$dir" "$name"
+  printf 'profile: adopted\n'
+  printf 'path: %s\n' "$dir"
+}
+
+cmd_path() {
+  [ $# -eq 1 ] || die "path requires NAME"
+  profile_dir "$1"
+}
+
+cmd_session_id() {
+  [ $# -eq 1 ] || die "session-id requires NAME"
+  local name="$1"
+  validate_name "$name"
+  command -v agent-browser >/dev/null 2>&1 \
+    || die "agent-browser is missing; obtain user authorization before installing it"
+  agent-browser session id --scope worktree --prefix "$name"
+}
+
+validate_run_args() {
+  local arg
+  for arg in "$@"; do
+    case "$arg" in
+      --session|--session=*|--profile|--profile=*|--restore|--restore=*|--restore-*|\
+      --state|--state=*|--auto-connect|--cdp|--cdp=*|--namespace|--namespace=*|\
+      --allowed-domains|--allowed-domains=*)
+        die "run manages session, profile, and persistence; conflicting argument: $arg"
+        ;;
+    esac
+  done
+}
+
+cmd_run() {
+  [ $# -ge 2 ] || die "run requires NAME and at least one agent-browser argument"
+  local name="$1"
+  shift
+  validate_run_args "$@"
+  local dir session_id
+  dir="$(profile_dir "$name")"
+  [ -d "$dir" ] || die "$name does not exist; run create first"
+  is_managed "$dir" || die "$name is not managed by this skill"
+  command -v agent-browser >/dev/null 2>&1 \
+    || die "agent-browser is missing; obtain user authorization before installing it"
+  session_id="$(agent-browser session id --scope worktree --prefix "$name")"
+  agent-browser --session "$session_id" --profile "$dir" "$@"
+}
+
+cmd_delete() {
+  local yes=false
+  [ $# -ge 1 ] || die "delete requires NAME --yes"
+  local name="$1"
+  shift
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --yes)
+        yes=true
+        shift
+        ;;
+      -h|--help)
+        usage
+        return 0
+        ;;
+      *)
+        die "unknown delete option: $1"
+        ;;
+    esac
+  done
+  $yes || die "delete requires --yes after user confirmation"
+
+  local dir
+  dir="$(profile_dir "$name")"
+  [ -d "$dir" ] || die "$name does not exist"
+  is_managed "$dir" || die "refusing to delete unmanaged profile: $dir"
+  profile_in_use "$dir" && die "refusing to delete profile while Chrome is using it: $dir"
+
+  case "$dir" in
+    "$PROFILE_ROOT"/*)
+      ;;
+    *)
+      die "refusing to delete outside profile root: $dir"
+      ;;
+  esac
+
+  rm -rf -- "$dir"
+  printf 'profile: deleted\n'
+  printf 'path: %s\n' "$dir"
+}
+
+main() {
+  [ $# -gt 0 ] || {
+    usage
+    exit 1
+  }
+
+  local command="$1"
+  shift
+
+  case "$command" in
+    doctor) cmd_doctor "$@" ;;
+    core-skill) cmd_core_skill "$@" ;;
+    root) cmd_root "$@" ;;
+    list) cmd_list "$@" ;;
+    create) cmd_create "$@" ;;
+    adopt) cmd_adopt "$@" ;;
+    path) cmd_path "$@" ;;
+    session-id) cmd_session_id "$@" ;;
+    run) cmd_run "$@" ;;
+    delete) cmd_delete "$@" ;;
+    -h|--help) usage ;;
+    *) die "unknown command: $command" ;;
+  esac
+}
+
+main "$@"

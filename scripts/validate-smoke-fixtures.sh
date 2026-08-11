@@ -21,7 +21,7 @@ required_skills=(
   "vp-skills"
   "vp-pr-comment-resolver"
   "vp-git"
-  "vp-chrome-profiles"
+  "vp-agent-browser-session"
   "vp-session-wrapup"
 )
 
@@ -45,7 +45,7 @@ done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
 stacked_rebase_fixture="fixtures/smoke/vp-git.md"
-chrome_profiles_fixture="fixtures/smoke/vp-chrome-profiles.md"
+agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 
@@ -88,16 +88,20 @@ require_pattern "$stacked_rebase_fixture" 'stack merge API' \
 require_pattern "$stacked_rebase_fixture" 'native.*not.*(reconstruction|manual)|not manual reconstruction' \
   "vp-git fixture must cover routing GitHub stacks to the native workflow"
 
-require_pattern "$chrome_profiles_fixture" 'dedicated managed profiles?' \
-  "vp-chrome-profiles fixture must cover dedicated managed profiles"
-require_pattern "$chrome_profiles_fixture" 'delete.*marker|marker.*delete' \
-  "vp-chrome-profiles fixture must cover marker-guarded deletion"
-require_pattern "$chrome_profiles_fixture" 'running profiles?.*not deleted|in use.*Chrome' \
-  "vp-chrome-profiles fixture must cover in-use profile deletion refusal"
-require_pattern "$chrome_profiles_fixture" 'Refuse to launch|not relaunched' \
-  "vp-chrome-profiles fixture must cover in-use profile launch refusal"
-require_pattern "$chrome_profiles_fixture" 'browser-url|browserUrl' \
-  "vp-chrome-profiles fixture must cover browser-url MCP connection"
+require_pattern "$agent_browser_session_fixture" 'dedicated managed profiles?' \
+  "vp-agent-browser-session fixture must cover dedicated managed profiles"
+require_pattern "$agent_browser_session_fixture" 'installed.*agent-browser skill' \
+  "vp-agent-browser-session fixture must prefer installed agent-browser guidance"
+require_pattern "$agent_browser_session_fixture" 'CLI-bundled.*(fallback|authoritative|authority)' \
+  "vp-agent-browser-session fixture must cover CLI-bundled guidance fallback"
+require_pattern "$agent_browser_session_fixture" 'GitHub.*not.*automatic|do not.*fetch GitHub' \
+  "vp-agent-browser-session fixture must reject automatic GitHub fallback"
+require_pattern "$agent_browser_session_fixture" 'delete.*marker|marker.*delete' \
+  "vp-agent-browser-session fixture must cover marker-guarded deletion"
+require_pattern "$agent_browser_session_fixture" 'running profiles?.*not deleted|in use.*Chrome' \
+  "vp-agent-browser-session fixture must cover in-use profile deletion refusal"
+require_pattern "$agent_browser_session_fixture" 'worktree-scoped' \
+  "vp-agent-browser-session fixture must cover stable worktree sessions"
 
 require_pattern "$session_wrapup_fixture" 'risk-free cleanup authorization does not extend' \
   "vp-session-wrapup fixture must cover bounded risk-free cleanup authorization"
@@ -119,55 +123,94 @@ cleanup() {
   rm -rf "$tmp_home"
 }
 trap cleanup EXIT
-profilectl="skills/vp-chrome-profiles/scripts/chrome-profilectl"
+sessionctl="skills/vp-agent-browser-session/scripts/agent-browser-sessionctl"
+fake_bin="$tmp_home/bin"
+mkdir -p "$fake_bin"
+cat > "$fake_bin/agent-browser" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
 
-[ -x "$profilectl" ] || fail "$profilectl is missing or not executable"
+case "$*" in
+  --version)
+    printf 'agent-browser 0.test\n'
+    ;;
+  'skills path core')
+    printf '/test/agent-browser/core\n'
+    ;;
+  'skills get core --full')
+    printf '# agent-browser core\n'
+    ;;
+  'session id --scope worktree --prefix '*)
+    printf '%s-worktree\n' "$6"
+    ;;
+  *)
+    printf '%s\n' "$*"
+    ;;
+esac
+EOF
+chmod +x "$fake_bin/agent-browser"
+export PATH="$fake_bin:$PATH"
+
+[ -x "$sessionctl" ] || fail "$sessionctl is missing or not executable"
 
 file_mode() {
   stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1" 2>/dev/null || printf 'unknown'
 }
 
-doctor_output="$(HOME="$tmp_home" "$profilectl" doctor)" \
-  || fail "chrome-profilectl doctor must pass in this repository test environment"
+doctor_output="$(HOME="$tmp_home" "$sessionctl" doctor)" \
+  || fail "agent-browser-sessionctl doctor must pass in this repository test environment"
 printf '%s\n' "$doctor_output" | grep -Fq 'root:' \
-  || fail "chrome-profilectl doctor must print the profile root"
+  || fail "agent-browser-sessionctl doctor must print the profile root"
 mkdir -p "$tmp_home/.agents/chrome-profiles"
 chmod 755 "$tmp_home/.agents/chrome-profiles"
-HOME="$tmp_home" "$profilectl" create test-profile >/dev/null
+HOME="$tmp_home" "$sessionctl" create test-profile >/dev/null
 [ "$(file_mode "$tmp_home/.agents/chrome-profiles")" = "700" ] \
-  || fail "chrome-profilectl must create profile root with mode 700"
+  || fail "agent-browser-sessionctl must create profile root with mode 700"
 [ "$(file_mode "$tmp_home/.agents/chrome-profiles/test-profile")" = "700" ] \
-  || fail "chrome-profilectl must create profiles with mode 700"
-grep -Fxq 'tool=vp-chrome-profiles' "$tmp_home/.agents/chrome-profiles/test-profile/.vp-chrome-profile" \
-  || fail "chrome-profilectl create must write a tool marker"
-HOME="$tmp_home" "$profilectl" list | grep -Fq 'test-profile' \
-  || fail "chrome-profilectl list must show created profiles"
-HOME="$tmp_home" "$profilectl" mcp-args test-profile --port 9344 | grep -Fq -- '--browser-url=http://127.0.0.1:9344' \
-  || fail "chrome-profilectl mcp-args must emit browser-url"
+  || fail "agent-browser-sessionctl must create profiles with mode 700"
+grep -Fxq 'tool=vp-agent-browser-session' "$tmp_home/.agents/chrome-profiles/test-profile/.vp-chrome-profile" \
+  || fail "agent-browser-sessionctl create must write a tool marker"
+HOME="$tmp_home" "$sessionctl" list | grep -Fq 'test-profile' \
+  || fail "agent-browser-sessionctl list must show created profiles"
+HOME="$tmp_home" "$sessionctl" session-id test-profile | grep -Fq 'test-profile' \
+  || fail "agent-browser-sessionctl must derive a prefixed session id"
+HOME="$tmp_home" "$sessionctl" core-skill | grep -Fq 'agent-browser core' \
+  || fail "agent-browser-sessionctl must load CLI-bundled core guidance"
+run_output="$(HOME="$tmp_home" "$sessionctl" run test-profile open https://example.com)"
+printf '%s\n' "$run_output" \
+  | grep -Fq -- "--session test-profile-worktree --profile $tmp_home/.agents/chrome-profiles/test-profile open https://example.com" \
+  || fail "agent-browser-sessionctl run must bind the stable session and managed profile"
+if HOME="$tmp_home" "$sessionctl" run test-profile --profile /tmp/override open https://example.com >/dev/null 2>&1; then
+  fail "agent-browser-sessionctl run must reject profile overrides"
+fi
+if HOME="$tmp_home" "$sessionctl" run test-profile --restore open https://example.com >/dev/null 2>&1; then
+  fail "agent-browser-sessionctl run must reject competing restore state"
+fi
 mkdir -p "$tmp_home/.agents/chrome-profiles/adopted/Default"
 touch "$tmp_home/.agents/chrome-profiles/adopted/Local State"
-HOME="$tmp_home" "$profilectl" adopt adopted --yes >/dev/null
-grep -Fxq 'tool=vp-chrome-profiles' "$tmp_home/.agents/chrome-profiles/adopted/.vp-chrome-profile" \
-  || fail "chrome-profilectl adopt must write a tool marker"
-HOME="$tmp_home" "$profilectl" delete adopted --yes >/dev/null
+HOME="$tmp_home" "$sessionctl" adopt adopted --yes >/dev/null
+grep -Fxq 'tool=vp-agent-browser-session' "$tmp_home/.agents/chrome-profiles/adopted/.vp-chrome-profile" \
+  || fail "agent-browser-sessionctl adopt must write a tool marker"
+HOME="$tmp_home" "$sessionctl" delete adopted --yes >/dev/null
+mkdir -p "$tmp_home/.agents/chrome-profiles/legacy"
+printf 'tool=vp-chrome-profiles\n' > "$tmp_home/.agents/chrome-profiles/legacy/.vp-chrome-profile"
+HOME="$tmp_home" "$sessionctl" delete legacy --yes >/dev/null \
+  || fail "agent-browser-sessionctl must accept legacy managed markers"
 mkdir -p "$tmp_home/.agents/chrome-profiles/unmanaged"
-if HOME="$tmp_home" "$profilectl" delete unmanaged --yes >/dev/null 2>&1; then
-  fail "chrome-profilectl delete must refuse unmanaged profiles"
+if HOME="$tmp_home" "$sessionctl" delete unmanaged --yes >/dev/null 2>&1; then
+  fail "agent-browser-sessionctl delete must refuse unmanaged profiles"
 fi
 bash -c 'trap "exit 0" TERM; while :; do sleep 1; done' \
-  chrome-profilectl-test "--user-data-dir=$tmp_home/.agents/chrome-profiles/test-profile" &
+  agent-browser-sessionctl-test "--user-data-dir=$tmp_home/.agents/chrome-profiles/test-profile" &
 fake_profile_pid="$!"
-if HOME="$tmp_home" "$profilectl" launch test-profile --port 9344 --headless >/dev/null 2>&1; then
-  fail "chrome-profilectl launch must refuse profiles that appear in use"
-fi
-if HOME="$tmp_home" "$profilectl" delete test-profile --yes >/dev/null 2>&1; then
-  fail "chrome-profilectl delete must refuse profiles that appear in use"
+if HOME="$tmp_home" "$sessionctl" delete test-profile --yes >/dev/null 2>&1; then
+  fail "agent-browser-sessionctl delete must refuse profiles that appear in use"
 fi
 kill "$fake_profile_pid" 2>/dev/null || true
 wait "$fake_profile_pid" 2>/dev/null || true
 fake_profile_pid=""
-HOME="$tmp_home" "$profilectl" delete test-profile --yes >/dev/null
+HOME="$tmp_home" "$sessionctl" delete test-profile --yes >/dev/null
 [ ! -e "$tmp_home/.agents/chrome-profiles/test-profile" ] \
-  || fail "chrome-profilectl delete must remove managed profiles"
+  || fail "agent-browser-sessionctl delete must remove managed profiles"
 
 printf 'Validated %s smoke fixtures.\n' "${#required_skills[@]}"
