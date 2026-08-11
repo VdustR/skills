@@ -38,15 +38,22 @@ them explicitly before installing `vp-git`:
 npx -y skills@1.5.3 remove vp-git-cleanup vp-gitignore-builder vp-stacked-pr-rebase -g -y
 ```
 
+When upgrading from `vp-chrome-profiles`, remove it explicitly before installing
+`vp-agent-browser-session`:
+
+```bash
+npx -y skills@1.5.3 remove vp-chrome-profiles -g -y
+```
+
 ## Skills
 
 ### vp-checklist-runner
 
 Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
 
-### vp-chrome-profiles
+### vp-agent-browser-session
 
-Manage persistent Chrome profiles for agent-assisted browser debugging.
+Manage persistent agent-browser sessions with dedicated Chrome profiles.
 
 ### vp-cspell
 
