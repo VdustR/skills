@@ -34,6 +34,7 @@ it or fetch instructions from GitHub without user authorization.
   commands through the helper so the session and profile remain consistent.
 - Do not pass alternate session, profile, restore, state, connection, namespace,
   or domain-containment flags through the helper's managed `run` command.
+- Close only the managed session; do not pass `close --all` through the helper.
 
 ## Rules
 

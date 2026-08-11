@@ -186,12 +186,28 @@ fi
 if HOME="$tmp_home" "$sessionctl" run test-profile --restore open https://example.com >/dev/null 2>&1; then
   fail "agent-browser-sessionctl run must reject competing restore state"
 fi
+if HOME="$tmp_home" "$sessionctl" run test-profile close --all >/dev/null 2>&1; then
+  fail "agent-browser-sessionctl run must not close unrelated sessions"
+fi
 mkdir -p "$tmp_home/.agents/chrome-profiles/adopted/Default"
 touch "$tmp_home/.agents/chrome-profiles/adopted/Local State"
 HOME="$tmp_home" "$sessionctl" adopt adopted --yes >/dev/null
 grep -Fxq 'tool=vp-agent-browser-session' "$tmp_home/.agents/chrome-profiles/adopted/.vp-chrome-profile" \
   || fail "agent-browser-sessionctl adopt must write a tool marker"
 HOME="$tmp_home" "$sessionctl" delete adopted --yes >/dev/null
+mkdir -p "$tmp_home/.agents/chrome-profiles/adopt-in-use/Default"
+touch "$tmp_home/.agents/chrome-profiles/adopt-in-use/Local State"
+bash -c 'trap "exit 0" TERM; while :; do sleep 1; done' \
+  agent-browser-sessionctl-test "--user-data-dir=$tmp_home/.agents/chrome-profiles/adopt-in-use" &
+fake_profile_pid="$!"
+if HOME="$tmp_home" "$sessionctl" adopt adopt-in-use --yes >/dev/null 2>&1; then
+  fail "agent-browser-sessionctl adopt must refuse profiles that appear in use"
+fi
+kill "$fake_profile_pid" 2>/dev/null || true
+wait "$fake_profile_pid" 2>/dev/null || true
+fake_profile_pid=""
+HOME="$tmp_home" "$sessionctl" adopt adopt-in-use --yes >/dev/null
+HOME="$tmp_home" "$sessionctl" delete adopt-in-use --yes >/dev/null
 mkdir -p "$tmp_home/.agents/chrome-profiles/legacy"
 printf 'tool=vp-chrome-profiles\n' > "$tmp_home/.agents/chrome-profiles/legacy/.vp-chrome-profile"
 HOME="$tmp_home" "$sessionctl" delete legacy --yes >/dev/null \

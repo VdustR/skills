@@ -200,6 +200,7 @@ cmd_adopt() {
   [ -d "$dir" ] || die "$dir does not exist"
   is_managed "$dir" && die "$name is already managed"
   is_chrome_profile "$dir" || die "$dir does not look like a Chrome user data directory"
+  profile_in_use "$dir" && die "refusing to adopt profile while Chrome is using it: $dir"
   write_marker "$dir" "$name"
   printf 'profile: adopted\n'
   printf 'path: %s\n' "$dir"
@@ -220,6 +221,14 @@ cmd_session_id() {
 }
 
 validate_run_args() {
+  if [ "${1:-}" = "close" ]; then
+    local close_arg
+    for close_arg in "$@"; do
+      [ "$close_arg" != "--all" ] \
+        || die "run manages one session; close --all would affect unrelated sessions"
+    done
+  fi
+
   local arg
   for arg in "$@"; do
     case "$arg" in

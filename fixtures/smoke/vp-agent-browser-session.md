@@ -34,6 +34,7 @@ Assume the machine already has agent-browser.
 - Use a stable worktree-scoped agent-browser session and the managed profile.
 - Reject caller arguments that override the managed session, profile,
   persistence, connection, namespace, or domain containment.
+- Reject `close --all` because it affects sessions outside the managed profile.
 - Use headed operation for manual authentication.
 - Do not combine profile persistence with restore state by default.
 - If agent-browser is missing, report it and do not install it or fetch GitHub
@@ -52,9 +53,11 @@ Assume the machine already has agent-browser.
 - user login happens in a visible agent-browser window
 - repeated commands reuse one worktree-scoped session and managed profile
 - managed session and profile arguments cannot be overridden by callers
+- managed commands cannot close unrelated agent-browser sessions
 - restore state and profile persistence are not combined by default
 - profile delete is marker-guarded and confirmation-gated
 - running profiles are not deleted
 - sensitive browser stores are not inspected for routine diagnostics
 - migrated profiles must be copied under `~/.agents/chrome-profiles` before adopt
+- running Chrome profiles cannot be adopted
 - legacy `vp-chrome-profiles` markers remain manageable after the rename
