@@ -1,120 +1,85 @@
 ---
 name: vp-tldr
 description: >-
-  Write or rewrite the TL;DR summary block that opens a pull request, issue,
-  design document, handoff note, or status post, so a reader with no context
-  decides in seconds whether it concerns them and can tell verified facts from
-  inference. Use when drafting that summary, when an existing one no longer
-  matches the current state of the work, or when a description buries its
-  conclusion, its open questions, or its blockers. Boundary: covers the summary
-  block only, not the body sections around it, and not reviewing someone else's
-  change.
+  Write or rewrite the concise summary that opens an artifact, message, or
+  update so a reader without prior context can quickly understand the outcome,
+  relevance, current state, and required action. Use for TL;DR blocks, executive
+  summaries, pull request or issue openings, design documents, investigations,
+  handoff notes, status updates, and other content whose conclusion or important
+  uncertainty is buried. Boundary: covers the summary only, not the surrounding
+  body and not a review of the underlying work.
 ---
 
 # TL;DR Summary
 
-The summary is the first block of the artifact, and for most readers it is
-where they stop. It does two jobs: it lets a reader decide within seconds
-whether the work concerns them, and it separates what has been verified from
-what has not, so the readers who continue know where to spend their attention.
+Write the smallest summary that lets the intended reader decide whether the
+artifact concerns them and what, if anything, they need to do.
 
-## Who reads it
+## Follow the artifact
 
-Write for someone who opens the artifact with zero context. They do not know
-the feature name, have not read the ticket, and were not in the discussion.
-They are also the person who has to decide whether to trust the work.
+Apply instructions in this order:
 
-That reader model produces three constraints:
+1. Follow the user's requested content and structure.
+2. Follow an established artifact template or documented convention.
+3. Choose the shortest structure that preserves the important meaning.
 
-- **Explain every proper noun on first use.** Feature names, flag names, and
-  internal component names each need a short in-place gloss. A reader who has
-  to look something up has already stopped reading.
-- **Never require the reader to remember earlier text.** Each beat stands
-  alone, and a pronoun must have its referent in the same beat.
-- **Never state an unverified thing in the voice of a verified one.** Every
-  claim either carries a reference or carries an epistemic tag. There is no
-  third category.
+Do not impose a standard TL;DR template when the user or artifact already has
+one. Preserve requested labels and section order. When no structure is given,
+use a short paragraph or a few bullets. Add labels only when they make distinct
+kinds of information easier to scan.
 
-## The six beats
+## Select the content
 
-Fixed order, fixed labels, shallowest first. Every beat is a valid stopping
-point.
+Lead with the conclusion or current outcome. Include only details that change a
+reader's understanding, decision, or next action. Depending on the source, that
+may include:
 
-| Beat             | Answers                                                | Form          |
-| ---------------- | ------------------------------------------------------ | ------------- |
-| **Bottom line**  | Whether to keep reading                                | 1 sentence    |
-| **Problem**      | What is wrong now, and who feels it                    | 1-3 sentences |
-| **Approach**     | How it is solved, and why that works                   | 1-3 sentences |
-| **Trade-offs**   | What it costs, which alternatives lost and why         | ≤ 3 bullets   |
-| **Verified**     | Which claims are checked facts, and where the proof is | ≤ 3 bullets   |
-| **Open**         | What is inference, unknown, or blocked, and on whom    | ≤ 3 bullets   |
+- the topic and why it matters;
+- the result, decision, or current state;
+- the most important supporting point;
+- a material limitation, risk, blocker, or unknown;
+- the owner, dependency, or next action.
 
-Do not rename, reorder, merge, or add a seventh beat. **Verified** and **Open**
-stay even when thin — write "None", because an empty **Open** is a meaningful
-claim that the author checked. Shape, length budget, beat boundaries, and what
-belongs in the body sections instead are in `references/beats.md`.
+These are content options, not required sections. Omit empty concepts instead
+of writing `None`, and do not manufacture a problem, approach, trade-off,
+evidence item, or next action merely to complete a shape.
 
-## Language
+When labels help, derive them from the artifact and audience. Examples include
+`Bottom line`, `Status`, `Decision`, `Evidence`, `Open`, and `Next action`.
+Rename, reorder, merge, or omit them freely. See `references/beats.md` when
+choosing a structure or checking length.
 
-Default to the language the user habitually works in, which is the language
-they are writing to you in unless their instructions name a different one.
-Plain language for the actual readers is the point of the block, so it does not
-inherit the language of the surrounding artifact or of the codebase.
+## Preserve epistemic status
 
-- A documented convention wins over the default. When a repository, team, or
-  user instruction fixes the language of this kind of artifact, follow it. The
-  block can be an exception to that convention, but only once the exception is
-  agreed, and it is then recorded where the convention lives so the next person
-  does not read it as a mistake.
-- If the readers do not share the default language, ask before writing rather
-  than guessing. A public repository, an open source project, or a mixed-language
-  team is the usual case.
-- Keep identifiers, paths, flags, commands, and product terms in their original
-  form. Do not translate them.
-- Translate the six beat labels and the epistemic tags into the summary
-  language, and keep one wording per label across artifacts. The set and the
-  order never change.
+Represent the source faithfully:
 
-## Evidence and epistemic status
+- State established facts directly.
+- Attribute externally supplied claims when attribution affects trust.
+- Mark inference, uncertainty, and unresolved questions in plain language.
+- Name an owner for a confirmation, blocker, or next action when one is known.
+- Do not upgrade a plausible claim into a verified fact.
 
-Every **Verified** bullet points at something the reader can open: a test file
-plus the case name, a manual verification with environment and observation, a
-linked thread with the person's resolved real name, a document, or a section of
-this same artifact. No reference means the claim does not belong in that beat.
+Use a link or precise reference when the source provides one and it helps the
+reader check a consequential claim. Do not require every fact to have an
+external link, and do not invent evidence that is absent. See
+`references/evidence.md` for evidence and attribution guidance.
 
-Every **Open** bullet opens with a tag — inference, unknown, needs
-confirmation, or blocker — and the last two name an owner. "Waiting on the
-backend" leaves nobody responsible. Evidence forms, attribution rules, and the
-tag table are in `references/evidence.md`.
+## Rewrite from the current source
 
-The most damaging move this block can make is promoting an inference into
-**Verified** because it feels safe. If nothing was executed, it is an
-inference.
+Make the summary true of the source's current state. When updating an existing
+summary, reread the source before relying on the old wording. Remove superseded
+claims and resolved questions rather than preserving an edit history in the
+summary. See `references/rewrite.md` for the update check.
 
-## Rewrite, never patch
+## Check the result
 
-The summary must be true of the current state of the work, so every push, every
-accepted review comment, and every scope change requires a rewrite. Rewrite
-means delete and write again from the current diff or current state, then
-compare against the old version only to recover a point that still holds.
-
-Appending a sentence, prefixing "Update:", annotating a resolved item in place,
-or leaving a superseded bullet next to its replacement all produce a
-description the reader has to reconcile. A resolved question moves into
-**Verified** with its reference, and the old line disappears. The procedure,
-the patterns that must not appear, and the pre-publish self-check are in
-`references/rewrite.md`.
-
-## Before it ships
-
-Read the finished block once as a whole, checking that no beat contradicts
-another or the body sections. Then check it against the banned patterns and the
-annotated bad example in `references/anti-slop.md` — filler openers, unquantified
-intensifiers, restated diff statistics, and uncitable claims are what make a
-summary cost more attention than it saves.
+Ensure the first sentence carries the main point, each remaining sentence earns
+its place, and the summary does not contradict the body. Remove filler,
+unsupported intensifiers, process narration, and detail that belongs in the
+body. Use `references/anti-slop.md` for the final language check.
 
 ## Route
 
-Use vp-pr-briefing to understand a pull request someone else wrote, vp-git for
-the pull request lifecycle around the description, and vp-checklist-runner when
-the artifact's checklist has to be verified rather than summarized.
+Use a workflow-specific skill when the user needs investigation, review,
+verification, lifecycle work, or edits beyond the summary. Apply this skill to
+the summary portion only when the user requests its TL;DR logic there.

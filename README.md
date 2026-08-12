@@ -125,7 +125,7 @@ Manage agent skills using the `npx skills` CLI.
 
 ### vp-tldr
 
-Write the summary block that opens a pull request or document, separating verified facts from open questions.
+Write a concise, reader-first summary for an artifact, message, or update while preserving uncertainty and required action.
 
 ### vp-typescript-best-practices
 
