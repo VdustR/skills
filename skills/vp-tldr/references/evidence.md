@@ -1,67 +1,39 @@
-# Evidence and Epistemic Tags
+# Evidence and Epistemic Status
 
-## Verified: every bullet resolves
+## Preserve what the source supports
 
-Each bullet under **Verified** must point at something the reader can open. No
-reference means the claim does not belong in this beat.
+Distinguish among:
 
-| Form              | Shape                                                             |
-| ----------------- | ----------------------------------------------------------------- |
-| Test              | `Test:` the file path and the case name, plus what it covers       |
-| Manual check      | `Manual:` which environment, what was done, what was observed      |
-| Decision in a thread | `<platform>:` a descriptive link, plus who confirmed what in one clause |
-| Document or spec  | `Doc:` a titled link                                               |
-| Code elsewhere    | The repository or service, plus the path                           |
-| This artifact     | Which body section or test file, by name                           |
-| Captured screen   | A specific image or recording labeled as coming from this change   |
+- **Established:** directly supported by the supplied source, observed output,
+  or a referenced decision.
+- **Attributed:** reported by a person or external source whose identity or
+  provenance matters.
+- **Inferred:** a conclusion drawn from available information but not directly
+  established.
+- **Unknown:** a known gap that remains unanswered.
+- **Blocked or pending:** an unresolved dependency or action.
 
-**Attribute people by resolved name and link.** "The product manager approved
-it" is not evidence. Chat user IDs must be resolved to names before being
-quoted; an unresolved `U0123ABCD` is an unverified attribution, and an
-unlinked claim dies as soon as the thread scrolls away.
+Use natural wording that fits the artifact. Fixed tags are optional unless the
+user or template requires them.
 
-**Cite the case, not the suite.** "Added tests" tells the reader nothing. The
-file plus the case name tells them what is covered, and by omission what is
-not.
+## References
 
-**Only real output counts as visual evidence.** A screenshot or recording
-produced by the change under review can be cited here. A mockup or a design
-comp is intent, and citing it is the same error as calling an inference a fact.
-When the artifact carries images, label each one with its provenance so the two
-cannot be confused.
+Add a link, file, test case, observation, or section reference when it helps the
+reader verify a consequential claim. Prefer the most specific available source.
+Examples include:
 
-**Never round an inference up to a fact.** If the reasoning is sound but
-nothing was executed, it is an inference and belongs under **Open**. Moving it
-into **Verified** because it feels safe is the most damaging thing this block
-can do.
+- a test file and case for tested behavior;
+- an environment, action, and observation for a manual check;
+- a descriptive link and named participant for a decision;
+- a titled document or relevant section;
+- a labeled screenshot or recording of actual output.
 
-## Open: every bullet carries a tag
+Absence of a reference does not automatically make a source statement false.
+Represent it at the confidence level supported by the available material. Never
+invent a citation, test result, owner, or confirmation.
 
-Each bullet under **Open** opens with one of four tags, first thing on the
-line, so the beat can be skimmed for what is unresolved.
+## Ownership
 
-| Tag                  | Means                                              | Must also include             |
-| -------------------- | -------------------------------------------------- | ----------------------------- |
-| `Inference:`         | Good reason to believe it, but nothing was executed | What the inference rests on   |
-| `Unknown:`           | A known gap, with no judgment made yet              | What specifically is unknown  |
-| `Needs confirmation:`| Someone has to answer before it can be settled      | A person, and the question    |
-| `Blocker:`           | Blocks merge or release                             | A person or team, and the action |
-
-`Needs confirmation:` and `Blocker:` without a named owner are incomplete.
-"Waiting on the backend" leaves nobody responsible; "waiting on <name> to
-confirm whether the API can return null" does not.
-
-A blocker must open with its tag. Burying one mid-sentence in another beat is a
-process failure, not a formatting preference.
-
-Write these tags in the summary's language, keeping one wording per tag across
-artifacts so a reader who has seen one summary can skim the next.
-
-## Unattended generation
-
-When the summary is produced by an automated path that has no diff analysis and
-no verification of its own, do not invent the beats. Emit the six labels as a
-stub, put whatever the automation can actually back — a quality gate that ran,
-for example — under **Verified**, and carry a blocker under **Open** naming the
-person or team who has to rewrite it. A stub that admits what it is costs less
-than a plausible summary nobody checked.
+Name the responsible person or team when the source identifies one and the item
+requires confirmation, resolution, or action. If no owner is known, state that
+the owner is unassigned only when the omission matters to the reader's decision.
