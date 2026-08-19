@@ -1,8 +1,8 @@
-# vp-git Smoke Fixture
+# vp-stacked-pr Smoke Fixture
 
 ## Prompt
 
-Use `$vp-git` for two stacked-change situations and route each to the correct
+Use `$vp-stacked-pr` for two stacked-change situations and route each to the correct
 reference before acting:
 
 **Situation 1 — GitHub, same repository.** Build and land a three-layer stack of
@@ -31,7 +31,7 @@ Assume each working tree is clean and authenticated host metadata is available.
 
 ## Expected Behavior
 
-Situation 1 (GitHub native stack) routes to `references/stacked-prs.md`:
+Situation 1 (GitHub native stack) routes to `references/github-native.md`:
 
 - Build with `gh stack init`, then `gh stack add` per layer, and open the PRs with
   `gh stack submit`; do not hand-rebuild history for a GitHub same-repo stack.
@@ -40,7 +40,7 @@ Situation 1 (GitHub native stack) routes to `references/stacked-prs.md`:
 - Rely on the server-side auto-rebase and retarget of upper PRs rather than a
   manual reconstruction.
 
-Situation 2 (non-GitHub manual repair) routes to `references/dependent-branch-rebase.md`:
+Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 
 - Confirm the intended parent and detect the squash-merge.
 - Exclude `aaa1111` and `bbb2222` as parent-owned commits.

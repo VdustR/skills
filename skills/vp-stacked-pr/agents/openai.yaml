@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Stacked PR"
+  short_description: "Build, merge, and repair stacked pull requests"
+  default_prompt: "Use $vp-stacked-pr to route this stacked-change work to the native or manual workflow."

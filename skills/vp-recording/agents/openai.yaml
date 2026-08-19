@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Recording"
+  short_description: "Record demo videos of web apps, generated motion, or macOS windows"
+  default_prompt: "Use $vp-recording to produce and verify this video."

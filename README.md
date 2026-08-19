@@ -38,6 +38,9 @@ them explicitly before installing `vp-git`:
 npx -y skills@1.5.3 remove vp-git-cleanup vp-gitignore-builder vp-stacked-pr-rebase -g -y
 ```
 
+Stacked-change guidance moved out of `vp-git` into `vp-stacked-pr`. Install both
+if you work with stacks.
+
 ## Skills
 
 ### vp-checklist-runner
@@ -70,7 +73,11 @@ Index repository-local skills written for other agent systems without converting
 
 ### vp-git
 
-Handle commits, repository setup, gitignore files, cleanup, stacked branches, and PR lifecycle decisions.
+Handle commits, repository setup, gitignore files, cleanup, and PR lifecycle decisions.
+
+### vp-github
+
+GitHub platform behavior: attaching media and files to issues and PRs, markdown rendering rules, and which credential reaches which endpoint.
 
 ### vp-guided-focus
 
@@ -104,6 +111,10 @@ Follow up on GitHub PR review conversations from the reviewer side.
 
 Generate concise session titles based on the whole conversation theme.
 
+### vp-recording
+
+Produce a demo video: a scripted browser walkthrough, a frame-accurate render of generated motion, or a macOS window capture.
+
 ### vp-retro
 
 Review recent agent work to discover workflow, instruction, and skill improvements.
@@ -115,6 +126,10 @@ Summarize a session before archiving it and clear leftover files, processes, and
 ### vp-skills
 
 Manage agent skills using the `npx skills` CLI.
+
+### vp-stacked-pr
+
+Build, submit, merge, and repair stacks of dependent pull requests, merge requests, or branches. Native automation on GitHub, manual Git rebase on any other host.
 
 ### vp-typescript-best-practices
 
@@ -147,7 +162,8 @@ Validation layers:
 
 Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
 prove with static validation, such as PR comment resolution policy, stacked
-branch history-rewrite safety, and session cleanup authorization limits.
+branch history-rewrite safety, screen-capture scoping on a shared machine,
+GitHub attachment visibility, and session cleanup authorization limits.
 
 ## License
 

@@ -3,7 +3,7 @@
 GitHub-native stacked pull requests (public preview, 2026-07-30) split a change
 into an ordered chain of dependent PRs and let the platform keep them consistent.
 This is a GitHub-only feature. For other hosts, or for stacks the native feature
-does not cover, read `dependent-branch-rebase.md`.
+does not cover, read `manual-rebase.md`.
 
 ## Prerequisites
 
