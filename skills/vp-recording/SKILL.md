@@ -54,16 +54,17 @@ come from the operating system, so switching input tools does not lift them.
 ## Pick the input tool by session, not by habit
 
 Recording a macOS window needs no automation tool. Driving the app on camera
-does, and the right one depends on which agent is running:
+does, and which one depends on the agent. Prefer the first:
 
-1. The session's own computer-use tool, when it has one.
+1. The session's own computer-use tool, when the agent has one. Codex computer
+   use is an example.
 2. Peekaboo, which any macOS session can install.
-3. Neither: use the browser path, or ask the user to drive while the recorder
-   runs.
 
-Read that tool's own skill or `--help` for current syntax. This skill names no
-input commands, because command surfaces move and a copied invocation goes
-stale.
+With neither available, use the browser path, or ask the user to drive while the
+recorder runs.
+
+Read the tool's own skill or `--help` for current syntax. This skill names no
+input commands, because flags get renamed and a copied invocation goes stale.
 
 ## Check what you produced
 

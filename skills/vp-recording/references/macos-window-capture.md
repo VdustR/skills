@@ -66,7 +66,9 @@ anyone else's content could be on screen, which on a shared workstation is
 always.
 
 `scripts/window-id.swift` reads `CGWindowListCopyWindowInfo` directly and needs
-nothing but Swift from Xcode or the Command Line Tools. It filters to layer 0, so
+nothing but Swift from Xcode or the Command Line Tools. Confirm it is there once
+with `xcode-select -p`; if it is not, any desktop automation tool's window
+listing returns the same id and bounds. It filters to layer 0, so
 menu bar items and other chrome stay out of the list. An app with several open
 windows prints several rows; the title and size columns are there to tell them
 apart. If the session already has a desktop automation tool, its own window
@@ -113,15 +115,20 @@ a 60 fps timebase.
 
 ## Driving the app: pick the tool the session already has
 
-This skill names no input commands, because command surfaces move and a copied
-invocation goes stale. Resolve the tool in this order:
+Two kinds of tool can drive a native app. Prefer the first:
 
-1. The session's own computer-use tool, when it has one.
+1. The session's own computer-use tool, when the agent has one. Codex computer
+   use is an example.
 2. Peekaboo, which any macOS session can install.
-3. Neither: record the browser path instead, or ask the user to drive while the
-   recorder runs.
 
-Read that tool's own skill or `--help` for current syntax before the first call.
+With neither of those available, do not drive the app from here. Record the
+browser path instead when the subject runs in a browser, or ask the user to
+drive while the recorder runs.
+
+Read the tool's own skill or `--help` for current syntax before the first call.
+This skill names no input commands, because flags get renamed and a copied
+invocation goes stale. Measured behavior is different: it stays true after a
+rename, so the limits below name their source and stay.
 
 Three constraints apply whichever tool you use:
 
