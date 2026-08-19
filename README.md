@@ -50,13 +50,13 @@ if you work with stacks.
 
 ## Skills
 
-### vp-checklist-runner
-
-Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
-
 ### vp-agent-browser-session
 
 Manage persistent agent-browser sessions with dedicated Chrome profiles.
+
+### vp-checklist-runner
+
+Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
 
 ### vp-cspell
 
