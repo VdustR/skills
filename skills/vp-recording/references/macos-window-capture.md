@@ -23,7 +23,7 @@ Paths below are relative to the skill directory.
 # 37528	Claude	Claude	1556x785
 
 # 2. Start recording in the background. -V is a ceiling, not the plan.
-screencapture -v -o -k -C -x -l37528 -V 120 out/window.mov &
+screencapture -v -k -C -x -l37528 -V 120 out/window.mov &
 SC=$!
 
 # 3. Wait out the startup delay, then drive the app.
@@ -67,8 +67,10 @@ always.
 
 `scripts/window-id.swift` reads `CGWindowListCopyWindowInfo` directly and needs
 nothing but Swift from Xcode or the Command Line Tools. It filters to layer 0, so
-menu bar items and other chrome stay out of the list. If the session already has
-a desktop automation tool, its own window listing works too and agrees on the id.
+menu bar items and other chrome stay out of the list. An app with several open
+windows prints several rows; the title and size columns are there to tell them
+apart. If the session already has a desktop automation tool, its own window
+listing works too and agrees on the id.
 
 ## Stop on a signal, not on a timer
 
@@ -85,21 +87,26 @@ slept 4 seconds before the interrupt and captured 2.59 seconds of video. Give it
 that lead-in before the first action, and expect the file to open on whatever was
 already on screen.
 
-## Use `-o`, then map coordinates by halves
+## Derive click coordinates from an `-o` still
 
-With `-o`, the file is exactly twice the window's point size on a 2x display: a
-1556x785 window records as 3112x1570. Without it, the same window records as
-3336x1794, adding a 112-pixel shadow margin on each side and breaking the
-arithmetic.
+A recording includes the window shadow, so its pixels do not map cleanly onto
+screen points. The same 1556x785 window records as 3336x1794, which is 224 pixels
+wider and taller than twice its bounds.
 
-To derive a click point, take a still first and measure on it:
+`-o` omits the shadow. Take a still with it and measure on that instead:
 
 ```bash
 screencapture -x -o -l37528 shot.png
+# 3112x1570, exactly twice the window bounds
 ```
 
 Then `screen point = window origin + pixel / 2`. The window origin comes from the
 bounds that `scripts/window-id.swift` prints.
+
+`-o` works on video too and produces the same exact-2x file. Whether `-C` still
+composites the cursor into a shadowless recording was not verified, so the
+recording command above leaves `-o` off, where the cursor is confirmed present
+frame by frame.
 
 Frame rate is variable. A 5.23-second file held 201 frames, about 38 fps against
 a 60 fps timebase.
@@ -116,11 +123,12 @@ invocation goes stale. Resolve the tool in this order:
 
 Read that tool's own skill or `--help` for current syntax before the first call.
 
-Three constraints hold whichever tool wins:
+Three constraints apply whichever tool you use:
 
 - **One system cursor.** Drawing the pointer in the frame means moving the real
-  pointer, which takes it away from whoever is at the keyboard. Tools ask for
-  explicit consent before doing that.
+  pointer, which takes it away from whoever is at the keyboard. Peekaboo requires
+  an explicit consent flag before it will do this; check whether your tool warns
+  at all.
 - **Background input leaves no cursor.** Driving through accessibility actions
   moves no pointer, so the recording shows changes with nothing visible causing
   them.
@@ -129,9 +137,10 @@ Three constraints hold whichever tool wins:
   reports `effect: unverifiable` while the target receives nothing. Check the
   equivalent limits on whichever tool you use.
 
-Getting a visible cursor and no interference at the same time means recording in
-the background and compositing a synthetic cursor afterward, which is what
-`web-demo.md` does inside the browser.
+The browser path escapes this by drawing its own pointer inside the page while
+the real one stays put. A native window has no such layer, so getting both a
+visible cursor and no interference means recording in the background and
+compositing a cursor in post.
 
 ## Peekaboo's own recorder samples on change
 

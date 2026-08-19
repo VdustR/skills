@@ -34,7 +34,7 @@ ask about anything missing before starting.
 |---|---|
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
-| macOS window capture | Screen Recording permission for the calling process, ffmpeg for verifying and converting the `.mov`, and Swift for the bundled window-id lookup. A desktop input tool only if the app has to do something on camera |
+| macOS window capture | Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov`. Window-id lookup needs either Swift for the bundled script or a desktop automation tool. An input tool as well, but only if the app has to do something on camera |
 
 The first two run on any platform and inside a container. The third depends on
 macOS system tools and has no equivalent here for Linux or Windows.
