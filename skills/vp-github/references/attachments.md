@@ -14,14 +14,15 @@ fall back to a release asset plus a plain link.
 ## Media: one request with a token
 
 ```bash
-FILE=demo.mp4
+PATH_TO_FILE=out/demo.mp4
+NAME=$(basename "$PATH_TO_FILE")   # the endpoint rejects a name containing a slash
 MIME=video/mp4
 REPO=owner/name
 curl -sS -X POST \
-  "https://uploads.github.com/user-attachments/assets?name=$FILE&content_type=$MIME&repository_id=$(gh api "repos/$REPO" --jq .id)" \
+  "https://uploads.github.com/user-attachments/assets?name=$NAME&content_type=$MIME&repository_id=$(gh api "repos/$REPO" --jq .id)" \
   -H "Authorization: Bearer $(gh auth token)" \
   -H "Accept: application/json" \
-  --data-binary "@$FILE"
+  --data-binary "@$PATH_TO_FILE"
 # 201 {"url":"https://github.com/user-attachments/assets/<uuid>"}
 ```
 

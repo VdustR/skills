@@ -161,9 +161,10 @@ Validation layers:
 - `npm run validate:latest` checks compatibility with the latest `skills` CLI for monitoring only.
 
 Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
-prove with static validation, such as PR comment resolution policy, stacked
-branch history-rewrite safety, screen-capture scoping on a shared machine,
-GitHub attachment visibility, and session cleanup authorization limits.
+prove with static validation, such as PR comment resolution policy, branch and
+stash deletion evidence, stacked branch history-rewrite safety, screen-capture
+scoping on a shared machine, GitHub attachment visibility, and session cleanup
+authorization limits.
 
 ## License
 

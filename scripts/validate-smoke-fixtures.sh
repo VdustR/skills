@@ -20,6 +20,7 @@ require_pattern() {
 required_skills=(
   "vp-skills"
   "vp-pr-comment-resolver"
+  "vp-git"
   "vp-stacked-pr"
   "vp-recording"
   "vp-github"
@@ -46,6 +47,7 @@ for skill_name in "${required_skills[@]}"; do
 done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
+git_fixture="fixtures/smoke/vp-git.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
 github_fixture="fixtures/smoke/vp-github.md"
@@ -79,6 +81,17 @@ require_pattern "$pr_resolver_fixture" 'PR discussion comment' \
 require_pattern "$pr_resolver_fixture" 'outdated unresolved review thread' \
   "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
 
+require_pattern "$git_fixture" 'force deletion harmless' \
+  "vp-git fixture must cover squash-merge state not justifying force deletion"
+require_pattern "$git_fixture" 'not treated as proof of merge' \
+  "vp-git fixture must cover a deleted upstream not proving a merge"
+require_pattern "$git_fixture" 'uninspected stashes are protected' \
+  "vp-git fixture must cover stash protection"
+require_pattern "$git_fixture" 'dirty worktree is not removed' \
+  "vp-git fixture must cover dirty worktree protection"
+require_pattern "$git_fixture" 'does not authorize destructive deletions' \
+  "vp-git fixture must cover vague cleanup requests not authorizing deletions"
+
 require_pattern "$stacked_rebase_fixture" 'squash[[:space:]-]*merge' \
   "vp-stacked-pr fixture must cover squash merges"
 require_pattern "$stacked_rebase_fixture" 'force-with-lease' \
@@ -109,9 +122,9 @@ require_pattern "$github_fixture" 'eight media content types|not promised on a t
   "vp-github fixture must cover the media-only token whitelist"
 require_pattern "$github_fixture" 'x-fetch-nonce' \
   "vp-github fixture must cover the verified-fetch nonce gate"
-require_pattern "$github_fixture" 'release asset' \
+require_pattern "$github_fixture" 'release asset or repo blob' \
   "vp-github fixture must cover the unattended release-asset fallback"
-require_pattern "$github_fixture" 'user-attachments' \
+require_pattern "$github_fixture" 'survives GitHub.s sanitizer only when' \
   "vp-github fixture must cover inline video requiring a user-attachments source"
 
 require_pattern "$chrome_profiles_fixture" 'dedicated managed profiles?' \

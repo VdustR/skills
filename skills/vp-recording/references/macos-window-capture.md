@@ -28,7 +28,10 @@ content could be on screen, which on a shared workstation is always.
 ```bash
 # Resolve the window id, then record it
 peekaboo window list --app "Google Chrome" --json \
-  | python3 -c 'import json,sys; print(next(w["window_id"] for w in json.load(sys.stdin)["data"]["windows"] if "Target" in (w.get("window_title") or "")))'
+  | python3 -c 'import json,sys
+windows = (json.load(sys.stdin).get("data") or {}).get("windows") or []
+match = next((w for w in windows if "Target" in (w.get("window_title") or "")), None)
+sys.exit("no window title matched; titles seen: %s" % [w.get("window_title") for w in windows]) if not match else print(match["window_id"])'
 
 screencapture -v -k -C -x -l<windowid> -V 20 out/window.mov
 ```

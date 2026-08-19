@@ -34,7 +34,7 @@ ask about anything missing before starting.
 |---|---|
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
-| macOS window capture | Peekaboo, and Screen Recording permission for the calling process |
+| macOS window capture | Peekaboo, Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov` |
 
 The first two run on any platform and inside a container. The third depends on
 macOS system tools and has no equivalent here for Linux or Windows.
@@ -67,8 +67,19 @@ ffmpeg -y -i out/demo.mp4 -ss 12.5 -frames:v 1 /tmp/frame.png
 On macOS, `peekaboo capture video out/demo.mp4 --sample-fps 1 --no-diff --path
 /tmp/sheet` writes the same contact sheet in one command.
 
-Confirm the frame count matches the duration. A file whose `nb_frames` is far
-below `duration x fps` was sampled, not recorded.
+Confirm the file holds real frames rather than samples.
+
+```
+nb_frames / duration
+```
+
+A frame-rendered file lands on its target rate almost exactly, so anything under
+it means dropped frames. Real-time recorders are variable rate and legitimately
+land well below their timebase: `screencapture` averaged 38 fps against a 60 fps
+timebase in one measurement. Change-aware sampling is what to watch for, and it is
+not subtle: `peekaboo capture live` kept 1 frame across 4 seconds on a static
+region. Treat single-digit effective fps as sampled, not a rate merely below the
+timebase.
 
 ```bash
 ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames \

@@ -36,7 +36,7 @@ video where the arrow visibly misses the button it is pressing.
 
 Inject through `page.addInitScript` so the layer exists from the first paint:
 
-```js
+```css
 html, body, * { cursor: none !important; }
 #cursor { position: absolute; left: 0; top: 0; transform: translate(-4px, -3px);
           filter: drop-shadow(0 3px 6px rgba(0,0,0,.55)); }
