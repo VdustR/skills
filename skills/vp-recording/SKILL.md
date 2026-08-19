@@ -45,11 +45,12 @@ If the subject runs in a browser, use the browser path even when a desktop
 recorder is already open. It is fully headless, so it never takes window focus or
 moves the real pointer, and it survives being run from a scheduled job.
 
-The desktop path cannot show a visible cursor without interfering. The machine
-has one system cursor, so drawing it in the frame means moving the real pointer
-away from whoever is at the keyboard. Driving a native app in the background
-through accessibility actions leaves no cursor in the frame at all. Both limits
-come from the operating system, so switching input tools does not lift them.
+A tool that drives the local machine cannot show a visible cursor without
+interfering, because the machine has one system cursor and drawing it in the
+frame means moving it away from whoever is at the keyboard. Driving the app in
+the background through accessibility actions leaves no cursor in the frame at
+all. A tool with its own virtual display escapes both, but then that display is
+what you record, and the user's own window never appears.
 
 ## Pick the input tool by session, not by habit
 
