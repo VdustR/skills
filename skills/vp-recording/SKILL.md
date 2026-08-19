@@ -34,7 +34,7 @@ ask about anything missing before starting.
 |---|---|
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
-| macOS window capture | Peekaboo, Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov` |
+| macOS window capture | Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov`. Window-id lookup needs either Swift for the bundled script or a desktop automation tool. An input tool as well, but only if the app has to do something on camera |
 
 The first two run on any platform and inside a container. The third depends on
 macOS system tools and has no equivalent here for Linux or Windows.
@@ -45,10 +45,27 @@ If the subject runs in a browser, use the browser path even when a desktop
 recorder is already open. It is fully headless, so it never takes window focus or
 moves the real pointer, and it survives being run from a scheduled job.
 
-The desktop path cannot have both a visible cursor and no interference: drawing
-the real cursor requires moving the real pointer, which takes it away from
-whoever is using the machine. Driving a native app in the background through
-accessibility actions leaves no cursor in the frame at all.
+A tool that drives the local machine cannot show a visible cursor without
+interfering, because the machine has one system cursor and drawing it in the
+frame means moving it away from whoever is at the keyboard. Driving the app in
+the background through accessibility actions leaves no cursor in the frame at
+all. A tool with its own virtual display escapes both, but then that display is
+what you record, and the user's own window never appears.
+
+## Pick the input tool by session, not by habit
+
+Recording a macOS window needs no automation tool. Driving the app on camera
+does, and which one depends on the agent. Prefer the first:
+
+1. The session's own computer-use tool, when the agent has one. Codex computer
+   use is an example.
+2. Peekaboo, which any macOS session can install.
+
+With neither available, use the browser path, or ask the user to drive while the
+recorder runs.
+
+Read the tool's own skill or `--help` for current syntax. This skill names no
+input commands, because flags get renamed and a copied invocation goes stale.
 
 ## Check what you produced
 
@@ -56,16 +73,21 @@ Never hand over a video you have not looked at. Rendering silently produces
 plausible garbage: a blank first frame, a cursor parked off-target, a click that
 missed.
 
+Derive the sampling rate from the duration so the sheet spans the whole file. A
+fixed `fps=2` into a 4x2 tile covers the first four seconds and nothing else,
+which reads as a failed recording when the action starts at ten seconds.
+
 ```bash
-# Several moments tiled into one image
-ffmpeg -y -i out/demo.mp4 -vf "fps=2,scale=420:-1,tile=4x2" -frames:v 1 /tmp/grid.png
+# Twelve moments spread across the whole file
+DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 out/demo.mp4)
+ffmpeg -y -i out/demo.mp4 -vf "fps=12/$DUR,scale=420:-1,tile=4x3" -frames:v 1 /tmp/grid.png
 
 # A specific moment at full resolution
 ffmpeg -y -i out/demo.mp4 -ss 12.5 -frames:v 1 /tmp/frame.png
 ```
 
-On macOS, `peekaboo capture video out/demo.mp4 --sample-fps 1 --no-diff --path
-/tmp/sheet` writes the same contact sheet in one command.
+Crop to the region that changes before scaling. A full application window at
+420 pixels wide is too small to read the text that proves the action worked.
 
 Confirm the file holds real frames rather than samples.
 
@@ -76,10 +98,10 @@ nb_frames / duration
 A frame-rendered file lands on its target rate almost exactly, so anything under
 it means dropped frames. Real-time recorders are variable rate and legitimately
 land well below their timebase: `screencapture` averaged 38 fps against a 60 fps
-timebase in one measurement. Change-aware sampling is what to watch for, and it is
-not subtle: `peekaboo capture live` kept 1 frame across 4 seconds on a static
-region. Treat single-digit effective fps as sampled, not a rate merely below the
-timebase.
+timebase in one measurement. Watch instead for change-aware sampling, which drops
+much further. Peekaboo's live capture kept 1 frame across 4 seconds on a static
+region. Treat single-digit effective fps as a sampled file rather than a rate
+below the timebase.
 
 ```bash
 ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames \
