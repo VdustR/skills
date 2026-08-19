@@ -43,5 +43,5 @@ as a follow-up.
 ## Route
 
 Use vp-git for Git and pull request state, vp-long-running-processes for
-services, vp-env-secrets for secret material, and vp-chrome-profiles for
-managed browser profiles.
+services, vp-env-secrets for secret material, and vp-agent-browser-session for
+managed browser sessions and profiles.

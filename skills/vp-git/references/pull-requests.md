@@ -6,6 +6,10 @@ Before creating a PR, verify the branch is not the default branch, inspect the
 complete diff and commit history, run proportionate checks, and follow the
 repository template. Create a draft first when PR-stage work is requested.
 
+Follow the user's requested structure and the repository's pull request
+template. Apply vp-tldr to the summary only when the user requests its TL;DR
+logic.
+
 ## Review
 
 Record the current head commit when evaluating automated review. Inspect checks,

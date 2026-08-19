@@ -1,4 +1,0 @@
-interface:
-  display_name: "VP Chrome Profiles"
-  short_description: "Manage persistent Chrome profiles for agents"
-  default_prompt: "Use $vp-chrome-profiles to create, launch, connect, inspect, or delete dedicated Chrome profiles for agent browser work."

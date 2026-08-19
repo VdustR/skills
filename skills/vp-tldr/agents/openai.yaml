@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP TL;DR"
+  short_description: "Write a concise, reader-first summary for any artifact"
+  default_prompt: "Use $vp-tldr to write a concise summary of this content for its intended readers."

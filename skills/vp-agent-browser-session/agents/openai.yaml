@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Agent Browser Session"
+  short_description: "Manage persistent agent-browser sessions"
+  default_prompt: "Use $vp-agent-browser-session to prepare or reuse a persistent agent-browser session with a safely managed Chrome profile."
