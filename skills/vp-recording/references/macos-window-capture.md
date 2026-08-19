@@ -1,7 +1,11 @@
 # macOS Window Capture
 
-**macOS only.** Everything here depends on `screencapture`, a macOS system binary,
-and on Peekaboo for window and pointer control. There is no Linux or Windows
+**macOS workstation only.** Everything here depends on `screencapture`, a macOS
+system binary, and on Peekaboo for window and pointer control. macOS alone is not
+enough: a hosted macOS CI runner has no interactive session in which to grant
+Screen Recording permission and no on-screen application to capture, so treat this
+path as unavailable in CI. That reasoning has not been tested against a hosted
+runner; the browser paths are the ones verified to work unattended. There is no Linux or Windows
 equivalent in this skill: `ffmpeg` can grab a screen through `x11grab`, `gdigrab`,
 or `kmsgrab` on those platforms, and OBS is the usual GUI answer, but neither has
 been verified here. If the subject runs in a browser, `web-demo.md` is

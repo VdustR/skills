@@ -86,8 +86,14 @@ Resolve targets from live geometry, never from remembered coordinates:
 
 ```js
 const box = await page.locator(selector).first().boundingBox();
+if (!box) throw new Error(`no box for ${selector}`);
 await glide({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
 ```
+
+`boundingBox()` returns null for a hidden or detached element, so an unguarded
+read throws on `box.x` several steps later, with a message that points at the
+glide instead of the missing target. Fail on the null with the selector in the
+message.
 
 ## Add the beats a person has
 
