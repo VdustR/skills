@@ -39,6 +39,7 @@ require_command() {
 
 require_command awk
 require_command bash
+require_command cmp
 require_command comm
 require_command find
 require_command grep
@@ -94,12 +95,22 @@ trap 'rm -rf "$tmp_dir"' EXIT
 
 actual_skills="$tmp_dir/actual-skills.txt"
 readme_skills="$tmp_dir/readme-skills.txt"
+readme_order="$tmp_dir/readme-order.txt"
 unpinned_commands="$tmp_dir/unpinned-commands.txt"
 find skills -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort > "$actual_skills"
-awk '/^### vp-/{print $2}' README.md | sort > "$readme_skills"
+awk '/^### vp-/{print $2}' README.md > "$readme_order"
+sort "$readme_order" > "$readme_skills"
 
 if ! diff_output="$(comm -3 "$actual_skills" "$readme_skills")" || [ -n "$diff_output" ]; then
   printf 'README skill list does not match skills/*:\n%s\n' "$diff_output" >&2
+  exit 1
+fi
+
+# The set comparison above passes when a section is renamed in place, which is how
+# the list drifted out of order once already. Check the sequence too.
+if ! cmp -s "$readme_order" "$readme_skills"; then
+  printf 'README skill sections are not in alphabetical order:\n' >&2
+  diff "$readme_order" "$readme_skills" >&2 || true
   exit 1
 fi
 

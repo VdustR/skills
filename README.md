@@ -45,15 +45,18 @@ When upgrading from `vp-chrome-profiles`, remove it explicitly before installing
 npx -y skills@1.5.3 remove vp-chrome-profiles -g -y
 ```
 
+Stacked-change guidance moved out of `vp-git` into `vp-stacked-pr`. Install both
+if you work with stacks.
+
 ## Skills
-
-### vp-checklist-runner
-
-Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
 
 ### vp-agent-browser-session
 
 Manage persistent agent-browser sessions with dedicated Chrome profiles.
+
+### vp-checklist-runner
+
+Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
 
 ### vp-cspell
 
@@ -77,7 +80,11 @@ Index repository-local skills written for other agent systems without converting
 
 ### vp-git
 
-Handle commits, repository setup, gitignore files, cleanup, stacked branches, and PR lifecycle decisions.
+Handle commits, repository setup, gitignore files, cleanup, and PR lifecycle decisions.
+
+### vp-github
+
+GitHub platform behavior: attaching media and files to issues and PRs, markdown rendering rules, and which credential reaches which endpoint.
 
 ### vp-guided-focus
 
@@ -111,6 +118,10 @@ Follow up on GitHub PR review conversations from the reviewer side.
 
 Generate concise session titles based on the whole conversation theme.
 
+### vp-recording
+
+Produce a demo video: a scripted browser walkthrough, a frame-accurate render of generated motion, or a macOS window capture.
+
 ### vp-retro
 
 Review recent agent work to discover workflow, instruction, and skill improvements.
@@ -122,6 +133,10 @@ Summarize a session before archiving it and clear leftover files, processes, and
 ### vp-skills
 
 Manage agent skills using the `npx skills` CLI.
+
+### vp-stacked-pr
+
+Build, submit, merge, and repair stacks of dependent pull requests, merge requests, or branches. Native automation on GitHub, manual Git rebase on any other host.
 
 ### vp-tldr
 
@@ -157,8 +172,10 @@ Validation layers:
 - `npm run validate:latest` checks compatibility with the latest `skills` CLI for monitoring only.
 
 Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
-prove with static validation, such as PR comment resolution policy, stacked
-branch history-rewrite safety, and session cleanup authorization limits.
+prove with static validation, such as PR comment resolution policy, branch and
+stash deletion evidence, stacked branch history-rewrite safety, screen-capture
+scoping on a shared machine, GitHub attachment visibility, and session cleanup
+authorization limits.
 
 ## License
 

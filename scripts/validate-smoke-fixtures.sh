@@ -21,6 +21,9 @@ required_skills=(
   "vp-skills"
   "vp-pr-comment-resolver"
   "vp-git"
+  "vp-stacked-pr"
+  "vp-recording"
+  "vp-github"
   "vp-agent-browser-session"
   "vp-session-wrapup"
 )
@@ -44,7 +47,10 @@ for skill_name in "${required_skills[@]}"; do
 done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
-stacked_rebase_fixture="fixtures/smoke/vp-git.md"
+git_fixture="fixtures/smoke/vp-git.md"
+stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
+recording_fixture="fixtures/smoke/vp-recording.md"
+github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
@@ -75,18 +81,51 @@ require_pattern "$pr_resolver_fixture" 'PR discussion comment' \
 require_pattern "$pr_resolver_fixture" 'outdated unresolved review thread' \
   "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
 
+require_pattern "$git_fixture" 'force deletion harmless' \
+  "vp-git fixture must cover squash-merge state not justifying force deletion"
+require_pattern "$git_fixture" 'not treated as proof of merge' \
+  "vp-git fixture must cover a deleted upstream not proving a merge"
+require_pattern "$git_fixture" 'uninspected stashes are protected' \
+  "vp-git fixture must cover stash protection"
+require_pattern "$git_fixture" 'dirty worktree is not removed' \
+  "vp-git fixture must cover dirty worktree protection"
+require_pattern "$git_fixture" 'does not authorize destructive deletions' \
+  "vp-git fixture must cover vague cleanup requests not authorizing deletions"
+
 require_pattern "$stacked_rebase_fixture" 'squash[[:space:]-]*merge' \
-  "vp-git fixture must cover squash merges"
+  "vp-stacked-pr fixture must cover squash merges"
 require_pattern "$stacked_rebase_fixture" 'force-with-lease' \
-  "vp-git fixture must cover force-with-lease confirmation"
+  "vp-stacked-pr fixture must cover force-with-lease confirmation"
 require_pattern "$stacked_rebase_fixture" 'backup branch' \
-  "vp-git fixture must cover backup retention"
+  "vp-stacked-pr fixture must cover backup retention"
 require_pattern "$stacked_rebase_fixture" 'gh stack (init|add|submit|merge)' \
-  "vp-git fixture must cover the native gh stack workflow"
+  "vp-stacked-pr fixture must cover the native gh stack workflow"
 require_pattern "$stacked_rebase_fixture" 'stack merge API' \
-  "vp-git fixture must cover stacked members requiring the stack merge API"
+  "vp-stacked-pr fixture must cover stacked members requiring the stack merge API"
 require_pattern "$stacked_rebase_fixture" 'native.*not.*(reconstruction|manual)|not manual reconstruction' \
-  "vp-git fixture must cover routing GitHub stacks to the native workflow"
+  "vp-stacked-pr fixture must cover routing GitHub stacks to the native workflow"
+
+require_pattern "$recording_fixture" 'window id, never a screen rectangle|screencapture -l' \
+  "vp-recording fixture must cover window-scoped capture over rectangle capture"
+require_pattern "$recording_fixture" 'samples on change|change-sampled' \
+  "vp-recording fixture must cover change-sampled capture not being a demo recorder"
+require_pattern "$recording_fixture" 'injected pointer follow' \
+  "vp-recording fixture must cover the pointer following real mouse events"
+require_pattern "$recording_fixture" 'live geometry' \
+  "vp-recording fixture must cover resolving targets from live geometry"
+require_pattern "$recording_fixture" 'verified by looking at frames|contact sheet' \
+  "vp-recording fixture must cover verifying output before delivery"
+
+require_pattern "$github_fixture" 'public by URL' \
+  "vp-github fixture must cover attachments being public by URL"
+require_pattern "$github_fixture" 'eight media content types|not promised on a token' \
+  "vp-github fixture must cover the media-only token whitelist"
+require_pattern "$github_fixture" 'x-fetch-nonce' \
+  "vp-github fixture must cover the verified-fetch nonce gate"
+require_pattern "$github_fixture" 'release asset or repo blob' \
+  "vp-github fixture must cover the unattended release-asset fallback"
+require_pattern "$github_fixture" 'survives GitHub.s sanitizer only when' \
+  "vp-github fixture must cover inline video requiring a user-attachments source"
 
 require_pattern "$agent_browser_session_fixture" 'dedicated managed profiles?' \
   "vp-agent-browser-session fixture must cover dedicated managed profiles"

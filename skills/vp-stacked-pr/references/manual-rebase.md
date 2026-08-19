@@ -10,7 +10,7 @@ for any one platform's stacking feature.
   GitHub for stacks the native feature does not cover: cross-fork stacks, or
   ad-hoc branches never registered as a GitHub stack.
 - On GitHub with a registered native stack, the platform rebases and retargets
-  upper PRs for you, including across squash merges; read `stacked-prs.md`
+  upper PRs for you, including across squash merges; read `github-native.md`
   instead of rebuilding history by hand.
 
 ## Prefer Native Git First
