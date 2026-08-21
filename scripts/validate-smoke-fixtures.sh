@@ -47,6 +47,7 @@ for skill_name in "${required_skills[@]}"; do
 done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
+pr_resolver_reply_templates="skills/vp-pr-comment-resolver/references/reply-templates.md"
 git_fixture="fixtures/smoke/vp-git.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
@@ -80,6 +81,10 @@ require_pattern "$pr_resolver_fixture" 'PR discussion comment' \
   "vp-pr-comment-resolver fixture must cover PR discussion comments"
 require_pattern "$pr_resolver_fixture" 'outdated unresolved review thread' \
   "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
+require_pattern "$pr_resolver_fixture" 'explicit Markdown commit link' \
+  "vp-pr-comment-resolver fixture must cover linked commit evidence"
+require_pattern "$pr_resolver_reply_templates" '\[`<short-sha>`\]\(<canonical-commit-url>\)' \
+  "vp-pr-comment-resolver fixed reply must use an explicit commit link"
 
 require_pattern "$git_fixture" 'force deletion harmless' \
   "vp-git fixture must cover squash-merge state not justifying force deletion"
