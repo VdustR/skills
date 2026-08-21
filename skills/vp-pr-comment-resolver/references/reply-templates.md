@@ -5,7 +5,13 @@ and current result without narrating the entire workflow.
 
 ## Fixed
 
-> Fixed in `<commit>`. `<behavioral change>`. Verified with `<evidence>`.
+> Fixed in [`<short-sha>`](<canonical-commit-url>). `<behavioral change>`.
+> Verified with `<evidence>`.
+
+Use an explicit Markdown link whose target contains the full commit SHA. Obtain
+the canonical commit URL from the GitHub response after verifying that the
+commit is on the PR's remote head. A bare or code-formatted short SHA is not a
+link.
 
 ## Already Addressed Or Obsolete
 

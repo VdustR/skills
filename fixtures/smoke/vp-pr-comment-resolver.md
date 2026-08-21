@@ -24,6 +24,8 @@ Assume the branch is checked out locally and `gh` is authenticated.
 - Fix only the verified `session` issue if the code confirms it.
 - Ask the user before disagreeing with the human debug-logging comment.
 - Reply to the PR discussion comment with `@reviewer` plus a quoted excerpt.
+- Link each fix commit with a short SHA as the label and the canonical GitHub
+  commit URL containing the full SHA as the target.
 - Resolve only the handled bot review thread.
 - Leave all human review threads unresolved unless the user explicitly says
   otherwise.
@@ -39,4 +41,6 @@ Assume the branch is checked out locally and `gh` is authenticated.
 - outdated unresolved threads still receive a decision
 - reviewer suggestions are verified instead of blindly applied
 - commits are grouped by modification topic, not by comment count
+- fix replies use an explicit Markdown commit link, not a bare or code-formatted
+  SHA
 - GraphQL fallback is only used after GraphQL reply failure
