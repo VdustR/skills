@@ -74,3 +74,10 @@ can run. It reports a reason instead of failing when the host cannot support it.
 - **Keep draining after the expected response.** The cancellation test continues
   reading for a grace period, because a regressed bridge could answer the
   cancelled request just after the occupying one.
+- **Assert the value, not the absence of an error.** A tolerated numeric
+  `element_index` must arrive upstream as the integer it names. Checking only
+  that validation passed would miss a coercion that mangled it, and targeting
+  the wrong element is the defect that tolerance once caused.
+- **Mutation-check an assertion you rely on.** Forcing `element_index` to zero in
+  the bridge makes that test fail, which is how its value was confirmed rather
+  than assumed.

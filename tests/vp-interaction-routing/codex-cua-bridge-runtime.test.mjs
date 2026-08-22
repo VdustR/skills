@@ -12,6 +12,17 @@ import test from "node:test";
 
 import { BridgeClient, bridgePath, fakeAppServerPath, toolText } from "./helpers/mcp-client.mjs";
 
+/** The argument object the bridge actually forwarded, recovered from the snippet. */
+function forwardedArgs(argsLog) {
+  const lines = readFileSync(argsLog, "utf8").trim().split("\n").filter(Boolean);
+  return lines.map((line) => {
+    const code = JSON.parse(line).code ?? "";
+    const literal = code.match(/JSON\.parse\((".*?")\)/);
+    assert.ok(literal, `no argument literal in: ${code}`);
+    return JSON.parse(JSON.parse(literal[1]));
+  });
+}
+
 function fakeEnv(extra = {}) {
   return { CODEX_CUA_BRIDGE_CODEX_BIN: fakeAppServerPath, ...extra };
 }
@@ -88,22 +99,48 @@ test("protocol-reserved keys are tolerated and never reach the upstream call", a
       // The boundary claim is about what crossed it. Inspecting only the
       // response would pass even if the keys had been forwarded, because the
       // upstream ignores what it does not know.
-      const forwarded = readFileSync(argsLog, "utf8").trim().split("\n").filter(Boolean);
-      assert.ok(forwarded.length >= 1, "the upstream received a call to inspect");
-      const code = forwarded.map((line) => JSON.parse(line).code ?? "").join("\n");
-      assert.ok(code.includes("sky.get_app_state"), "the snippet drives get_app_state");
-
-      // The snippet embeds the arguments as a JSON literal, so recover them and
-      // assert the exact key set that crossed the boundary.
-      const literal = code.match(/JSON\.parse\((".*?")\)/);
-      assert.ok(literal, `no argument literal found in: ${code}`);
-      const crossed = JSON.parse(JSON.parse(literal[1]));
+      const crossings = forwardedArgs(argsLog);
+      assert.equal(crossings.length, 1, "the upstream received one call to inspect");
+      const crossed = crossings[0];
       assert.deepEqual(
         Object.keys(crossed).sort(),
         ["app", "disableDiff"],
         "only declared arguments may cross, and get_app_state maps full_tree to disableDiff",
       );
       assert.equal(crossed.app, "X");
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("an accepted element_index reaches the upstream as the exact integer meant", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "codex-cua-index-"));
+  const argsLog = join(dir, "args");
+  try {
+    await withFake({ FAKE_ARGS_LOG: argsLog }, async (client) => {
+      // A numeric string is deliberately tolerated, but it must arrive upstream
+      // as the number it names. Asserting only that validation passed would miss
+      // a coercion that mangled the value, and targeting the wrong element is
+      // exactly the defect this tolerance once caused.
+      for (const [given, expected] of [
+        ["1", 1],
+        [1, 1],
+        ["42", 42],
+        [7, 7],
+      ]) {
+        const response = await client.callTool(
+          "click",
+          { app: "X", element_index: given },
+          30000,
+        );
+        assert.notEqual(response.result?.isError, true, toolText(response));
+      }
+      const seen = forwardedArgs(argsLog).map((args) => args.element_index);
+      assert.deepEqual(seen, [1, 1, 42, 7], "each value must arrive as the integer it names");
+      for (const value of seen) {
+        assert.equal(typeof value, "number", "the upstream must receive a number, not a string");
+      }
     });
   } finally {
     rmSync(dir, { recursive: true, force: true });

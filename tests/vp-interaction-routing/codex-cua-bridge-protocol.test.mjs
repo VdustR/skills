@@ -206,28 +206,19 @@ test("arguments are validated against the advertised schema", async () => {
   });
 });
 
-test("element_index accepts a numeric string but never a value Number() would coerce to 0", async () => {
+test("element_index rejects every value Number() would coerce to zero", async () => {
   await withSession(async (client) => {
     for (const bad of [null, false, "", "   ", "1.5", 2.5, []]) {
       const rejected = await client.callTool("click", { app: "X", element_index: bad });
       assert.equal(rejected.result.isError, true, `element_index ${JSON.stringify(bad)}`);
       assert.match(toolText(rejected), /element_index must be an integer/);
     }
-
-    // The positive half: a numeric string must clear validation. Without this the
-    // test would still pass if the bridge stopped accepting "1" entirely. The
-    // call fails upstream here because there is no Computer Use in this suite,
-    // so the assertion is that it failed for some other reason.
-    for (const good of ["1", 1, "42"]) {
-      const accepted = await client.callTool("click", { app: "X", element_index: good });
-      assert.doesNotMatch(
-        toolText(accepted),
-        /must be an integer/,
-        `element_index ${JSON.stringify(good)} must pass validation`,
-      );
-    }
   });
 });
+
+// The accepted side is asserted in codex-cua-bridge-runtime.test.mjs, where a
+// fake upstream makes the forwarded value observable. Asserting only that no
+// validation error came back would pass even if the value were mangled.
 
 test("click requires a usable target rather than advertising app alone as valid", async () => {
   await withSession(async (client) => {
