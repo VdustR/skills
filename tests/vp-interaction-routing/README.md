@@ -44,9 +44,16 @@ can run. It reports a reason instead of failing when the host cannot support it.
 - **Re-read before every click.** Element indexes are valid only for the read
   that produced them. Entering an expression inserts a result row and renumbers
   every control below it, so a cached index acts on the wrong control.
-- **Assert a starting state.** One press of the clear key clears the current
-  entry but not a pending operation, so `resetCalculator` presses until the
-  display reads zero.
+- **Assert a starting state, and prove it settled.** One press of the clear key
+  clears the current entry but not a pending operation, which survives as a
+  separate result row. A single read can also race the previous test's actions
+  still landing, which was observed leaving a stale value in place and failing
+  the cancellation test only in the full run. `resetCalculator` therefore
+  requires no pending expression and two consecutive identical readings.
+- **Share one index between the negative and positive halves.** The cancellation
+  test resolves `element_index` once and uses it for both the cancelled and the
+  allowed click. A stale index pointing at something that does not change the
+  display would otherwise satisfy the cancelled half for the wrong reason.
 - **Assert both directions.** The cancellation test also performs the same click
   uncancelled, because "the display did not change" would otherwise pass even if
   a click could never be detected.

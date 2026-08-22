@@ -79,23 +79,32 @@ function displayValue(tree) {
 }
 
 /**
- * Put Calculator in a known state. One clear press is not enough: with a pending
- * operation the key clears only the current entry, so it is pressed until the
- * display reads zero.
+ * Put Calculator in a known state and prove it settled there.
+ *
+ * A zero display alone is not enough on two counts. One clear press clears the
+ * current entry but not a pending operation, which survives as a separate
+ * result row and would corrupt the next arithmetic. And a single read can race
+ * the previous test's actions still landing, which has been observed leaving a
+ * stale value in place. So this requires no pending expression and two
+ * consecutive identical readings.
  */
 async function resetCalculator(client) {
-  for (let attempt = 0; attempt < 4; attempt += 1) {
+  let settledAt = null;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
     const tree = await readTree(client);
-    if (/text ‎0$/.test(displayValue(tree))) return displayValue(tree);
-    await client.callTool(
-      "click",
-      { app: APP, element_index: findIndex(tree, ...CLEAR) },
-      90000,
-    );
+    const shown = displayValue(tree);
+    const clear = /‎0$/.test(shown) && !tree.includes("StandardResultView");
+    if (clear) {
+      if (settledAt === shown) return shown;
+      settledAt = shown;
+      continue;
+    }
+    settledAt = null;
+    await client.callTool("click", { app: APP, element_index: findIndex(tree, ...CLEAR) }, 90000);
   }
-  const settled = displayValue(await readTree(client));
-  assert.match(settled, /0$/, "Calculator must be resettable to zero before the test acts");
-  return settled;
+  assert.fail(
+    `Calculator never settled to a cleared state; last stable reading ${JSON.stringify(settledAt)}`,
+  );
 }
 
 /**
@@ -251,10 +260,19 @@ test("coordinates are window-relative, so an out-of-window point is refused", { 
 test("cancelling a queued click prevents it from ever reaching the UI", { skip }, async () => {
   await withSession(async (client) => {
     const cleared = await resetCalculator(client);
-    const clearedTree = await readTree(client);
-    // Resolved against the cleared state, which is the state the queued click
-    // will act on.
-    const seven = findIndex(clearedTree, "ID: Seven");
+
+    // Resolve the index from a read that also confirms the cleared state still
+    // holds, and use that one index for both the cancelled and the allowed
+    // click below. Sharing it matters: a stale index pointing at some control
+    // that does not change the display would otherwise satisfy the cancelled
+    // half for the wrong reason, and now fails the allowed half instead.
+    const stateTree = await readTree(client);
+    assert.equal(
+      displayValue(stateTree),
+      cleared,
+      "the cleared state must still hold when the index is taken",
+    );
+    const seven = findIndex(stateTree, "ID: Seven");
 
     // Occupy the serialization lock, queue a click behind it, then cancel the
     // click. Without the cancellation checks the click would still be performed
@@ -298,10 +316,10 @@ test("cancelling a queued click prevents it from ever reaching the UI", { skip }
 
     assert.equal(displayValue(await readTree(client)), cleared, "the click never ran");
 
-    // The same click, uncancelled, must change the display. Without this the
-    // assertion above would pass even if a click could not be detected at all.
-    const liveSeven = findIndex(await readTree(client), "ID: Seven");
-    await client.callTool("click", { app: APP, element_index: liveSeven }, 90000);
+    // The same index, uncancelled, must change the display. Without this the
+    // assertion above would pass even if a click could not be detected at all,
+    // or if the index did not point at a key.
+    await client.callTool("click", { app: APP, element_index: seven }, 90000);
     assert.notEqual(displayValue(await readTree(client)), cleared, "an allowed click does run");
     await resetCalculator(client);
   });
