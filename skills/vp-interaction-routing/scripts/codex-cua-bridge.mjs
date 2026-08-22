@@ -1080,8 +1080,19 @@ function startMcpServer() {
       replyError(id ?? null, -32002, `server not initialized: call initialize before ${method}`);
       return;
     }
-    if (isNotification && method !== "notifications/initialized" && method !== "notifications/cancelled") {
-      log(`ignoring unexpected notification: ${method}`);
+    const isNotificationMethod = method.startsWith("notifications/");
+    if (isNotification) {
+      if (method !== "notifications/initialized" && method !== "notifications/cancelled") {
+        log(`ignoring unexpected notification: ${method}`);
+      }
+      return;
+    }
+    if (isNotificationMethod) {
+      replyError(
+        id ?? null,
+        -32600,
+        `${method} is a notification and must be sent without an id member`,
+      );
       return;
     }
 
@@ -1110,9 +1121,6 @@ function startMcpServer() {
           });
           return;
         }
-        case "notifications/initialized":
-        case "notifications/cancelled":
-          return;
         case "ping":
           reply(id, {});
           return;
