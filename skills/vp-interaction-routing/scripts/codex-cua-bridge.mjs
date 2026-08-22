@@ -517,8 +517,16 @@ class Sky {
   }
 
   /** Run JS in the persistent node_repl session and return its written text. */
-  js(code) {
+  js(code, token) {
     return this.#serialize(async () => {
+      // Calls are serialized, so a cancelled call may still be queued when the
+      // cancellation arrives. Checking here is what stops a cancelled click
+      // from being performed after the call ahead of it finishes.
+      if (token?.cancelled) {
+        const err = new Error("request cancelled by the client before it ran");
+        err.cancelled = true;
+        throw err;
+      }
       try {
         const result = await this.appServer.callMcpTool("node_repl", "js", { code });
         const text = resultText(result);
@@ -541,7 +549,7 @@ class Sky {
    * Call one sky function. Arguments cross into JS as a JSON literal parsed at
    * runtime, so no caller-supplied value is ever interpolated as code.
    */
-  async call(fn, args) {
+  async call(fn, args, token) {
     const literal = JSON.stringify(JSON.stringify(args ?? {}));
     const code = [
       SKY_BOOTSTRAP,
@@ -549,16 +557,16 @@ class Sky {
       `var __out = await sky.${fn}(__args);`,
       'nodeRepl.write(typeof __out === "undefined" ? "ok" : JSON.stringify(__out));',
     ].join("\n");
-    return this.js(code);
+    return this.js(code, token);
   }
 
-  async listApps() {
+  async listApps(token) {
     const code = [
       SKY_BOOTSTRAP,
       "var __out = await sky.list_apps();",
       "nodeRepl.write(JSON.stringify(__out));",
     ].join("\n");
-    return this.js(code);
+    return this.js(code, token);
   }
 
   /** Reflect the real upstream API surface instead of trusting a hardcoded list. */
@@ -640,16 +648,34 @@ const TOOLS = [
   {
     name: "click",
     mutating: MUTATING,
+    // The declared schema subset cannot express "element_index, or both x and
+    // y", so the requirement is checked here rather than being advertised as
+    // valid and failing upstream.
+    precondition: (args) => {
+      if (args.element_index !== undefined) return null;
+      if (args.x !== undefined && args.y !== undefined) return null;
+      return "requires element_index, or both x and y";
+    },
     description:
-      "Click an element by element_index, or a point by x/y. Prefer element_index; " +
-      "fall back to coordinates only when accessibility actions are unavailable.",
+      "Click an element by element_index, or a point by x/y. Prefer element_index: " +
+      "coordinates are window-relative, and the accessibility text carries no bounds " +
+      "to derive them from.",
     inputSchema: {
       type: "object",
       properties: {
         app: APP_PROP,
         element_index: ELEMENT_INDEX_PROP,
-        x: { type: "number", description: "Screen x, only when element_index is unusable." },
-        y: { type: "number", description: "Screen y, only when element_index is unusable." },
+        x: {
+          type: "number",
+          description:
+            "X relative to the target window's top-left, NOT a screen coordinate. " +
+            "Use only when element_index is unusable; the accessibility text exposes " +
+            "no element bounds, so coordinates must come from elsewhere.",
+        },
+        y: {
+          type: "number",
+          description: "Y relative to the target window's top-left, NOT a screen coordinate.",
+        },
         mouse_button: { type: "string", enum: ["left", "right", "middle", "l", "r", "m"] },
         click_count: { type: "integer", minimum: 1, maximum: 3 },
       },
@@ -740,15 +766,17 @@ const TOOLS = [
   {
     name: "drag",
     mutating: MUTATING,
-    description: "Drag from one screen point to another within the app.",
+    description:
+      "Drag between two points measured from the target window's top-left, not screen " +
+      "coordinates.",
     inputSchema: {
       type: "object",
       properties: {
         app: APP_PROP,
-        from_x: { type: "number" },
-        from_y: { type: "number" },
-        to_x: { type: "number" },
-        to_y: { type: "number" },
+        from_x: { type: "number", description: "Window-relative X." },
+        from_y: { type: "number", description: "Window-relative Y." },
+        to_x: { type: "number", description: "Window-relative X." },
+        to_y: { type: "number", description: "Window-relative Y." },
       },
       required: ["app", "from_x", "from_y", "to_x", "to_y"],
       additionalProperties: false,
@@ -941,23 +969,25 @@ function readScreenshot(url) {
   };
 }
 
-async function runTool(ctx, name, rawArgs) {
+async function runTool(ctx, name, rawArgs, token) {
   const tool = TOOL_BY_NAME.get(name);
   if (!tool) throw new Error(`unknown tool: ${name}`);
   // Only the declared properties survive validation, so nothing undeclared can
   // reach the upstream API.
   const args = validateArgs(name, tool.inputSchema, coerceIntegers(rawArgs ?? {}));
+  const unmet = tool.precondition?.(args);
+  if (unmet) throw new Error(`${name}: ${unmet}`);
   const { sky } = ctx;
 
   if (name === "health") return runHealth(ctx);
 
   if (name === "list_apps") {
-    return { content: [{ type: "text", text: cap(await sky.listApps()) }] };
+    return { content: [{ type: "text", text: cap(await sky.listApps(token)) }] };
   }
 
   if (name === "get_app_state") {
     const { app, full_tree = false, include_screenshot = false } = args;
-    const raw = await sky.call("get_app_state", { app, disableDiff: full_tree === true });
+    const raw = await sky.call("get_app_state", { app, disableDiff: full_tree === true }, token);
     let state;
     try {
       state = JSON.parse(raw);
@@ -987,7 +1017,7 @@ async function runTool(ctx, name, rawArgs) {
     return { content };
   }
 
-  return { content: [{ type: "text", text: cap(await sky.call(name, args)) }] };
+  return { content: [{ type: "text", text: cap(await sky.call(name, args, token)) }] };
 }
 
 async function runHealth(ctx) {
@@ -1100,6 +1130,9 @@ function startMcpServer() {
   let clientName = null;
 
   let initialized = false;
+  // Request id -> cancellation token, so notifications/cancelled can reach a
+  // call that is still queued behind the serialization lock.
+  const inFlight = new Map();
 
   const send = (obj) => process.stdout.write(`${JSON.stringify(obj)}\n`);
   const reply = (id, result) => send({ jsonrpc: "2.0", id, result });
@@ -1145,7 +1178,18 @@ function startMcpServer() {
     // Message shape is decided before server state, so a malformed request gets
     // the same answer whether or not the session is initialized.
     if (isNotification) {
-      if (method !== "notifications/initialized" && method !== "notifications/cancelled") {
+      if (method === "notifications/cancelled") {
+        const target = params?.requestId;
+        const token = inFlight.get(target);
+        if (token) {
+          token.cancelled = true;
+          log(`cancelled request ${JSON.stringify(target)}`);
+        } else {
+          log(`nothing in flight for cancelled request ${JSON.stringify(target)}`);
+        }
+        return;
+      }
+      if (method !== "notifications/initialized") {
         log(`ignoring unexpected notification: ${method}`);
       }
       return;
@@ -1211,8 +1255,16 @@ function startMcpServer() {
             replyError(id, -32602, `unknown tool: ${toolName}`);
             return;
           }
-          const result = await runTool(ctx, toolName, params?.arguments ?? {});
-          reply(id, result);
+          const token = { cancelled: false };
+          inFlight.set(id, token);
+          try {
+            const result = await runTool(ctx, toolName, params?.arguments ?? {}, token);
+            // MCP requires that a cancelled request receive no response.
+            if (token.cancelled) return;
+            reply(id, result);
+          } finally {
+            inFlight.delete(id);
+          }
           return;
         }
         default:
@@ -1222,6 +1274,11 @@ function startMcpServer() {
     } catch (err) {
       if (isNotification) {
         log(`error handling ${method}: ${err.message}`);
+        return;
+      }
+      // A cancelled request must not be answered at all.
+      if (err?.cancelled) {
+        log(`dropped response for cancelled request: ${err.message}`);
         return;
       }
       // Surface tool failures as tool results so the model can react and retry.

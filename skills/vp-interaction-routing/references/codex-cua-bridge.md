@@ -118,6 +118,13 @@ file path unless `include_screenshot` is set.
   may have been made by a different process. A fresh bridge session can receive
   a diff against a tree it has never seen. Pass `full_tree: true` on the first
   read of a session, and whenever indexes must be re-derived from scratch.
+- **Coordinates are window-relative, not screen coordinates.** `click` x/y and
+  `drag` from/to are measured from the target window's top-left; the service adds
+  the window origin itself. Verified against a Calculator window at screen
+  (147, 529): a click at (300, 700) was reported as (447, 1229). The
+  accessibility text exposes no element bounds, so there is nothing in a read to
+  derive coordinates from. Use `element_index`. In particular, do not carry
+  coordinates over from Peekaboo, whose bounds are screen coordinates.
 - **Leave `include_screenshot` off** unless the accessibility text is
   insufficient. An embedded screenshot costs far more context than the tree.
 - Responses are capped at `CODEX_CUA_BRIDGE_MAX_CHARS` (default 40000) and the
