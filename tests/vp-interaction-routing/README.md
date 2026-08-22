@@ -5,13 +5,30 @@ Coverage for `skills/vp-interaction-routing/scripts/codex-cua-bridge.mjs`.
 | Suite | Needs | Run by |
 |-------|-------|--------|
 | `codex-cua-bridge-protocol.test.mjs` | Node only | `npm run validate`, including CI |
+| `codex-cua-bridge-approvals.test.mjs` | Node only, via a fake upstream | `npm run validate`, including CI |
+| `codex-cua-bridge-runtime.test.mjs` | Node only, via a fake upstream | `npm run validate`, including CI |
 | `codex-cua-bridge-live.test.mjs` | macOS, ChatGPT.app with the Computer Use component | `npm run validate` on a capable host; skips elsewhere |
+
+`helpers/fake-app-server.mjs` stands in for the Codex binary. The bridge spawns
+it as `<bin> app-server --stdio`, so behavior that needs a live upstream can be
+tested without ChatGPT.app: reverse approval requests, the output cap, and the
+timeout that tears down the shared session. Point the bridge at it with
+`CODEX_CUA_BRIDGE_CODEX_BIN`.
 
 The protocol suite covers everything the bridge answers before it reaches
 Computer Use: JSON-RPC framing and error codes, `initialize` validation and
 version negotiation, notification handling, request-id rules, the advertised
 tool surface and its annotations, argument validation against each tool's
 schema, and graceful degradation when the Codex binary is missing.
+
+The approvals suite covers the bridge's primary safety boundary: each reverse
+request method answered in its own response shape, recognized approvals declined
+by default, unclassifiable requests refused with `-32601`, and
+`CODEX_CUA_BRIDGE_AUTO_APPROVE` flipping only the recognized ones.
+
+The runtime suite covers the output cap, the timeout and session reset,
+protocol-reserved `_`-prefixed keys being tolerated but not forwarded, and the
+standalone CLI.
 
 The live suite drives the real service against Calculator, which ships with
 macOS and whose display makes a performed click observable. It covers the health
@@ -35,3 +52,11 @@ can run. It reports a reason instead of failing when the host cannot support it.
   a click could never be detected.
 - **`skip` must be `false`, not `null`.** Node treats any non-`undefined` value
   as a skip directive, so a null reason silently skips the whole suite.
+- **Suites run serially.** `validate-skills.sh` passes `--test-concurrency=1`.
+  The live suite drives one shared macOS UI, and parallel files also saturate the
+  machine enough to trip request timeouts.
+- **Assert the negative capability too.** `frontmostApp()` fails when `osascript`
+  cannot answer, because an empty string on both sides of the focus comparison
+  would pass even if focus had been stolen.
+- **Validation fails when no suite is found.** An unmatched glob would reach
+  `node --test` literally and exit zero having run nothing.

@@ -12,7 +12,7 @@ async function withClient(run) {
   try {
     await run(client);
   } finally {
-    client.close();
+    await client.close();
   }
 }
 
@@ -213,6 +213,19 @@ test("element_index accepts a numeric string but never a value Number() would co
       assert.equal(rejected.result.isError, true, `element_index ${JSON.stringify(bad)}`);
       assert.match(toolText(rejected), /element_index must be an integer/);
     }
+
+    // The positive half: a numeric string must clear validation. Without this the
+    // test would still pass if the bridge stopped accepting "1" entirely. The
+    // call fails upstream here because there is no Computer Use in this suite,
+    // so the assertion is that it failed for some other reason.
+    for (const good of ["1", 1, "42"]) {
+      const accepted = await client.callTool("click", { app: "X", element_index: good });
+      assert.doesNotMatch(
+        toolText(accepted),
+        /must be an integer/,
+        `element_index ${JSON.stringify(good)} must pass validation`,
+      );
+    }
   });
 });
 
@@ -241,7 +254,7 @@ test("unterminated input is bounded and the reader resynchronizes after it", asy
     const recovered = await client.initialize();
     assert.equal(recovered.result.serverInfo.name, "codex-cua-bridge");
   } finally {
-    client.close();
+    await client.close();
   }
 });
 
@@ -259,6 +272,6 @@ test("a missing Codex binary degrades instead of taking the server down", async 
     const stillAlive = await client.request("tools/list", {});
     assert.equal(stillAlive.result.tools.length, 12, "the bridge survives the failure");
   } finally {
-    client.close();
+    await client.close();
   }
 });

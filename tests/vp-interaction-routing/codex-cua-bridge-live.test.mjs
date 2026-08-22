@@ -23,7 +23,7 @@ async function withSession(run, env) {
     await client.initialize();
     await run(client);
   } finally {
-    client.close();
+    await client.close();
   }
 }
 
@@ -96,13 +96,25 @@ async function resetCalculator(client) {
   return settled;
 }
 
+/**
+ * The frontmost application name. Fails loudly when it cannot be read: a silent
+ * empty string on both sides of the comparison would make the focus assertion
+ * pass even if the bridge had stolen focus.
+ */
 function frontmostApp() {
   const result = spawnSync(
     "osascript",
     ["-e", 'tell application "System Events" to get name of first process whose frontmost is true'],
-    { encoding: "utf8" },
+    { encoding: "utf8", timeout: 5000 },
   );
-  return result.stdout.trim();
+  assert.equal(
+    result.status,
+    0,
+    `reading the frontmost app failed, so focus cannot be asserted: ${result.stderr?.trim()}`,
+  );
+  const name = result.stdout.trim();
+  assert.ok(name, "the frontmost app name must not be empty");
+  return name;
 }
 
 test("health reports the live upstream inventory rather than a hardcoded list", { skip }, async () => {
