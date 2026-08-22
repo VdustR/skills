@@ -66,11 +66,14 @@ A healthy report ends with `"verdict": "healthy"` and shows:
 | `checks.thread_id` | an ephemeral thread was created |
 | `checks.node_repl_configured` | the upstream `node_repl` server is configured |
 | `checks.sky_surface` | the live `@oai/sky` function list, reflected rather than assumed |
+| `checks.missing_sky_functions` | required upstream functions the surface no longer provides |
 | `checks.intercepted_server_requests` | approval requests the bridge declined |
 
 Re-run it after a ChatGPT.app update. `app-server` is an experimental protocol
 and its surface can change between versions; treat a failed handshake or a
-shrunken `sky_surface` as a compatibility break, not a transient error.
+shrunken `sky_surface` as a compatibility break, not a transient error. The
+verdict is `unhealthy` whenever `missing_sky_functions` is non-empty, so a
+renamed upstream function is reported rather than passing silently.
 
 Other diagnostics:
 
@@ -124,6 +127,11 @@ file path unless `include_screenshot` is set.
 - Calls are serialized. The upstream `node_repl` session is one shared
   JavaScript context, so concurrent requests queue rather than interleave. Expect
   in-flight calls to complete in order, not in parallel.
+- **A timed-out call tears down the session.** The upstream snippet may still be
+  running against shared REPL state, so the bridge abandons the app-server child
+  and its `node_repl` session before releasing the queue. The next call starts a
+  fresh session; the accessibility-tree diff baseline survives because it lives
+  in the Computer Use service, not in the REPL.
 
 ## Authorization
 
@@ -137,10 +145,17 @@ programmatically rather than by name: `readOnlyHint` is true for `health`,
 `list_apps`, and `get_app_state`, and `destructiveHint` is true for the nine
 action tools.
 
-When app-server asks the client to approve something, the bridge declines by
-default and records the request in `health`, because it must not stand in for the
-user. `CODEX_CUA_BRIDGE_AUTO_APPROVE=1` approves instead; set it only
-deliberately.
+When app-server asks the client to decide something, the bridge answers only the
+reverse-request methods it recognizes, each in that method's own response shape:
+a command-execution or file-change approval gets a `decision`, an MCP elicitation
+gets an `action`, and a user-input request gets empty answers. Recognized
+approvals are **declined** by default and recorded in `health`, because the bridge
+must not stand in for the user.
+
+Anything it cannot classify, including a method added by a future app-server
+version, is refused with a JSON-RPC `-32601` rather than answered with a guess.
+`CODEX_CUA_BRIDGE_AUTO_APPROVE=1` flips the recognized approvals to accept; it
+cannot approve an unclassified request. Set it only deliberately.
 
 ## Environment
 
@@ -149,6 +164,7 @@ deliberately.
 | `CODEX_CUA_BRIDGE_CODEX_BIN` | app-bundle search | path to `Contents/Resources/codex` |
 | `CODEX_CUA_BRIDGE_MAX_CHARS` | `40000` | text cap per response |
 | `CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES` | `1500000` | above this a screenshot is returned as a path |
+| `CODEX_CUA_BRIDGE_MAX_FRAME_CHARS` | `33554432` | maximum JSON-RPC frame accepted on either side |
 | `CODEX_CUA_BRIDGE_TIMEOUT_MS` | `60000` | per-call timeout |
 | `CODEX_CUA_BRIDGE_AUTO_APPROVE` | unset | `1` approves app-server approval requests |
 | `CODEX_CUA_BRIDGE_VERBOSE` | unset | `1` logs app-server stderr |

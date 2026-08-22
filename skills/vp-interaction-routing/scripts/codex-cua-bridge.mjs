@@ -26,7 +26,7 @@
  */
 
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,6 +35,7 @@ import { createInterface } from "node:readline";
 const BRIDGE_NAME = "codex-cua-bridge";
 const BRIDGE_VERSION = "0.1.0";
 const MCP_PROTOCOL_VERSION = "2025-06-18";
+const SUPPORTED_MCP_PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"];
 
 const MAX_CHARS = clampInt(process.env.CODEX_CUA_BRIDGE_MAX_CHARS, 40000, 500, 500000);
 const CALL_TIMEOUT_MS = clampInt(process.env.CODEX_CUA_BRIDGE_TIMEOUT_MS, 60000, 1000, 600000);
@@ -44,7 +45,14 @@ const MAX_IMAGE_BYTES = clampInt(
   10000,
   20000000,
 );
+const MAX_FRAME_CHARS = clampInt(
+  process.env.CODEX_CUA_BRIDGE_MAX_FRAME_CHARS,
+  33554432,
+  65536,
+  268435456,
+);
 const AUTO_APPROVE = process.env.CODEX_CUA_BRIDGE_AUTO_APPROVE === "1";
+const APPROVAL_HISTORY_LIMIT = 100;
 
 const ROUTING_NOTICE = [
   "This bridge exists to give a NON-Codex harness access to macOS Codex Computer Use.",
@@ -114,6 +122,31 @@ function readAppVersion(codexBin) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Reverse requests from app-server
+ * ------------------------------------------------------------------ */
+
+const REJECTION =
+  `${BRIDGE_NAME} does not grant approvals on the user's behalf. The calling ` +
+  "agent must obtain confirmation from the user and retry.";
+
+/**
+ * Every app-server server request has its own response shape, so a single
+ * generic reply is wrong for most of them. Only the methods listed here are
+ * approval decisions the bridge is willing to answer; anything else, including
+ * a method added by a future app-server version, is refused as unsupported so
+ * an unknown request is never silently approved.
+ */
+const APPROVAL_RESPONDERS = {
+  "item/commandExecution/requestApproval": (approve) =>
+    approve ? { decision: "approved" } : { decision: { denied: { rejection: REJECTION } } },
+  "item/fileChange/requestApproval": (approve) =>
+    approve ? { decision: "approved" } : { decision: { denied: { rejection: REJECTION } } },
+  "mcpServer/elicitation/request": (approve) =>
+    approve ? { action: "accept", content: {} } : { action: "decline" },
+  "item/tool/requestUserInput": () => ({ answers: {} }),
+};
+
+/* ------------------------------------------------------------------ *
  * app-server JSON-RPC client
  * ------------------------------------------------------------------ */
 
@@ -139,7 +172,16 @@ class AppServerClient {
 
   async start() {
     if (this.startPromise) return this.startPromise;
-    this.startPromise = this.#start();
+    // A cached rejected promise would wedge every later call, and the child's
+    // exit handler cannot clear it when the child is still alive and only the
+    // initialize handshake failed.
+    this.startPromise = this.#start().catch((err) => {
+      this.startPromise = null;
+      const child = this.child;
+      this.child = null;
+      child?.kill();
+      throw err;
+    });
     return this.startPromise;
   }
 
@@ -173,6 +215,10 @@ class AppServerClient {
     this.child.stdin.on("error", (err) => log(`app-server stdin error: ${err.message}`));
 
     createInterface({ input: this.child.stdout }).on("line", (line) => {
+      if (line.length > MAX_FRAME_CHARS) {
+        log(`dropping app-server frame of ${line.length} chars, over MAX_FRAME_CHARS`);
+        return;
+      }
       const trimmed = line.trim();
       if (!trimmed) return;
       let msg;
@@ -196,6 +242,10 @@ class AppServerClient {
   }
 
   #handle(msg) {
+    if (msg === null || typeof msg !== "object" || Array.isArray(msg)) {
+      log("ignoring non-object frame from app-server");
+      return;
+    }
     if (msg.id !== undefined && msg.method) {
       this.#handleServerRequest(msg);
       return;
@@ -211,31 +261,51 @@ class AppServerClient {
   }
 
   /**
-   * app-server can ask the client to approve an action. The bridge is not a
-   * user and must not silently stand in for one, so it declines by default and
-   * records the request for the `health` tool to report.
+   * app-server can ask the client to decide something. The bridge is not a user
+   * and must not stand in for one, so a known approval request is declined by
+   * default and an unknown request is refused outright rather than answered
+   * with a guess.
    */
   #handleServerRequest(msg) {
-    this.interceptedServerRequests.push({ method: msg.method });
-    const decision = AUTO_APPROVE
-      ? "approved"
-      : {
-          denied: {
-            rejection:
-              `${BRIDGE_NAME} declines approvals on the user's behalf. ` +
-              "The calling agent must obtain confirmation and retry, or set " +
-              "CODEX_CUA_BRIDGE_AUTO_APPROVE=1 deliberately.",
-          },
-        };
-    log(
-      `intercepted server request ${msg.method} -> ${AUTO_APPROVE ? "approved" : "denied"}`,
-    );
-    this.#write({ id: msg.id, result: { decision } });
+    const responder = APPROVAL_RESPONDERS[msg.method];
+    const outcome = !responder ? "unsupported" : AUTO_APPROVE ? "approved" : "declined";
+    this.#recordServerRequest({ method: msg.method, outcome });
+    log(`server request ${msg.method} -> ${outcome}`);
+
+    if (!responder) {
+      this.#write({
+        id: msg.id,
+        error: {
+          code: -32601,
+          message:
+            `${BRIDGE_NAME} does not implement ${msg.method}. The bridge answers only ` +
+            "known approval requests and refuses anything it cannot classify.",
+        },
+      });
+      return;
+    }
+    this.#write({ id: msg.id, result: responder(AUTO_APPROVE) });
   }
 
-  #write(obj) {
+  #recordServerRequest(entry) {
+    this.interceptedServerRequests.push(entry);
+    if (this.interceptedServerRequests.length > APPROVAL_HISTORY_LIMIT) {
+      this.interceptedServerRequests.splice(
+        0,
+        this.interceptedServerRequests.length - APPROVAL_HISTORY_LIMIT,
+      );
+    }
+  }
+
+  #write(obj, onError) {
     if (!this.child) throw new Error("app-server is not running");
-    this.child.stdin.write(`${JSON.stringify(obj)}\n`);
+    // app-server accepts frames with or without the version tag and omits it in
+    // its own replies, so it is JSON-RPC-like rather than strict. Sending it is
+    // verified-harmless and stays correct if app-server ever tightens.
+    const frame = JSON.stringify({ jsonrpc: "2.0", ...obj });
+    this.child.stdin.write(`${frame}\n`, (err) => {
+      if (err) onError?.(err);
+    });
   }
 
   notify(method, params = {}) {
@@ -247,11 +317,20 @@ class AppServerClient {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(id);
-        reject(new Error(`app-server request timed out after ${timeoutMs}ms: ${method}`));
+        const err = new Error(`app-server request timed out after ${timeoutMs}ms: ${method}`);
+        err.timedOut = true;
+        reject(err);
       }, timeoutMs);
       this.pending.set(id, { resolve, reject, timer });
+      const failWrite = (err) => {
+        const entry = this.pending.get(id);
+        if (!entry) return;
+        this.pending.delete(id);
+        clearTimeout(entry.timer);
+        entry.reject(new Error(`failed to write ${method} to app-server: ${err.message}`));
+      };
       try {
-        this.#write({ id, method, params });
+        this.#write({ id, method, params }, failWrite);
       } catch (err) {
         clearTimeout(timer);
         this.pending.delete(id);
@@ -298,6 +377,34 @@ class AppServerClient {
   async listMcpServers() {
     await this.start();
     return this.request("mcpServerStatus/list", {});
+  }
+
+  /**
+   * Abandon the current app-server child and its node_repl session. Used after a
+   * timeout: the upstream snippet may still be running against shared REPL
+   * state, so the session cannot be reused.
+   */
+  async reset(reason) {
+    log(`resetting app-server session: ${reason}`);
+    const child = this.child;
+    this.child = null;
+    this.startPromise = null;
+    this.threadId = null;
+    this.threadPromise = null;
+    for (const [, entry] of this.pending) {
+      clearTimeout(entry.timer);
+      entry.reject(new Error(`app-server session reset: ${reason}`));
+    }
+    this.pending.clear();
+    if (!child) return;
+    await new Promise((resolve) => {
+      const done = setTimeout(resolve, 2000);
+      child.once("exit", () => {
+        clearTimeout(done);
+        resolve();
+      });
+      child.kill();
+    });
   }
 
   stop() {
@@ -352,10 +459,21 @@ class Sky {
   /** Run JS in the persistent node_repl session and return its written text. */
   js(code) {
     return this.#serialize(async () => {
-      const result = await this.appServer.callMcpTool("node_repl", "js", { code });
-      const text = resultText(result);
-      if (isErrorResult(result)) throw new Error(text);
-      return text;
+      try {
+        const result = await this.appServer.callMcpTool("node_repl", "js", { code });
+        const text = resultText(result);
+        if (isErrorResult(result)) throw new Error(text);
+        return text;
+      } catch (err) {
+        // A timed-out call may still be executing upstream against the shared
+        // REPL state. Tear the session down before the queue is released, so the
+        // next call cannot observe or collide with it.
+        if (err?.timedOut) {
+          await this.appServer.reset(`timed out: ${err.message}`);
+          err.message += " (app-server session was reset)";
+        }
+        throw err;
+      }
     });
   }
 
@@ -615,6 +733,18 @@ const TOOLS = [
 
 const TOOL_BY_NAME = new Map(TOOLS.map((t) => [t.name, t]));
 
+/**
+ * The upstream sky functions the exposed tools depend on. `health` compares the
+ * reflected surface against this list, so a renamed or removed upstream
+ * function is reported as a compatibility break rather than passing because the
+ * reflection still returned an array.
+ */
+const REQUIRED_SKY_FUNCTIONS = [
+  "list_apps",
+  "get_app_state",
+  ...TOOLS.filter((t) => t.mutating).map((t) => t.name),
+];
+
 /* ------------------------------------------------------------------ *
  * Tool execution
  * ------------------------------------------------------------------ */
@@ -636,12 +766,20 @@ function cap(text) {
 function coerceIntegers(args) {
   const out = { ...args };
   for (const key of ["element_index", "click_count"]) {
-    if (out[key] === undefined) continue;
-    const n = Number(out[key]);
-    if (!Number.isInteger(n)) {
-      throw new Error(`${key} must be an integer, received ${JSON.stringify(out[key])}`);
+    const raw = out[key];
+    if (raw === undefined) continue;
+    // Number() maps null, false and "" to 0, which would silently target
+    // element 0 instead of reporting a bad argument.
+    const numeric =
+      typeof raw === "number"
+        ? raw
+        : typeof raw === "string" && raw.trim() !== ""
+          ? Number(raw)
+          : Number.NaN;
+    if (!Number.isInteger(numeric)) {
+      throw new Error(`${key} must be an integer, received ${JSON.stringify(raw) ?? typeof raw}`);
     }
-    out[key] = n;
+    out[key] = numeric;
   }
   return out;
 }
@@ -661,14 +799,16 @@ function readScreenshot(url) {
     return null;
   }
   if (!existsSync(path)) return null;
-  const bytes = readFileSync(path);
-  if (bytes.length > MAX_IMAGE_BYTES) {
+  // Check the size before allocating: reading first would defeat the cap.
+  const size = statSync(path).size;
+  if (size > MAX_IMAGE_BYTES) {
     return {
       path,
-      tooLarge: `screenshot is ${bytes.length} bytes, over ` +
+      tooLarge: `screenshot is ${size} bytes, over ` +
         `CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES=${MAX_IMAGE_BYTES}; read it from ${path} instead`,
     };
   }
+  const bytes = readFileSync(path);
   const ext = (basename(path).match(/\.[a-z]+$/i) || [""])[0].toLowerCase();
   return {
     path,
@@ -781,10 +921,18 @@ async function runHealth(ctx) {
 
   report.checks.intercepted_server_requests = appServer.interceptedServerRequests;
 
-  const skyOk = Array.isArray(report.checks.sky_surface);
-  report.verdict = skyOk
-    ? "healthy: Computer Use is reachable through this bridge"
-    : "unhealthy: the sky Computer Use surface did not load";
+  const surface = report.checks.sky_surface;
+  const missing = Array.isArray(surface)
+    ? REQUIRED_SKY_FUNCTIONS.filter((fn) => !surface.includes(fn))
+    : REQUIRED_SKY_FUNCTIONS;
+  report.checks.missing_sky_functions = missing;
+
+  const skyOk = Array.isArray(surface) && missing.length === 0;
+  report.verdict = !Array.isArray(surface)
+    ? "unhealthy: the sky Computer Use surface did not load"
+    : missing.length
+      ? `unhealthy: upstream is missing ${missing.join(", ")}; the matching tools will fail`
+      : "healthy: Computer Use is reachable through this bridge";
 
   return {
     content: [{ type: "text", text: JSON.stringify(report, null, 2) }],
@@ -825,6 +973,8 @@ function startMcpServer() {
   const ctx = { appServer, sky: new Sky(appServer) };
   let clientName = null;
 
+  let initialized = false;
+
   const send = (obj) => process.stdout.write(`${JSON.stringify(obj)}\n`);
   const reply = (id, result) => send({ jsonrpc: "2.0", id, result });
   const replyError = (id, code, message) =>
@@ -833,14 +983,38 @@ function startMcpServer() {
   createInterface({ input: process.stdin }).on("line", async (line) => {
     const trimmed = line.trim();
     if (!trimmed) return;
+    if (trimmed.length > MAX_FRAME_CHARS) {
+      replyError(null, -32600, `request exceeds ${MAX_FRAME_CHARS} characters`);
+      return;
+    }
     let msg;
     try {
       msg = JSON.parse(trimmed);
-    } catch {
+    } catch (err) {
+      // JSON-RPC 2.0 requires a parse-error reply with a null id.
+      replyError(null, -32700, `parse error: ${err.message}`);
+      return;
+    }
+
+    if (msg === null || typeof msg !== "object" || Array.isArray(msg)) {
+      replyError(null, -32600, "invalid request: expected a JSON-RPC object");
       return;
     }
 
     const { id, method, params } = msg;
+
+    if (typeof method !== "string") {
+      replyError(id ?? null, -32600, "invalid request: missing method");
+      return;
+    }
+    if (msg.jsonrpc !== undefined && msg.jsonrpc !== "2.0") {
+      replyError(id ?? null, -32600, `unsupported jsonrpc version: ${msg.jsonrpc}`);
+      return;
+    }
+    if (!initialized && id !== undefined && method !== "initialize" && method !== "ping") {
+      replyError(id, -32002, `server not initialized: call initialize before ${method}`);
+      return;
+    }
 
     try {
       switch (method) {
@@ -849,8 +1023,18 @@ function startMcpServer() {
           if (clientName && /codex/i.test(clientName)) {
             log(`client "${clientName}" looks like Codex; it should use sky directly`);
           }
+          initialized = true;
+          const asked = params?.protocolVersion;
+          // Echo a version both sides know; otherwise answer with ours and let
+          // the client decide whether it can proceed.
+          const negotiated = SUPPORTED_MCP_PROTOCOL_VERSIONS.includes(asked)
+            ? asked
+            : MCP_PROTOCOL_VERSION;
+          if (asked && asked !== negotiated) {
+            log(`client requested unsupported protocolVersion ${asked}; offering ${negotiated}`);
+          }
           reply(id, {
-            protocolVersion: MCP_PROTOCOL_VERSION,
+            protocolVersion: negotiated,
             capabilities: { tools: { listChanged: false } },
             serverInfo: { name: BRIDGE_NAME, version: BRIDGE_VERSION },
             instructions: instructionsFor(clientName),
