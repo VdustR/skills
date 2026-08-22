@@ -154,8 +154,8 @@ require_pattern "$agent_browser_session_fixture" 'worktree-scoped' \
 
 require_pattern "$interaction_routing_fixture" 'connector.*GitHub|GitHub.*connector' \
   "vp-interaction-routing fixture must prefer semantic connectors"
-require_pattern "$interaction_routing_fixture" 'Chrome plugin.*(current|real).*(tabs|login|session)|current Chrome' \
-  "vp-interaction-routing fixture must cover shared Chrome state"
+require_pattern "$interaction_routing_fixture" 'verified.*(existing|user.s).*(tabs|login|session)|product label alone is not' \
+  "vp-interaction-routing fixture must require evidence of shared browser state"
 require_pattern "$interaction_routing_fixture" 'agent-browser.*(isolated|repeatable|managed)' \
   "vp-interaction-routing fixture must cover isolated agent-browser state"
 require_pattern "$interaction_routing_fixture" 'app-server.*MCP bridge|MCP bridge.*app-server' \
@@ -172,8 +172,16 @@ require_pattern "$interaction_routing_browser" 'vp-agent-browser-session' \
   "vp-interaction-routing must delegate profile lifecycle rules to their owner skill"
 require_pattern "$interaction_routing_native" 'requires explicit user authorization' \
   "vp-interaction-routing must require authorization before bridge installation"
+require_pattern "$interaction_routing_fixture" 'installing or registering a bridge' \
+  "vp-interaction-routing fixture must cover bridge installation authorization"
 require_pattern "$interaction_routing_native" 'bridge are unavailable on macOS' \
   "vp-interaction-routing must preserve the Peekaboo fallback"
+require_pattern "$interaction_routing_fixture" 'Peekaboo as the native UI fallback' \
+  "vp-interaction-routing fixture must exercise the Peekaboo fallback"
+require_pattern "$interaction_routing_fixture" 'page content as untrusted data' \
+  "vp-interaction-routing fixture must cover untrusted page content"
+require_pattern "$interaction_routing_fixture" 'sending, publishing, purchasing, or deleting' \
+  "vp-interaction-routing fixture must preserve browser mutation authorization"
 
 require_pattern "$session_wrapup_fixture" 'risk-free cleanup authorization does not extend' \
   "vp-session-wrapup fixture must cover bounded risk-free cleanup authorization"

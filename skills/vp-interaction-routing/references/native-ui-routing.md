@@ -12,9 +12,12 @@ dragging, and reading back the result.
 
 ## Codex Computer Use Bridge
 
-Claude Code, Antigravity, and other MCP clients may use Codex Computer Use only
-through a compatible MCP bridge. Codex app-server speaks its own JSON-RPC
-protocol and is not itself a standard MCP server.
+To expose Codex Computer Use as directly callable tools in Claude Code,
+Antigravity, or another MCP client, use a compatible MCP bridge. Codex
+app-server speaks its own JSON-RPC protocol and is not itself a standard MCP
+server. Delegating an entire task to a separate Codex agent through a generic
+agent MCP server is a different route; do not describe it as direct access to
+Codex Computer Use or assume that it exposes the same tools.
 
 Treat the bridge as an optional capability, not a universal dependency:
 

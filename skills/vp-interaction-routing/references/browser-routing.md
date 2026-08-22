@@ -5,7 +5,8 @@ browser surface according to the session state the task requires.
 
 ## Current User Browser
 
-Use a connected Chrome or Edge plugin when the task requires any of these:
+Use a DOM-aware browser surface verified to carry the user's existing browser
+state when the task requires any of these:
 
 - the user's current tabs or navigation state;
 - an existing login, SSO session, passkey flow, or browser extension;
