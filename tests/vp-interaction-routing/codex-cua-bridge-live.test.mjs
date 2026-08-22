@@ -102,15 +102,27 @@ async function resetCalculator(client) {
  * pass even if the bridge had stolen focus.
  */
 function frontmostApp() {
+  // Asks AppKit directly rather than going through System Events, whose
+  // AppleEvent IPC blocks under load: it has been observed timing out after two
+  // minutes on a machine where this query answers in well under a second.
   const result = spawnSync(
     "osascript",
-    ["-e", 'tell application "System Events" to get name of first process whose frontmost is true'],
-    { encoding: "utf8", timeout: 5000 },
+    [
+      "-l",
+      "JavaScript",
+      "-e",
+      'ObjC.import("AppKit"); $.NSWorkspace.sharedWorkspace.frontmostApplication.localizedName.js',
+    ],
+    { encoding: "utf8", timeout: 10000 },
   );
   assert.equal(
     result.status,
     0,
-    `reading the frontmost app failed, so focus cannot be asserted: ${result.stderr?.trim()}`,
+    // A timeout reports a null status, so name that case rather than printing
+    // an unexplained "null !== 0".
+    result.status === null
+      ? `reading the frontmost app timed out or was killed (${result.signal}), so focus cannot be asserted`
+      : `reading the frontmost app failed, so focus cannot be asserted: ${result.stderr?.trim()}`,
   );
   const name = result.stdout.trim();
   assert.ok(name, "the frontmost app name must not be empty");
@@ -237,14 +249,22 @@ test("cancelling a queued click prevents it from ever reaching the UI", { skip }
 
     const seen = new Set();
     const deadline = Date.now() + 60000;
-    while (Date.now() < deadline) {
+    while (Date.now() < deadline && !seen.has(occupyId)) {
       const message = await client.next(5000);
       if (!message) break;
       if (message.id !== undefined) seen.add(message.id);
-      if (seen.has(occupyId)) break;
     }
     assert.ok(seen.has(occupyId), "the occupying call still answers");
-    assert.ok(!seen.has(cancelledId), "a cancelled request receives no response");
+
+    // Keep draining after that: a regressed bridge could answer the cancelled
+    // request just afterwards, and stopping here would leave it unnoticed.
+    const graceEnd = Date.now() + 6000;
+    while (Date.now() < graceEnd) {
+      const late = await client.next(2000);
+      if (!late) continue;
+      if (late.id !== undefined) seen.add(late.id);
+    }
+    assert.ok(!seen.has(cancelledId), "a cancelled request receives no response, even later");
 
     assert.equal(displayValue(await readTree(client)), cleared, "the click never ran");
 

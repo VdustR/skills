@@ -60,3 +60,17 @@ can run. It reports a reason instead of failing when the host cannot support it.
   would pass even if focus had been stolen.
 - **Validation fails when no suite is found.** An unmatched glob would reach
   `node --test` literally and exit zero having run nothing.
+- **Ask AppKit for the frontmost app, not System Events.** Its AppleEvent IPC
+  blocks under load; it has been seen timing out after two minutes on a machine
+  where the AppKit query answered in a fraction of a second. Note that a
+  `spawnSync` timeout reports a null status, so say so rather than printing an
+  unexplained `null !== 0`.
+- **Assert what crossed the boundary, not just the response.** The upstream
+  ignores arguments it does not know, so a forwarded `_meta` would still produce
+  a successful call. `FAKE_ARGS_LOG` records the real arguments to assert on.
+- **Prove the process changed, not just the message.** The timeout test compares
+  upstream pids via `FAKE_PID_LOG`; asserting only on "session was reset" would
+  pass if the reset regressed to reusing the hung process.
+- **Keep draining after the expected response.** The cancellation test continues
+  reading for a grace period, because a regressed bridge could answer the
+  cancelled request just after the occupying one.

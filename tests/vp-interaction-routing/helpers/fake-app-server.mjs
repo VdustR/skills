@@ -9,6 +9,8 @@
 //   FAKE_REVERSE_PARAMS  optional JSON params for the reverse request
 //   FAKE_TEXT_LENGTH     pad tool-call results to this many characters
 //   FAKE_HANG            never answer a tool call, to exercise the timeout path
+//   FAKE_ARGS_LOG        append the arguments of each tool call, as JSON lines
+//   FAKE_PID_LOG         append this process's pid on startup, to prove replacement
 
 import { appendFileSync } from "node:fs";
 import { createInterface } from "node:readline";
@@ -18,6 +20,10 @@ const observedPath = process.env.FAKE_OBSERVED;
 const reverseParams = process.env.FAKE_REVERSE_PARAMS
   ? JSON.parse(process.env.FAKE_REVERSE_PARAMS)
   : { note: "fake reverse request" };
+
+if (process.env.FAKE_PID_LOG) {
+  appendFileSync(process.env.FAKE_PID_LOG, `${process.pid}\n`);
+}
 
 const textLength = Number.parseInt(process.env.FAKE_TEXT_LENGTH ?? "", 10);
 const hang = process.env.FAKE_HANG === "1";
@@ -77,6 +83,14 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     return;
   }
   if (message.method === "mcpServer/tool/call") {
+    // Record what actually crossed the boundary, so a test can assert that
+    // undeclared arguments never reach the upstream call.
+    if (process.env.FAKE_ARGS_LOG) {
+      appendFileSync(
+        process.env.FAKE_ARGS_LOG,
+        `${JSON.stringify(message.params?.arguments ?? null)}\n`,
+      );
+    }
     if (hang) return; // exercise the caller's timeout and session reset
     if (reverseMethod) {
       const id = reverseId++;

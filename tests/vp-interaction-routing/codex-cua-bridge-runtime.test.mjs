@@ -5,6 +5,9 @@
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import { BridgeClient, bridgePath, fakeAppServerPath, toolText } from "./helpers/mcp-client.mjs";
@@ -41,40 +44,70 @@ test("text under the cap is returned whole, with no truncation notice", async ()
   });
 });
 
-test("a timed-out call reports the session reset and the bridge still works after", async () => {
-  await withFake({ CODEX_CUA_BRIDGE_TIMEOUT_MS: "1000", FAKE_HANG: "1" }, async (client) => {
-    const timedOut = await client.callTool("list_apps", {}, 30000);
-    assert.equal(timedOut.result.isError, true);
-    assert.match(toolText(timedOut), /timed out/);
-    assert.match(
-      toolText(timedOut),
-      /app-server session was reset/,
-      "a timeout must tear the shared session down, not just abandon the response",
-    );
+test("a timed-out call actually replaces the upstream session", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "codex-cua-timeout-"));
+  const pidLog = join(dir, "pids");
+  try {
+    await withFake(
+      { CODEX_CUA_BRIDGE_TIMEOUT_MS: "1000", FAKE_HANG: "1", FAKE_PID_LOG: pidLog },
+      async (client) => {
+        const timedOut = await client.callTool("list_apps", {}, 30000);
+        assert.equal(timedOut.result.isError, true);
+        assert.match(toolText(timedOut), /timed out/);
+        assert.match(toolText(timedOut), /app-server session was reset/);
 
-    // A second call must still be served, proving the reset rebuilt the session
-    // rather than wedging it.
-    const after = await client.callTool("list_apps", {}, 30000);
-    assert.equal(after.result.isError, true, "the fake still hangs, so this also times out");
-    assert.match(toolText(after), /timed out/);
-  });
+        // A second call must be served by a different upstream process. Asserting
+        // only on the message would still pass if the reset regressed to keeping
+        // the hung process alive.
+        const after = await client.callTool("list_apps", {}, 30000);
+        assert.equal(after.result.isError, true, "the fake still hangs, so this also times out");
+
+        const pids = readFileSync(pidLog, "utf8").trim().split("\n").filter(Boolean);
+        assert.equal(pids.length, 2, `expected two upstream processes, saw ${pids.join()}`);
+        assert.notEqual(pids[0], pids[1], "the hung process must be replaced, not reused");
+      },
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
-test("protocol-reserved keys are tolerated and never forwarded", async () => {
-  await withFake({}, async (client) => {
-    // Accepted without an unknown-property error...
-    const accepted = await client.callTool("get_app_state", { app: "X", _meta: { trace: 1 } }, 30000);
-    assert.notEqual(accepted.result?.isError, true, toolText(accepted));
-    assert.doesNotMatch(toolText(accepted), /unknown property/);
+test("protocol-reserved keys are tolerated and never reach the upstream call", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "codex-cua-args-"));
+  const argsLog = join(dir, "args");
+  try {
+    await withFake({ FAKE_ARGS_LOG: argsLog }, async (client) => {
+      const accepted = await client.callTool(
+        "get_app_state",
+        { app: "X", _meta: { trace: 1 }, _disableDiff: true },
+        30000,
+      );
+      assert.notEqual(accepted.result?.isError, true, toolText(accepted));
+      assert.doesNotMatch(toolText(accepted), /unknown property/);
 
-    // ...and an underscore cannot smuggle a parameter the tool does not declare.
-    const smuggled = await client.callTool(
-      "get_app_state",
-      { app: "X", _disableDiff: true },
-      30000,
-    );
-    assert.doesNotMatch(toolText(smuggled), /unknown property/);
-  });
+      // The boundary claim is about what crossed it. Inspecting only the
+      // response would pass even if the keys had been forwarded, because the
+      // upstream ignores what it does not know.
+      const forwarded = readFileSync(argsLog, "utf8").trim().split("\n").filter(Boolean);
+      assert.ok(forwarded.length >= 1, "the upstream received a call to inspect");
+      const code = forwarded.map((line) => JSON.parse(line).code ?? "").join("\n");
+      assert.ok(code.includes("sky.get_app_state"), "the snippet drives get_app_state");
+
+      // The snippet embeds the arguments as a JSON literal, so recover them and
+      // assert the exact key set that crossed the boundary.
+      const literal = code.match(/JSON\.parse\((".*?")\)/);
+      assert.ok(literal, `no argument literal found in: ${code}`);
+      const crossed = JSON.parse(JSON.parse(literal[1]));
+      assert.deepEqual(
+        Object.keys(crossed).sort(),
+        ["app", "disableDiff"],
+        "only declared arguments may cross, and get_app_state maps full_tree to disableDiff",
+      );
+      assert.equal(crossed.app, "X");
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("the standalone CLI lists tools and explains itself without an upstream", () => {
