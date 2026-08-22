@@ -128,6 +128,12 @@ require_pattern "$recording_fixture" 'verified by looking at frames|contact shee
 
 require_pattern "$github_fixture" 'public by URL' \
   "vp-github fixture must cover attachments being public by URL"
+require_pattern "$github_fixture" 'token.*out of process arguments|not expanded into curl process arguments' \
+  "vp-github fixture must keep bearer tokens out of process arguments"
+if grep -Fq -- '-H "Authorization: Bearer $(gh auth token)"' \
+  skills/vp-github/references/attachments.md; then
+  fail "vp-github must not expose gh auth token in curl process arguments"
+fi
 require_pattern "$github_fixture" 'eight media content types|not promised on a token' \
   "vp-github fixture must cover the media-only token whitelist"
 require_pattern "$github_fixture" 'x-fetch-nonce' \

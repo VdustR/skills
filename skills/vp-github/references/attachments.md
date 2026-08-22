@@ -18,13 +18,20 @@ PATH_TO_FILE=out/demo.mp4
 NAME=$(basename "$PATH_TO_FILE")   # the endpoint rejects a name containing a slash
 MIME=video/mp4
 REPO=owner/name
-curl -sS -X POST \
+GITHUB_UPLOAD_TOKEN=$(gh auth token)
+{
+  printf 'header = "Authorization: Bearer %s"\n' "$GITHUB_UPLOAD_TOKEN"
+} | curl --config - -sS -X POST \
   "https://uploads.github.com/user-attachments/assets?name=$NAME&content_type=$MIME&repository_id=$(gh api "repos/$REPO" --jq .id)" \
-  -H "Authorization: Bearer $(gh auth token)" \
   -H "Accept: application/json" \
   --data-binary "@$PATH_TO_FILE"
+unset GITHUB_UPLOAD_TOKEN
 # 201 {"url":"https://github.com/user-attachments/assets/<uuid>"}
 ```
+
+Passing the authorization header through curl's standard-input config keeps the
+token out of curl's process arguments. Do not expand `gh auth token` directly in
+the `-H` argument, where another local process may be able to read it.
 
 That URL is identical to what drag-and-drop produces, so every GitHub surface
 renders it natively. The whole exchange is one HTTP request, so it runs from a
