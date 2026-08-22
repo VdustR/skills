@@ -26,13 +26,14 @@ file records routing intent rather than a permanent tool inventory.
 ## Antigravity
 
 - Prefer MCP connectors, APIs, and repository CLIs for semantic operations.
-- Use its connected browser tooling for shared browser state. Use agent-browser
-  for isolated or managed-profile automation.
+- Use available DOM-aware browser tooling for web pages, but do not assume it
+  shares the user's live browser state. Use agent-browser for isolated or
+  managed-profile automation.
 - Use Antigravity first-party computer use when available and appropriate.
 - A compatible Codex Computer Use MCP bridge is the next native-application
   option when it is installed and healthy.
-- Use Peekaboo when it is installed and the task requires its macOS-specific
-  extended surface.
+- Use Peekaboo as the macOS fallback when first-party computer use and the
+  bridge are unavailable, and for its extended system and inspection surface.
 
 Do not claim that an adapter is available merely because this file names it.
 Discover the current session's tools and follow their directly matching skills
