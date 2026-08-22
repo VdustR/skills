@@ -136,8 +136,8 @@ file path unless `include_screenshot` is set.
 ## Protocol notes
 
 The bridge is a strict JSON-RPC 2.0 server on the MCP side: `jsonrpc: "2.0"` is
-required, a request without an id is treated as a notification and never
-answered, malformed JSON returns `-32700` with a null id, a call before
+required, a request with no id member at all is a notification and is never
+answered (an explicit `id: null` is a request and does get a response), malformed JSON returns `-32700` with a null id, a call before
 `initialize` returns `-32002`, and `protocolVersion` is negotiated against the
 versions the bridge knows rather than always claimed. Input is framed with a hard
 cap on the unterminated remainder, and the reader resynchronizes to the next

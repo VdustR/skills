@@ -264,6 +264,10 @@ class AppServerClient {
       onOverflow: (dropped) =>
         log(`discarded ${dropped} unterminated chars from app-server stdout`),
       onFrame: (line) => {
+        // A superseded child may still emit buffered output or a late reverse
+        // request. Answering it would write into the replacement child's
+        // session, so its frames are dropped rather than handled.
+        if (this.child !== child) return;
         const trimmed = line.trim();
         if (!trimmed) return;
         let msg;
@@ -281,6 +285,7 @@ class AppServerClient {
       maxChars: MAX_FRAME_CHARS,
       onOverflow: () => {},
       onFrame: (line) => {
+        if (this.child !== child) return;
         if (process.env.CODEX_CUA_BRIDGE_VERBOSE === "1") log("app-server:", line);
       },
     });
@@ -448,8 +453,13 @@ class AppServerClient {
     this.pending.clear();
     if (!child) return;
     await new Promise((resolve) => {
+      const escalate = setTimeout(() => {
+        log("app-server did not exit on SIGTERM; sending SIGKILL");
+        child.kill("SIGKILL");
+      }, 1000);
       const done = setTimeout(resolve, 2000);
       child.once("exit", () => {
+        clearTimeout(escalate);
         clearTimeout(done);
         resolve();
       });
@@ -1048,22 +1058,26 @@ function startMcpServer() {
     }
 
     const { id, method, params } = msg;
-    // A message without an id is a notification: it must never be answered,
-    // because a response with no id is not a valid JSON-RPC response.
-    const isNotification = id === undefined || id === null;
+    // Only an absent id makes a notification. `id: null` is a permitted, if
+    // discouraged, request id and must still receive a response.
+    const isNotification = !("id" in msg);
 
     if (typeof method !== "string") {
-      if (!isNotification) replyError(id, -32600, "invalid request: missing method");
+      if (!isNotification) replyError(id ?? null, -32600, "invalid request: missing method");
       return;
     }
     if (msg.jsonrpc !== "2.0") {
       if (!isNotification) {
-        replyError(id, -32600, `jsonrpc must be "2.0", received ${JSON.stringify(msg.jsonrpc)}`);
+        replyError(
+          id ?? null,
+          -32600,
+          `jsonrpc must be "2.0", received ${JSON.stringify(msg.jsonrpc)}`,
+        );
       }
       return;
     }
     if (!initialized && !isNotification && method !== "initialize" && method !== "ping") {
-      replyError(id, -32002, `server not initialized: call initialize before ${method}`);
+      replyError(id ?? null, -32002, `server not initialized: call initialize before ${method}`);
       return;
     }
     if (isNotification && method !== "notifications/initialized" && method !== "notifications/cancelled") {
@@ -1127,7 +1141,7 @@ function startMcpServer() {
           return;
         }
         default:
-          if (!isNotification) replyError(id, -32601, `method not found: ${method}`);
+          if (!isNotification) replyError(id ?? null, -32601, `method not found: ${method}`);
           return;
       }
     } catch (err) {
@@ -1137,9 +1151,12 @@ function startMcpServer() {
       }
       // Surface tool failures as tool results so the model can react and retry.
       if (method === "tools/call") {
-        reply(id, { content: [{ type: "text", text: `error: ${err.message}` }], isError: true });
+        reply(id ?? null, {
+          content: [{ type: "text", text: `error: ${err.message}` }],
+          isError: true,
+        });
       } else {
-        replyError(id, -32603, err.message);
+        replyError(id ?? null, -32603, err.message);
       }
     }
   };
