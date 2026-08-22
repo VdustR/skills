@@ -356,11 +356,17 @@ test("a mutating call reporting ok is not evidence the UI changed", { skip }, as
       const index = findIndex(await readTree(client), ...key);
       await client.callTool("click", { app: APP, element_index: index }, 90000);
     }
+    // The premise has to be proven, not inferred from "the display changed":
+    // if the Divide click had failed, the display would read 9 and Escape
+    // leaving 9 would still satisfy a mere inequality against the cleared state.
     const pending = displayValue(await readTree(client));
-    assert.notEqual(pending, before, "the pending operation is visible");
+    assert.notEqual(pending, before, "the entry is visible");
+    assert.match(pending, /÷/, "a pending operation must actually be established");
 
     const escaped = await client.callTool("press_key", { app: APP, key: "Escape" }, 90000);
-    assert.notEqual(escaped.result?.isError, true, "the keystroke is reported as delivered");
+    // The documented claim is about `ok` specifically, so assert that value
+    // rather than merely the absence of an error.
+    assert.equal(toolText(escaped).trim(), "ok", "the keystroke is reported as delivered");
     assert.equal(
       displayValue(await readTree(client)),
       pending,
