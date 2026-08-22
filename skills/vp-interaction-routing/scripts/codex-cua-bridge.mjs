@@ -73,6 +73,12 @@ function clampInt(raw, fallback, min, max) {
   return Math.min(max, Math.max(min, n));
 }
 
+function cancelledError(stage) {
+  const err = new Error(`request cancelled by the client ${stage}`);
+  err.cancelled = true;
+  return err;
+}
+
 function log(...parts) {
   process.stderr.write(`[${BRIDGE_NAME}] ${parts.join(" ")}\n`);
 }
@@ -419,8 +425,13 @@ class AppServerClient {
     return this.threadId;
   }
 
-  async callMcpTool(server, tool, args) {
+  async callMcpTool(server, tool, args, token) {
     const threadId = await this.ensureThread();
+    // Acquiring the serialization slot is not the last wait: on a cold or reset
+    // session ensureThread() awaits initialize and thread/start, which is long
+    // enough for a cancellation to arrive. Re-check before dispatching, so a
+    // cancelled mutating call is never actually performed.
+    if (token?.cancelled) throw cancelledError("while the session was starting");
     return this.request("mcpServer/tool/call", {
       server,
       threadId,
@@ -522,13 +533,9 @@ class Sky {
       // Calls are serialized, so a cancelled call may still be queued when the
       // cancellation arrives. Checking here is what stops a cancelled click
       // from being performed after the call ahead of it finishes.
-      if (token?.cancelled) {
-        const err = new Error("request cancelled by the client before it ran");
-        err.cancelled = true;
-        throw err;
-      }
+      if (token?.cancelled) throw cancelledError("before it ran");
       try {
-        const result = await this.appServer.callMcpTool("node_repl", "js", { code });
+        const result = await this.appServer.callMcpTool("node_repl", "js", { code }, token);
         const text = resultText(result);
         if (isErrorResult(result)) throw new Error(text);
         return text;

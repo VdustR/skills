@@ -134,6 +134,10 @@ file path unless `include_screenshot` is set.
 - Calls are serialized. The upstream `node_repl` session is one shared
   JavaScript context, so concurrent requests queue rather than interleave. Expect
   in-flight calls to complete in order, not in parallel.
+- **Cancellation is honored before the action, not after.** `notifications/cancelled`
+  is checked when a queued call reaches the front of the queue and again once the
+  session is ready, so a cancelled mutating call is never performed. A cancelled
+  request receives no response, as MCP requires.
 - **A timed-out call tears down the session.** The upstream snippet may still be
   running against shared REPL state, so the bridge abandons the app-server child
   and its `node_repl` session before releasing the queue. The next call starts a
