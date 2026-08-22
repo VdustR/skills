@@ -118,7 +118,12 @@ file path unless `include_screenshot` is set.
 - **Leave `include_screenshot` off** unless the accessibility text is
   insufficient. An embedded screenshot costs far more context than the tree.
 - Responses are capped at `CODEX_CUA_BRIDGE_MAX_CHARS` (default 40000) and the
-  cap is reported inline when it truncates.
+  cap is reported inline when it truncates. An embedded screenshot over
+  `CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES` (default 1500000) is replaced by its file
+  path.
+- Calls are serialized. The upstream `node_repl` session is one shared
+  JavaScript context, so concurrent requests queue rather than interleave. Expect
+  in-flight calls to complete in order, not in parallel.
 
 ## Authorization
 
@@ -126,6 +131,11 @@ The bridge performs no intent classification and enforces no action gate. A
 bridge call does not execute the Codex Computer Use confirmations policy, so the
 calling agent keeps its own authorization boundary and must confirm consequential
 UI actions with the user before invoking a mutating tool.
+
+Every tool carries MCP annotations so a host can gate mutating calls
+programmatically rather than by name: `readOnlyHint` is true for `health`,
+`list_apps`, and `get_app_state`, and `destructiveHint` is true for the nine
+action tools.
 
 When app-server asks the client to approve something, the bridge declines by
 default and records the request in `health`, because it must not stand in for the
@@ -138,6 +148,7 @@ deliberately.
 |----------|---------|---------|
 | `CODEX_CUA_BRIDGE_CODEX_BIN` | app-bundle search | path to `Contents/Resources/codex` |
 | `CODEX_CUA_BRIDGE_MAX_CHARS` | `40000` | text cap per response |
+| `CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES` | `1500000` | above this a screenshot is returned as a path |
 | `CODEX_CUA_BRIDGE_TIMEOUT_MS` | `60000` | per-call timeout |
 | `CODEX_CUA_BRIDGE_AUTO_APPROVE` | unset | `1` approves app-server approval requests |
 | `CODEX_CUA_BRIDGE_VERBOSE` | unset | `1` logs app-server stderr |

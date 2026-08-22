@@ -38,6 +38,12 @@ const MCP_PROTOCOL_VERSION = "2025-06-18";
 
 const MAX_CHARS = clampInt(process.env.CODEX_CUA_BRIDGE_MAX_CHARS, 40000, 500, 500000);
 const CALL_TIMEOUT_MS = clampInt(process.env.CODEX_CUA_BRIDGE_TIMEOUT_MS, 60000, 1000, 600000);
+const MAX_IMAGE_BYTES = clampInt(
+  process.env.CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES,
+  1500000,
+  10000,
+  20000000,
+);
 const AUTO_APPROVE = process.env.CODEX_CUA_BRIDGE_AUTO_APPROVE === "1";
 
 const ROUTING_NOTICE = [
@@ -96,6 +102,7 @@ function resolveCodexHome() {
 }
 
 function readAppVersion(codexBin) {
+  if (!codexBin) return null;
   // codexBin is <bundle>/Contents/Resources/codex
   const plist = codexBin.replace(/\/Contents\/Resources\/codex$/, "/Contents/Info.plist");
   if (!existsSync(plist)) return null;
@@ -112,11 +119,20 @@ function readAppVersion(codexBin) {
 
 class AppServerClient {
   constructor() {
-    this.codexBin = resolveCodexBin();
+    // Resolution failure must not crash startup: the MCP server still has to
+    // answer initialize and tools/list, and report the cause through `health`.
+    this.codexBin = null;
+    this.codexBinError = null;
+    try {
+      this.codexBin = resolveCodexBin();
+    } catch (err) {
+      this.codexBinError = err;
+    }
     this.child = null;
     this.nextId = 1;
     this.pending = new Map();
     this.threadId = null;
+    this.threadPromise = null;
     this.interceptedServerRequests = [];
     this.startPromise = null;
   }
@@ -128,20 +144,33 @@ class AppServerClient {
   }
 
   async #start() {
+    if (this.codexBinError) throw this.codexBinError;
     const env = { ...process.env, CODEX_HOME: resolveCodexHome() };
     this.child = spawn(this.codexBin, ["app-server", "--stdio"], {
       stdio: ["pipe", "pipe", "pipe"],
       env,
     });
-    this.child.on("exit", (code, signal) => {
-      const reason = `app-server exited (code=${code} signal=${signal})`;
+
+    const fail = (reason) => {
       log(reason);
-      for (const [, entry] of this.pending) entry.reject(new Error(reason));
+      for (const [, entry] of this.pending) {
+        clearTimeout(entry.timer);
+        entry.reject(new Error(reason));
+      }
       this.pending.clear();
       this.child = null;
       this.startPromise = null;
       this.threadId = null;
-    });
+      this.threadPromise = null;
+    };
+
+    // Without an `error` listener a failed spawn raises an uncaught exception
+    // and takes the whole bridge down.
+    this.child.on("error", (err) => fail(`app-server failed to start: ${err.message}`));
+    this.child.on("exit", (code, signal) =>
+      fail(`app-server exited (code=${code} signal=${signal})`),
+    );
+    this.child.stdin.on("error", (err) => log(`app-server stdin error: ${err.message}`));
 
     createInterface({ input: this.child.stdout }).on("line", (line) => {
       const trimmed = line.trim();
@@ -234,6 +263,17 @@ class AppServerClient {
   async ensureThread() {
     await this.start();
     if (this.threadId) return this.threadId;
+    // Concurrent first calls must not each start a thread.
+    this.threadPromise ??= this.#startThread();
+    try {
+      return await this.threadPromise;
+    } catch (err) {
+      this.threadPromise = null;
+      throw err;
+    }
+  }
+
+  async #startThread() {
     const result = await this.request("thread/start", {
       cwd: tmpdir(),
       ephemeral: true,
@@ -292,14 +332,31 @@ function isErrorResult(result) {
 class Sky {
   constructor(appServer) {
     this.appServer = appServer;
+    this.queue = Promise.resolve();
+  }
+
+  /**
+   * node_repl is one persistent JavaScript session shared by every call, and
+   * each snippet assigns the same scratch variables. Concurrent calls would
+   * interleave and read each other's state, so execution is serialized.
+   */
+  #serialize(task) {
+    const run = this.queue.then(task, task);
+    this.queue = run.then(
+      () => {},
+      () => {},
+    );
+    return run;
   }
 
   /** Run JS in the persistent node_repl session and return its written text. */
-  async js(code) {
-    const result = await this.appServer.callMcpTool("node_repl", "js", { code });
-    const text = resultText(result);
-    if (isErrorResult(result)) throw new Error(text);
-    return text;
+  js(code) {
+    return this.#serialize(async () => {
+      const result = await this.appServer.callMcpTool("node_repl", "js", { code });
+      const text = resultText(result);
+      if (isErrorResult(result)) throw new Error(text);
+      return text;
+    });
   }
 
   /**
@@ -571,10 +628,21 @@ function cap(text) {
   );
 }
 
+/**
+ * The upstream sky API rejects a string element_index even though callers
+ * routinely send one, so numbers are normalized here and rejected loudly when
+ * they are not actually numeric.
+ */
 function coerceIntegers(args) {
   const out = { ...args };
-  if (out.element_index !== undefined) out.element_index = Number(out.element_index);
-  if (out.click_count !== undefined) out.click_count = Number(out.click_count);
+  for (const key of ["element_index", "click_count"]) {
+    if (out[key] === undefined) continue;
+    const n = Number(out[key]);
+    if (!Number.isInteger(n)) {
+      throw new Error(`${key} must be an integer, received ${JSON.stringify(out[key])}`);
+    }
+    out[key] = n;
+  }
   return out;
 }
 
@@ -593,17 +661,25 @@ function readScreenshot(url) {
     return null;
   }
   if (!existsSync(path)) return null;
+  const bytes = readFileSync(path);
+  if (bytes.length > MAX_IMAGE_BYTES) {
+    return {
+      path,
+      tooLarge: `screenshot is ${bytes.length} bytes, over ` +
+        `CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES=${MAX_IMAGE_BYTES}; read it from ${path} instead`,
+    };
+  }
   const ext = (basename(path).match(/\.[a-z]+$/i) || [""])[0].toLowerCase();
   return {
     path,
     mimeType: IMAGE_MIME[ext] || "application/octet-stream",
-    data: readFileSync(path).toString("base64"),
+    data: bytes.toString("base64"),
   };
 }
 
 async function runTool(ctx, name, rawArgs) {
   const args = coerceIntegers(rawArgs ?? {});
-  const { sky, appServer } = ctx;
+  const { sky } = ctx;
 
   if (name === "health") return runHealth(ctx);
 
@@ -636,7 +712,8 @@ async function runTool(ctx, name, rawArgs) {
     ];
     if (include_screenshot && state.screenshot?.url) {
       const shot = readScreenshot(state.screenshot.url);
-      if (shot) content.push({ type: "image", data: shot.data, mimeType: shot.mimeType });
+      if (shot?.data) content.push({ type: "image", data: shot.data, mimeType: shot.mimeType });
+      else if (shot?.tooLarge) content.push({ type: "text", text: shot.tooLarge });
       else content.push({ type: "text", text: `screenshot unreadable: ${state.screenshot.url}` });
     }
     return { content };
@@ -658,7 +735,7 @@ async function runHealth(ctx) {
       call_timeout_ms: CALL_TIMEOUT_MS,
       auto_approve: AUTO_APPROVE,
     },
-    codex_binary: appServer.codexBin,
+    codex_binary: appServer.codexBin ?? `unresolved: ${appServer.codexBinError?.message}`,
     chatgpt_app_version: readAppVersion(appServer.codexBin),
     codex_home: resolveCodexHome(),
     checks: {},
@@ -788,10 +865,15 @@ function startMcpServer() {
           return;
         case "tools/list":
           reply(id, {
-            tools: TOOLS.map(({ name, description, inputSchema }) => ({
+            tools: TOOLS.map(({ name, description, inputSchema, mutating }) => ({
               name,
               description,
               inputSchema,
+              annotations: {
+                readOnlyHint: !mutating,
+                destructiveHint: Boolean(mutating),
+                openWorldHint: true,
+              },
             })),
           });
           return;
@@ -830,6 +912,8 @@ function startMcpServer() {
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
   process.stdin.on("close", shutdown);
+  process.on("exit", () => appServer.stop());
+  process.on("unhandledRejection", (err) => log(`unhandled rejection: ${err}`));
 }
 
 /* ------------------------------------------------------------------ *
