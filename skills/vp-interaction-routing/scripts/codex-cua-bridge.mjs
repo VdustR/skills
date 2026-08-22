@@ -819,6 +819,61 @@ function cap(text) {
 }
 
 /**
+ * Validate arguments against the tool's advertised inputSchema. Only the subset
+ * of JSON Schema these tools actually declare is implemented. Without this the
+ * schema is documentation rather than a boundary: undeclared properties would
+ * reach `@oai/sky` even though every tool declares
+ * `additionalProperties: false`.
+ */
+function validateArgs(toolName, schema, args) {
+  if (args === null || typeof args !== "object" || Array.isArray(args)) {
+    throw new Error(`${toolName}: arguments must be an object`);
+  }
+  const properties = schema.properties ?? {};
+  const errors = [];
+
+  for (const key of schema.required ?? []) {
+    if (!(key in args)) errors.push(`missing required property "${key}"`);
+  }
+
+  for (const [key, value] of Object.entries(args)) {
+    if (key.startsWith("_")) continue; // reserved for protocol metadata
+    const spec = properties[key];
+    if (!spec) {
+      if (schema.additionalProperties === false) {
+        errors.push(`unknown property "${key}"`);
+      }
+      continue;
+    }
+    if (value === undefined) continue;
+    const expected = spec.type;
+    const typeOk =
+      expected === undefined ||
+      (expected === "string" && typeof value === "string") ||
+      (expected === "boolean" && typeof value === "boolean") ||
+      (expected === "number" && typeof value === "number" && Number.isFinite(value)) ||
+      (expected === "integer" && Number.isInteger(value));
+    if (!typeOk) {
+      errors.push(`"${key}" must be ${expected === "integer" ? "an integer" : `a ${expected}`}`);
+      continue;
+    }
+    if (spec.enum && !spec.enum.includes(value)) {
+      errors.push(`"${key}" must be one of ${spec.enum.map((v) => JSON.stringify(v)).join(", ")}`);
+    }
+    if (typeof value === "number") {
+      if (spec.minimum !== undefined && value < spec.minimum) {
+        errors.push(`"${key}" must be >= ${spec.minimum}`);
+      }
+      if (spec.maximum !== undefined && value > spec.maximum) {
+        errors.push(`"${key}" must be <= ${spec.maximum}`);
+      }
+    }
+  }
+
+  if (errors.length) throw new Error(`${toolName}: ${errors.join("; ")}`);
+}
+
+/**
  * The upstream sky API rejects a string element_index even though callers
  * routinely send one, so numbers are normalized here and rejected loudly when
  * they are not actually numeric.
@@ -878,7 +933,10 @@ function readScreenshot(url) {
 }
 
 async function runTool(ctx, name, rawArgs) {
+  const tool = TOOL_BY_NAME.get(name);
+  if (!tool) throw new Error(`unknown tool: ${name}`);
   const args = coerceIntegers(rawArgs ?? {});
+  validateArgs(name, tool.inputSchema, args);
   const { sky } = ctx;
 
   if (name === "health") return runHealth(ctx);
@@ -919,8 +977,6 @@ async function runTool(ctx, name, rawArgs) {
     return { content };
   }
 
-  const tool = TOOL_BY_NAME.get(name);
-  if (!tool) throw new Error(`unknown tool: ${name}`);
   return { content: [{ type: "text", text: cap(await sky.call(name, args)) }] };
 }
 
