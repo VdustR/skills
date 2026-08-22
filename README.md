@@ -10,6 +10,12 @@ Preview available skills:
 npx -y skills@1.5.3 add VdustR/skills --list
 ```
 
+Install all skills globally for all supported agents:
+
+```bash
+npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent '*' -y
+```
+
 Install all skills globally for Codex:
 
 ```bash
@@ -20,6 +26,12 @@ Install all skills globally for Claude Code:
 
 ```bash
 npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent claude-code
+```
+
+Install all skills globally for Antigravity:
+
+```bash
+npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent antigravity
 ```
 
 Install selected skills:
@@ -89,6 +101,10 @@ GitHub platform behavior: attaching media and files to issues and PRs, markdown 
 ### vp-guided-focus
 
 Use structured questions to align on requirements before planning or complex tasks.
+
+### vp-interaction-routing
+
+Choose among connectors, APIs, CLIs, browser sessions, computer use, and macOS desktop automation.
 
 ### vp-long-running-processes
 

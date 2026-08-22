@@ -37,8 +37,10 @@ Default to the pinned `npx skills@1.5.3` CLI for installation and management:
 
 ```bash
 npx -y skills@1.5.3 add VdustR/skills --list
+npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent '*' -y
 npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent codex
 npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent claude-code
+npx -y skills@1.5.3 add VdustR/skills --skill '*' -g --agent antigravity
 ```
 
 Do not recommend plugin marketplace installation from this repository by default.
