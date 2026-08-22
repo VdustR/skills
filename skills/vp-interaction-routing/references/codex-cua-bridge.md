@@ -133,6 +133,17 @@ file path unless `include_screenshot` is set.
   fresh session; the accessibility-tree diff baseline survives because it lives
   in the Computer Use service, not in the REPL.
 
+## Protocol notes
+
+The bridge is a strict JSON-RPC 2.0 server on the MCP side: `jsonrpc: "2.0"` is
+required, a request without an id is treated as a notification and never
+answered, malformed JSON returns `-32700` with a null id, a call before
+`initialize` returns `-32002`, and `protocolVersion` is negotiated against the
+versions the bridge knows rather than always claimed. Input is framed with a hard
+cap on the unterminated remainder, and the reader resynchronizes to the next
+newline after an overflow instead of splicing a truncated frame onto the next
+one.
+
 ## Authorization
 
 The bridge performs no intent classification and enforces no action gate. A
@@ -164,7 +175,7 @@ cannot approve an unclassified request. Set it only deliberately.
 | `CODEX_CUA_BRIDGE_CODEX_BIN` | app-bundle search | path to `Contents/Resources/codex` |
 | `CODEX_CUA_BRIDGE_MAX_CHARS` | `40000` | text cap per response |
 | `CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES` | `1500000` | above this a screenshot is returned as a path |
-| `CODEX_CUA_BRIDGE_MAX_FRAME_CHARS` | `33554432` | maximum JSON-RPC frame accepted on either side |
+| `CODEX_CUA_BRIDGE_MAX_FRAME_CHARS` | `33554432` | maximum unterminated JSON-RPC input buffered on either side |
 | `CODEX_CUA_BRIDGE_TIMEOUT_MS` | `60000` | per-call timeout |
 | `CODEX_CUA_BRIDGE_AUTO_APPROVE` | unset | `1` approves app-server approval requests |
 | `CODEX_CUA_BRIDGE_VERBOSE` | unset | `1` logs app-server stderr |

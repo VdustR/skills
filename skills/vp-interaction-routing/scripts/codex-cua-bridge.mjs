@@ -30,7 +30,6 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createInterface } from "node:readline";
 
 const BRIDGE_NAME = "codex-cua-bridge";
 const BRIDGE_VERSION = "0.1.0";
@@ -76,6 +75,46 @@ function clampInt(raw, fallback, min, max) {
 
 function log(...parts) {
   process.stderr.write(`[${BRIDGE_NAME}] ${parts.join(" ")}\n`);
+}
+
+/**
+ * Split a stream into newline-delimited frames with a hard cap on the
+ * unterminated remainder. `readline` accumulates a full line before emitting
+ * it, so checking length in its callback cannot bound memory: input with no
+ * newline grows without limit.
+ */
+function readFrames(stream, { maxChars, onFrame, onOverflow }) {
+  let buffer = "";
+  let resyncing = false;
+  stream.setEncoding("utf8");
+  stream.on("data", (chunk) => {
+    buffer += chunk;
+
+    // After an overflow the stream is mid-frame. Discard through the next
+    // newline instead of gluing the truncated remainder onto the next frame.
+    if (resyncing) {
+      const boundary = buffer.indexOf("\n");
+      if (boundary === -1) {
+        buffer = "";
+        return;
+      }
+      buffer = buffer.slice(boundary + 1);
+      resyncing = false;
+    }
+
+    let index;
+    while ((index = buffer.indexOf("\n")) !== -1) {
+      const frame = buffer.slice(0, index);
+      buffer = buffer.slice(index + 1);
+      onFrame(frame);
+    }
+    if (buffer.length > maxChars) {
+      const dropped = buffer.length;
+      buffer = "";
+      resyncing = true;
+      onOverflow(dropped);
+    }
+  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -193,7 +232,13 @@ class AppServerClient {
       env,
     });
 
+    const child = this.child;
     const fail = (reason) => {
+      // Events from a superseded child must not clear the current session.
+      if (this.child !== child) {
+        log(`ignoring event from superseded app-server: ${reason}`);
+        return;
+      }
       log(reason);
       for (const [, entry] of this.pending) {
         clearTimeout(entry.timer);
@@ -208,31 +253,36 @@ class AppServerClient {
 
     // Without an `error` listener a failed spawn raises an uncaught exception
     // and takes the whole bridge down.
-    this.child.on("error", (err) => fail(`app-server failed to start: ${err.message}`));
-    this.child.on("exit", (code, signal) =>
+    child.on("error", (err) => fail(`app-server failed to start: ${err.message}`));
+    child.on("exit", (code, signal) =>
       fail(`app-server exited (code=${code} signal=${signal})`),
     );
-    this.child.stdin.on("error", (err) => log(`app-server stdin error: ${err.message}`));
+    child.stdin.on("error", (err) => log(`app-server stdin error: ${err.message}`));
 
-    createInterface({ input: this.child.stdout }).on("line", (line) => {
-      if (line.length > MAX_FRAME_CHARS) {
-        log(`dropping app-server frame of ${line.length} chars, over MAX_FRAME_CHARS`);
-        return;
-      }
-      const trimmed = line.trim();
-      if (!trimmed) return;
-      let msg;
-      try {
-        msg = JSON.parse(trimmed);
-      } catch {
-        return; // non-JSON banner output
-      }
-      this.#handle(msg);
+    readFrames(child.stdout, {
+      maxChars: MAX_FRAME_CHARS,
+      onOverflow: (dropped) =>
+        log(`discarded ${dropped} unterminated chars from app-server stdout`),
+      onFrame: (line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        let msg;
+        try {
+          msg = JSON.parse(trimmed);
+        } catch {
+          return; // non-JSON banner output
+        }
+        this.#handle(msg);
+      },
     });
 
     // app-server stderr is diagnostic only; surface it without mixing into stdout.
-    createInterface({ input: this.child.stderr }).on("line", (line) => {
-      if (process.env.CODEX_CUA_BRIDGE_VERBOSE === "1") log("app-server:", line);
+    readFrames(child.stderr, {
+      maxChars: MAX_FRAME_CHARS,
+      onOverflow: () => {},
+      onFrame: (line) => {
+        if (process.env.CODEX_CUA_BRIDGE_VERBOSE === "1") log("app-server:", line);
+      },
     });
 
     await this.request("initialize", {
@@ -980,13 +1030,9 @@ function startMcpServer() {
   const replyError = (id, code, message) =>
     send({ jsonrpc: "2.0", id, error: { code, message } });
 
-  createInterface({ input: process.stdin }).on("line", async (line) => {
+  const handleFrame = async (line) => {
     const trimmed = line.trim();
     if (!trimmed) return;
-    if (trimmed.length > MAX_FRAME_CHARS) {
-      replyError(null, -32600, `request exceeds ${MAX_FRAME_CHARS} characters`);
-      return;
-    }
     let msg;
     try {
       msg = JSON.parse(trimmed);
@@ -1002,17 +1048,26 @@ function startMcpServer() {
     }
 
     const { id, method, params } = msg;
+    // A message without an id is a notification: it must never be answered,
+    // because a response with no id is not a valid JSON-RPC response.
+    const isNotification = id === undefined || id === null;
 
     if (typeof method !== "string") {
-      replyError(id ?? null, -32600, "invalid request: missing method");
+      if (!isNotification) replyError(id, -32600, "invalid request: missing method");
       return;
     }
-    if (msg.jsonrpc !== undefined && msg.jsonrpc !== "2.0") {
-      replyError(id ?? null, -32600, `unsupported jsonrpc version: ${msg.jsonrpc}`);
+    if (msg.jsonrpc !== "2.0") {
+      if (!isNotification) {
+        replyError(id, -32600, `jsonrpc must be "2.0", received ${JSON.stringify(msg.jsonrpc)}`);
+      }
       return;
     }
-    if (!initialized && id !== undefined && method !== "initialize" && method !== "ping") {
+    if (!initialized && !isNotification && method !== "initialize" && method !== "ping") {
       replyError(id, -32002, `server not initialized: call initialize before ${method}`);
+      return;
+    }
+    if (isNotification && method !== "notifications/initialized" && method !== "notifications/cancelled") {
+      log(`ignoring unexpected notification: ${method}`);
       return;
     }
 
@@ -1072,11 +1127,11 @@ function startMcpServer() {
           return;
         }
         default:
-          if (id !== undefined) replyError(id, -32601, `method not found: ${method}`);
+          if (!isNotification) replyError(id, -32601, `method not found: ${method}`);
           return;
       }
     } catch (err) {
-      if (id === undefined) {
+      if (isNotification) {
         log(`error handling ${method}: ${err.message}`);
         return;
       }
@@ -1087,6 +1142,15 @@ function startMcpServer() {
         replyError(id, -32603, err.message);
       }
     }
+  };
+
+  readFrames(process.stdin, {
+    maxChars: MAX_FRAME_CHARS,
+    onOverflow: (dropped) =>
+      replyError(null, -32600, `discarded ${dropped} characters with no frame terminator`),
+    onFrame: (line) => {
+      handleFrame(line).catch((err) => log(`frame handler failed: ${err.message}`));
+    },
   });
 
   const shutdown = () => {
