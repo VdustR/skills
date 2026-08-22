@@ -1168,6 +1168,12 @@ function startMcpServer() {
     // discouraged, request id and must still receive a response.
     const isNotification = !("id" in msg);
 
+    // JSON-RPC permits only a string, number, or null id. Echoing anything else
+    // back in a response would break a client correlating on conforming ids.
+    if (!isNotification && id !== null && typeof id !== "string" && typeof id !== "number") {
+      replyError(null, -32600, `invalid request: id must be a string, number, or null`);
+      return;
+    }
     if (typeof method !== "string") {
       if (!isNotification) replyError(id ?? null, -32600, "invalid request: missing method");
       return;
