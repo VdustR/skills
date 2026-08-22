@@ -7,6 +7,8 @@
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import { BridgeClient, liveUnavailable, toolText } from "./helpers/mcp-client.mjs";
@@ -139,6 +141,14 @@ test("health reports the live upstream inventory rather than a hardcoded list", 
     assert.equal(report.checks.node_repl_configured, true);
     assert.deepEqual(report.checks.missing_sky_functions, []);
     assert.ok(report.checks.sky_surface.includes("get_app_state"));
+    // Evidence the surface is reflected off the live upstream rather than
+    // restated from the tool table: `target` is a property of the sky object,
+    // not one of the functions the bridge needs, so a hardcoded list of
+    // requirements would not contain it.
+    assert.ok(
+      report.checks.sky_surface.includes("target"),
+      `sky_surface looks hardcoded rather than reflected: ${report.checks.sky_surface.join()}`,
+    );
     assert.ok(report.chatgpt_app_version, "the ChatGPT.app version is reported");
     assert.match(report.routing_notice, /do not use this bridge/i);
   });
@@ -169,6 +179,11 @@ test("a screenshot is omitted unless asked for, and its path is always reported"
       90000,
     );
     assert.ok(withImage.result.content.some((part) => part.type === "image"));
+    assert.match(
+      toolText(withImage),
+      /screenshot: file:\/\//,
+      "the path is reported even when the image is embedded",
+    );
   });
 });
 
@@ -181,7 +196,20 @@ test("an oversized screenshot is returned as a path instead of an image", { skip
         90000,
       );
       assert.ok(!response.result.content.some((part) => part.type === "image"));
-      assert.match(toolText(response), /over CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES/);
+      const text = toolText(response);
+      assert.match(text, /over CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES/);
+
+      // The cap promises a path in place of the image, so the path must be
+      // there and must actually resolve to the file.
+      // The path can contain spaces, so match up to the trailing word rather
+      // than to the first whitespace.
+      const named = text.match(/read it from (.+) instead/);
+      assert.ok(named, `no usable path offered in place of the image: ${text}`);
+      assert.ok(existsSync(named[1]), `the offered path does not exist: ${named[1]}`);
+
+      const reported = toolText(response).match(/screenshot: (file:\S+)/);
+      assert.ok(reported, "the screenshot URL is still reported");
+      assert.ok(existsSync(fileURLToPath(decodeURI(reported[1]))), "the reported URL resolves");
     },
     { CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES: "10000" },
   );
@@ -251,7 +279,9 @@ test("cancelling a queued click prevents it from ever reaching the UI", { skip }
     const deadline = Date.now() + 60000;
     while (Date.now() < deadline && !seen.has(occupyId)) {
       const message = await client.next(5000);
-      if (!message) break;
+      // A quiet interval is not the end of the wait: the occupying read can
+      // legitimately take longer than one poll. The deadline is the bound.
+      if (!message) continue;
       if (message.id !== undefined) seen.add(message.id);
     }
     assert.ok(seen.has(occupyId), "the occupying call still answers");
