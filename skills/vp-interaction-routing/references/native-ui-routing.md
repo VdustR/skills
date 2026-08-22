@@ -19,6 +19,18 @@ server. Delegating an entire task to a separate Codex agent through a generic
 agent MCP server is a different route; do not describe it as direct access to
 Codex Computer Use or assume that it exposes the same tools.
 
+This skill ships one such bridge at
+[scripts/codex-cua-bridge.mjs](../scripts/codex-cua-bridge.mjs). Read
+[references/codex-cua-bridge.md](codex-cua-bridge.md) for its requirements,
+registration, verification procedure, tool surface, and cost comparison against
+Peekaboo.
+
+**The bridge is for harnesses other than Codex.** Codex reaches the same
+capability natively through its bundled `node_repl` and `@oai/sky` surface, so
+routing Codex through a bridge adds a hop, loses the integration, and moves the
+action outside the Codex Computer Use confirmations policy. When operating as
+Codex, use the first-party surface and do not register or call a bridge.
+
 Treat the bridge as an optional capability, not a universal dependency:
 
 - treat bridge installation or registration as a persistent, privileged
@@ -27,7 +39,8 @@ Treat the bridge as an optional capability, not a universal dependency:
   bridge is an official Codex component;
 - require a compatible macOS host and installed official Computer Use
   component;
-- verify bridge health and upstream tool inventory before relying on it;
+- verify bridge health and upstream tool inventory before relying on it, and
+  reverify after a host application update rather than assuming continuity;
 - pin or compatibility-test the bridge because app-server surfaces may change;
 - do not assume it works while the Mac is locked;
 - apply the host agent's authorization policy before mutating UI because a
