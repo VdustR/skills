@@ -819,11 +819,16 @@ function cap(text) {
 }
 
 /**
- * Validate arguments against the tool's advertised inputSchema. Only the subset
- * of JSON Schema these tools actually declare is implemented. Without this the
- * schema is documentation rather than a boundary: undeclared properties would
- * reach `@oai/sky` even though every tool declares
- * `additionalProperties: false`.
+ * Validate arguments against the tool's advertised inputSchema and return only
+ * the declared properties. Only the subset of JSON Schema these tools actually
+ * declare is implemented. Without this the schema is documentation rather than a
+ * boundary: undeclared properties would reach `@oai/sky` even though every tool
+ * declares `additionalProperties: false`.
+ *
+ * Returning an allowlisted copy rather than validating in place matters:
+ * protocol-reserved `_`-prefixed keys are tolerated without an error, but they
+ * are not forwarded either, so they cannot be used to smuggle an undeclared
+ * parameter past the boundary.
  */
 function validateArgs(toolName, schema, args) {
   if (args === null || typeof args !== "object" || Array.isArray(args)) {
@@ -836,16 +841,19 @@ function validateArgs(toolName, schema, args) {
     if (!(key in args)) errors.push(`missing required property "${key}"`);
   }
 
+  const allowed = {};
   for (const [key, value] of Object.entries(args)) {
-    if (key.startsWith("_")) continue; // reserved for protocol metadata
     const spec = properties[key];
     if (!spec) {
-      if (schema.additionalProperties === false) {
+      // `_`-prefixed keys are reserved for protocol metadata: tolerated here,
+      // but never forwarded, since they are not part of the declared surface.
+      if (schema.additionalProperties === false && !key.startsWith("_")) {
         errors.push(`unknown property "${key}"`);
       }
       continue;
     }
     if (value === undefined) continue;
+    allowed[key] = value;
     const expected = spec.type;
     const typeOk =
       expected === undefined ||
@@ -871,6 +879,7 @@ function validateArgs(toolName, schema, args) {
   }
 
   if (errors.length) throw new Error(`${toolName}: ${errors.join("; ")}`);
+  return allowed;
 }
 
 /**
@@ -935,8 +944,9 @@ function readScreenshot(url) {
 async function runTool(ctx, name, rawArgs) {
   const tool = TOOL_BY_NAME.get(name);
   if (!tool) throw new Error(`unknown tool: ${name}`);
-  const args = coerceIntegers(rawArgs ?? {});
-  validateArgs(name, tool.inputSchema, args);
+  // Only the declared properties survive validation, so nothing undeclared can
+  // reach the upstream API.
+  const args = validateArgs(name, tool.inputSchema, coerceIntegers(rawArgs ?? {}));
   const { sky } = ctx;
 
   if (name === "health") return runHealth(ctx);

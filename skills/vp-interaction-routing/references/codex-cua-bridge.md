@@ -138,8 +138,10 @@ file path unless `include_screenshot` is set.
 Tool arguments are validated against each tool's advertised `inputSchema`
 before the call reaches Computer Use: required properties, declared types,
 enums, numeric bounds, and `additionalProperties: false` are all enforced, so the
-schema is a boundary rather than documentation. A numeric string is still
-accepted where an integer is declared, because callers routinely send one.
+schema is a boundary rather than documentation. Only declared properties are
+forwarded, so a protocol-reserved `_`-prefixed key is tolerated without an error
+but never reaches Computer Use. A numeric string is still accepted where an
+integer is declared, because callers routinely send one.
 
 The bridge is a strict JSON-RPC 2.0 server on the MCP side: `jsonrpc: "2.0"` is
 required, a request with no id member at all is a notification and is never
