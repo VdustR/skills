@@ -167,6 +167,22 @@ while IFS= read -r skill_dir; do
   mentions_skill "$openai_yaml" "$skill_name" || fail "$openai_yaml default_prompt must mention \$$skill_name"
 done < <(find skills -mindepth 1 -maxdepth 1 -type d | sort)
 
-node --test tests/vp-skills/skill-agent-table.test.mjs
+# Runs every suite under tests/. Suites needing macOS with Computer Use skip
+# themselves rather than failing, so this stays green in CI.
+#
+# An unmatched glob would be passed to node literally, and node exits 0 having
+# run nothing, so validation would stay green while testing nothing. Collect the
+# suites first and fail when there are none.
+test_suites=()
+while IFS= read -r suite; do
+  test_suites+=("$suite")
+done < <(find tests -type f -name '*.test.mjs' | sort)
+
+[ "${#test_suites[@]}" -gt 0 ] || fail "no test suites found under tests/"
+
+# One suite at a time: the live suite drives a single shared macOS UI, and
+# parallel files also saturate the machine enough to trip request timeouts.
+node --test --test-concurrency=1 "${test_suites[@]}"
+printf 'Ran %s test suites.\n' "${#test_suites[@]}"
 
 printf 'Validated %s skills.\n' "$(wc -l < "$actual_skills" | tr -d ' ')"
