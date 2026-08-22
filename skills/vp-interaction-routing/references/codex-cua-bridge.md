@@ -70,7 +70,9 @@ it needs no MCP client:
 node ~/.agents/skills/vp-interaction-routing/scripts/codex-cua-bridge.mjs --health
 ```
 
-A healthy report ends with `"verdict": "healthy"` and shows:
+A healthy report's `verdict` begins with `healthy` and carries the reason after
+it, currently `healthy: Computer Use is reachable through this bridge`, so match
+the prefix rather than the whole string. It also shows:
 
 | Field | What it proves |
 |-------|----------------|
@@ -85,8 +87,10 @@ A healthy report ends with `"verdict": "healthy"` and shows:
 Re-run it after a ChatGPT.app update. `app-server` is an experimental protocol
 and its surface can change between versions; treat a failed handshake or a
 shrunken `sky_surface` as a compatibility break, not a transient error. The
-verdict is `unhealthy` whenever `missing_sky_functions` is non-empty, so a
-renamed upstream function is reported rather than passing silently.
+verdict begins with `unhealthy` whenever `missing_sky_functions` is non-empty,
+naming what is missing, so a renamed upstream function is reported rather than
+passing silently. Both prefixes are asserted by the test suites, so match on the
+prefix and treat the text after it as a reason for a human.
 
 Other diagnostics:
 
