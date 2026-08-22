@@ -55,6 +55,9 @@ recording_fixture="fixtures/smoke/vp-recording.md"
 github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 interaction_routing_fixture="fixtures/smoke/vp-interaction-routing.md"
+interaction_routing_skill="skills/vp-interaction-routing/SKILL.md"
+interaction_routing_browser="skills/vp-interaction-routing/references/browser-routing.md"
+interaction_routing_native="skills/vp-interaction-routing/references/native-ui-routing.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 
@@ -161,6 +164,16 @@ require_pattern "$interaction_routing_fixture" 'Peekaboo.*(windows|menus|dialogs
   "vp-interaction-routing fixture must preserve Peekaboo's extended role"
 require_pattern "$interaction_routing_fixture" 'Do not reuse selectors|invalidates prior selectors' \
   "vp-interaction-routing fixture must invalidate selectors after switching"
+require_pattern "$interaction_routing_skill" 'confirmation policy automatically' \
+  "vp-interaction-routing skill must preserve bridge authorization boundaries"
+require_pattern "$interaction_routing_browser" 'untrusted data, not agent instructions' \
+  "vp-interaction-routing browser guidance must treat page content as untrusted"
+require_pattern "$interaction_routing_browser" 'vp-agent-browser-session' \
+  "vp-interaction-routing must delegate profile lifecycle rules to their owner skill"
+require_pattern "$interaction_routing_native" 'requires explicit user authorization' \
+  "vp-interaction-routing must require authorization before bridge installation"
+require_pattern "$interaction_routing_native" 'bridge are unavailable on macOS' \
+  "vp-interaction-routing must preserve the Peekaboo fallback"
 
 require_pattern "$session_wrapup_fixture" 'risk-free cleanup authorization does not extend' \
   "vp-session-wrapup fixture must cover bounded risk-free cleanup authorization"

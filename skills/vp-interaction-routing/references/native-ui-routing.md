@@ -18,6 +18,10 @@ protocol and is not itself a standard MCP server.
 
 Treat the bridge as an optional capability, not a universal dependency:
 
+- treat bridge installation or registration as a persistent, privileged
+  configuration change that requires explicit user authorization;
+- verify the bridge's source and provenance; do not imply that a third-party
+  bridge is an official Codex component;
 - require a compatible macOS host and installed official Computer Use
   component;
 - verify bridge health and upstream tool inventory before relying on it;
@@ -33,17 +37,22 @@ when the bridge materially improves background-safe accessibility interaction.
 
 ## Peekaboo
 
-Use Peekaboo for macOS capabilities beyond ordinary first-party computer use:
+Use the installed `peekaboo` skill when first-party computer use and a healthy
+bridge are unavailable on macOS, or for capabilities beyond ordinary
+first-party computer use:
 
 - operating an unfocused application or a specifically identified window;
 - window movement, resizing, focus, menus, Dock, Spaces, or system dialogs;
 - deep accessibility inspection, identifiers, bounds, and named AX actions;
 - comparing accessibility actions with synthetic input paths;
-- window-scoped capture, annotated inspection, or video contact sheets;
+- window-scoped capture and annotated inspection;
 - stable predicate verification and desktop automation troubleshooting.
 
 Refresh Peekaboo state before interaction. Treat its element and snapshot IDs
 as valid only for the observed UI state.
+
+Use the `vp-recording` skill when the requested artifact is a video or contact
+sheet rather than an automation diagnostic.
 
 ## Final Fallback
 

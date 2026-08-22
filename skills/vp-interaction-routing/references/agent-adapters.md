@@ -16,8 +16,9 @@ file records routing intent rather than a permanent tool inventory.
 ## Claude Code
 
 - Prefer MCP connectors, APIs, and repository CLIs for semantic operations.
-- Use its connected browser tooling for the user's real browser session. Use
-  agent-browser for isolated or managed-profile automation.
+- Use browser tooling that demonstrably carries the user's real browser session
+  when shared state is required. Use agent-browser for isolated or
+  managed-profile automation.
 - Use Claude Code first-party computer use when available and appropriate.
 - A compatible Codex Computer Use MCP bridge is the next native-application
   option when it is installed and healthy.

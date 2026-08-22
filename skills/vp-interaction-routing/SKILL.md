@@ -5,6 +5,8 @@ description: >-
   and services. Use before browser or desktop automation, especially when
   choosing among connectors, APIs, CLIs, Chrome session sharing, agent-browser,
   first-party computer use, the Codex Computer Use bridge, and Peekaboo.
+  Boundary: route interactions only; use the directly matching browser,
+  profile-management, desktop-automation, or recording skill to execute them.
 ---
 
 # Interaction Routing
