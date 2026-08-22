@@ -1,0 +1,272 @@
+// Live coverage for the Codex Computer Use bridge. These reach the real Computer
+// Use service through `codex app-server`, so they need macOS with ChatGPT.app
+// and its Computer Use component. Everywhere else they skip.
+//
+// Calculator is the fixture: it ships with macOS, exposes a stable accessibility
+// tree, and its display makes a performed click observable.
+
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import test from "node:test";
+
+import { BridgeClient, liveUnavailable, toolText } from "./helpers/mcp-client.mjs";
+
+const unavailable = liveUnavailable();
+// Node treats any non-undefined `skip` value as a skip directive, so an absent
+// reason must be `false` rather than null or the whole suite silently skips.
+const skip = unavailable ?? false;
+const APP = "Calculator";
+
+async function withSession(run, env) {
+  const client = new BridgeClient({ env });
+  try {
+    await client.initialize();
+    await run(client);
+  } finally {
+    client.close();
+  }
+}
+
+/** Element indexes, parsed from a full accessibility read. Valid only for that read. */
+function indexes(tree) {
+  const found = new Map();
+  for (const line of tree.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || !/^\d/.test(trimmed)) continue;
+    found.set(trimmed, Number.parseInt(trimmed, 10));
+  }
+  return found;
+}
+
+/**
+ * First element matching any of the alternatives. Calculator relabels controls
+ * as its state changes -- the clear key is "Clear" on a fresh launch and
+ * "All Clear" after a calculation -- so a fixture cannot rely on one spelling.
+ */
+function findIndex(tree, ...alternatives) {
+  for (const needle of alternatives) {
+    for (const [description, index] of indexes(tree)) {
+      if (description.includes(needle)) return index;
+    }
+  }
+  throw new Error(`no element matching any of ${alternatives.join(", ")}`);
+}
+
+const CLEAR = ["AllClear", "button Clear"];
+const KEYS = [CLEAR, ["ID: Eight"], ["button Multiply"], ["ID: Seven"], ["button Equals"]];
+
+async function readTree(client) {
+  const response = await client.callTool("get_app_state", { app: APP, full_tree: true }, 90000);
+  return toolText(response);
+}
+
+/**
+ * The Calculator input display, which is how a performed click is observed. It
+ * is the text node under StandardInputView; a separate StandardResultView holds
+ * the last expression, so picking the last text node in the tree is not safe.
+ */
+function displayValue(tree) {
+  const lines = tree.split("\n");
+  const inputAt = lines.findIndex((line) => line.includes("StandardInputView"));
+  assert.notEqual(inputAt, -1, "the accessibility tree must expose StandardInputView");
+  for (const line of lines.slice(inputAt + 1)) {
+    if (line.includes(" text ")) return line.trim();
+    if (line.includes("scroll area") || line.includes("button")) break;
+  }
+  return "";
+}
+
+/**
+ * Put Calculator in a known state. One clear press is not enough: with a pending
+ * operation the key clears only the current entry, so it is pressed until the
+ * display reads zero.
+ */
+async function resetCalculator(client) {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const tree = await readTree(client);
+    if (/text ‎0$/.test(displayValue(tree))) return displayValue(tree);
+    await client.callTool(
+      "click",
+      { app: APP, element_index: findIndex(tree, ...CLEAR) },
+      90000,
+    );
+  }
+  const settled = displayValue(await readTree(client));
+  assert.match(settled, /0$/, "Calculator must be resettable to zero before the test acts");
+  return settled;
+}
+
+function frontmostApp() {
+  const result = spawnSync(
+    "osascript",
+    ["-e", 'tell application "System Events" to get name of first process whose frontmost is true'],
+    { encoding: "utf8" },
+  );
+  return result.stdout.trim();
+}
+
+test("health reports the live upstream inventory rather than a hardcoded list", { skip }, async () => {
+  await withSession(async (client) => {
+    const response = await client.callTool("health", {}, 90000);
+    const report = JSON.parse(toolText(response));
+
+    assert.match(report.verdict, /^healthy/);
+    assert.equal(report.checks.app_server_handshake, "ok");
+    assert.equal(report.checks.node_repl_configured, true);
+    assert.deepEqual(report.checks.missing_sky_functions, []);
+    assert.ok(report.checks.sky_surface.includes("get_app_state"));
+    assert.ok(report.chatgpt_app_version, "the ChatGPT.app version is reported");
+    assert.match(report.routing_notice, /do not use this bridge/i);
+  });
+});
+
+test("a read returns the accessibility tree and a re-read returns a smaller diff", { skip }, async () => {
+  await withSession(async (client) => {
+    const full = await readTree(client);
+    assert.match(full, /Window: "Calculator"/);
+    assert.ok(full.includes("read: full tree"));
+
+    const again = await client.callTool("get_app_state", { app: APP }, 90000);
+    const diff = toolText(again);
+    assert.ok(diff.includes("read: diff against previous read"));
+    assert.ok(diff.length < full.length, "the diff must be cheaper than the full tree");
+  });
+});
+
+test("a screenshot is omitted unless asked for, and its path is always reported", { skip }, async () => {
+  await withSession(async (client) => {
+    const textOnly = await client.callTool("get_app_state", { app: APP, full_tree: true }, 90000);
+    assert.ok(!textOnly.result.content.some((part) => part.type === "image"));
+    assert.match(toolText(textOnly), /screenshot: file:\/\//);
+
+    const withImage = await client.callTool(
+      "get_app_state",
+      { app: APP, include_screenshot: true },
+      90000,
+    );
+    assert.ok(withImage.result.content.some((part) => part.type === "image"));
+  });
+});
+
+test("an oversized screenshot is returned as a path instead of an image", { skip }, async () => {
+  await withSession(
+    async (client) => {
+      const response = await client.callTool(
+        "get_app_state",
+        { app: APP, include_screenshot: true },
+        90000,
+      );
+      assert.ok(!response.result.content.some((part) => part.type === "image"));
+      assert.match(toolText(response), /over CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES/);
+    },
+    { CODEX_CUA_BRIDGE_MAX_IMAGE_BYTES: "10000" },
+  );
+});
+
+test("clicks act on the target and do not steal focus", { skip }, async () => {
+  await withSession(async (client) => {
+    await resetCalculator(client);
+    const before = frontmostApp();
+
+    // 8 x 7 = 56, re-reading before every click. Indexes are valid only for the
+    // read that produced them: entering an expression inserts a result row and
+    // renumbers every control below it, so a cached index hits the wrong key.
+    for (const alternatives of KEYS) {
+      const index = findIndex(await readTree(client), ...alternatives);
+      const clicked = await client.callTool("click", { app: APP, element_index: index }, 90000);
+      assert.notEqual(clicked.result.isError, true, `clicking ${alternatives[0]}`);
+    }
+
+    assert.match(displayValue(await readTree(client)), /56/);
+    // The invariant is that the bridge does not change focus. Asserting the
+    // target is never frontmost would be wrong whenever it already was.
+    assert.equal(frontmostApp(), before, "the bridge must not change which app is frontmost");
+  });
+});
+
+test("coordinates are window-relative, so an out-of-window point is refused", { skip }, async () => {
+  await withSession(async (client) => {
+    const inside = await client.callTool("click", { app: APP, x: 100, y: 100 }, 90000);
+    assert.notEqual(inside.result.isError, true, "a point inside the window is clickable");
+
+    // The service adds the window origin, so a large offset lands off-window.
+    const outside = await client.callTool("click", { app: APP, x: 9000, y: 9000 }, 90000);
+    assert.equal(outside.result.isError, true);
+    assert.match(toolText(outside), /windowNotFoundAtPosition/);
+  });
+});
+
+test("cancelling a queued click prevents it from ever reaching the UI", { skip }, async () => {
+  await withSession(async (client) => {
+    const cleared = await resetCalculator(client);
+    const clearedTree = await readTree(client);
+    // Resolved against the cleared state, which is the state the queued click
+    // will act on.
+    const seven = findIndex(clearedTree, "ID: Seven");
+
+    // Occupy the serialization lock, queue a click behind it, then cancel the
+    // click. Without the cancellation checks the click would still be performed
+    // once the lock freed.
+    const occupyId = client.nextId++;
+    client.write({
+      jsonrpc: "2.0",
+      id: occupyId,
+      method: "tools/call",
+      params: { name: "get_app_state", arguments: { app: APP, full_tree: true } },
+    });
+    const cancelledId = client.nextId++;
+    client.write({
+      jsonrpc: "2.0",
+      id: cancelledId,
+      method: "tools/call",
+      params: { name: "click", arguments: { app: APP, element_index: seven } },
+    });
+    client.notify("notifications/cancelled", { requestId: cancelledId });
+
+    const seen = new Set();
+    const deadline = Date.now() + 60000;
+    while (Date.now() < deadline) {
+      const message = await client.next(5000);
+      if (!message) break;
+      if (message.id !== undefined) seen.add(message.id);
+      if (seen.has(occupyId)) break;
+    }
+    assert.ok(seen.has(occupyId), "the occupying call still answers");
+    assert.ok(!seen.has(cancelledId), "a cancelled request receives no response");
+
+    assert.equal(displayValue(await readTree(client)), cleared, "the click never ran");
+
+    // The same click, uncancelled, must change the display. Without this the
+    // assertion above would pass even if a click could not be detected at all.
+    const liveSeven = findIndex(await readTree(client), "ID: Seven");
+    await client.callTool("click", { app: APP, element_index: liveSeven }, 90000);
+    assert.notEqual(displayValue(await readTree(client)), cleared, "an allowed click does run");
+    await resetCalculator(client);
+  });
+});
+
+test("the bridge recovers when its app-server child dies mid-session", { skip }, async () => {
+  await withSession(async (client) => {
+    assert.match(await readTree(client), /Window: "Calculator"/);
+
+    const before = spawnSync("pgrep", ["-P", String(client.child.pid)], { encoding: "utf8" })
+      .stdout.trim()
+      .split("\n")
+      .filter(Boolean);
+    assert.equal(before.length, 1, "exactly one app-server child");
+    spawnSync("kill", ["-9", before[0]]);
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const response = await client.callTool("get_app_state", { app: APP, full_tree: true }, 90000);
+      assert.ok(response.result, "every call answers, none hangs");
+    }
+    assert.match(await readTree(client), /Window: "Calculator"/);
+
+    const after = spawnSync("pgrep", ["-P", String(client.child.pid)], { encoding: "utf8" })
+      .stdout.trim()
+      .split("\n")
+      .filter(Boolean);
+    assert.equal(after.length, 1, "exactly one replacement child");
+    assert.notDeepEqual(after, before, "it is a new process");
+  });
+});
