@@ -31,6 +31,19 @@ the rule still has to be followed by whoever configures the client.
   code signature, so an unsigned parent is rejected with `Sender process is not
   authenticated`.
 
+## What it cannot do
+
+Computer Use refuses to operate on Codex itself. Any tool call targeting
+`com.openai.codex` fails with:
+
+```
+Computer Use is not allowed to use the app 'com.openai.codex' for safety reasons.
+```
+
+So this bridge cannot drive the Codex or ChatGPT desktop UI, only other
+applications. To have Codex review or act on something, use `codex exec`, which
+needs no UI.
+
 ## Register
 
 ```json
@@ -57,7 +70,9 @@ it needs no MCP client:
 node ~/.agents/skills/vp-interaction-routing/scripts/codex-cua-bridge.mjs --health
 ```
 
-A healthy report ends with `"verdict": "healthy"` and shows:
+A healthy report's `verdict` begins with `healthy` and carries the reason after
+it, currently `healthy: Computer Use is reachable through this bridge`, so match
+the prefix rather than the whole string. It also shows:
 
 | Field | What it proves |
 |-------|----------------|
@@ -72,8 +87,10 @@ A healthy report ends with `"verdict": "healthy"` and shows:
 Re-run it after a ChatGPT.app update. `app-server` is an experimental protocol
 and its surface can change between versions; treat a failed handshake or a
 shrunken `sky_surface` as a compatibility break, not a transient error. The
-verdict is `unhealthy` whenever `missing_sky_functions` is non-empty, so a
-renamed upstream function is reported rather than passing silently.
+verdict begins with `unhealthy` whenever `missing_sky_functions` is non-empty,
+naming what is missing, so a renamed upstream function is reported rather than
+passing silently. Both prefixes are asserted by the test suites, so match on the
+prefix and treat the text after it as a reason for a human.
 
 Other diagnostics:
 
@@ -98,7 +115,7 @@ node .../codex-cua-bridge.mjs --call get_app_state '{"app":"Calculator","full_tr
 | `set_value` | mutating | replaces an element's contents |
 | `select_text` | mutating | select, or place the cursor before or after a match |
 | `scroll` | mutating | whole pages, one direction |
-| `drag` | mutating | screen points within the app |
+| `drag` | mutating | window-relative points, like `click` x/y |
 | `paste` | mutating | via the pasteboard, restoring the previous clipboard |
 | `perform_secondary_action` | mutating | only an action listed for that element |
 
@@ -125,6 +142,14 @@ file path unless `include_screenshot` is set.
   accessibility text exposes no element bounds, so there is nothing in a read to
   derive coordinates from. Use `element_index`. In particular, do not carry
   coordinates over from Peekaboo, whose bounds are screen coordinates.
+- **A mutating tool returning `ok` is not evidence the UI changed.** The upstream
+  reports that it dispatched the action, not that the application acted on it.
+  Two silent no-ops observed here: `set_value` against an Electron
+  `contenteditable` (Antigravity's message box) returned `ok` and left the field
+  empty, and `press_key` with `Escape` against Calculator returned `ok` and left
+  a pending operation in place. Read the state back to confirm an action landed;
+  for an Electron text box, `click` then `paste` works where `set_value` does
+  not.
 - **Leave `include_screenshot` off** unless the accessibility text is
   insufficient. An embedded screenshot costs far more context than the tree.
 - Responses are capped at `CODEX_CUA_BRIDGE_MAX_CHARS` (default 40000) and the

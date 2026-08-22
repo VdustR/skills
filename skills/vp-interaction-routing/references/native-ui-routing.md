@@ -67,6 +67,17 @@ first-party computer use:
 Refresh Peekaboo state before interaction. Treat its element and snapshot IDs
 as valid only for the observed UI state.
 
+Reading and acting use different observations. The text-only read, `inspect_ui`
+over MCP or `see --tree --no-screenshot` on the command line, is the cheap way to
+inspect a tree, but its snapshot cannot drive a click:
+
+```
+Exact-window snapshot has no capture-time process-generation receipt. Run see again.
+```
+
+Use `see` when the intent is to act, and reserve the text-only read for
+inspection.
+
 Use the `vp-recording` skill when the requested artifact is a video or contact
 sheet rather than an automation diagnostic.
 

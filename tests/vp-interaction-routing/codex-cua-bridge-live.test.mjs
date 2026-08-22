@@ -325,6 +325,58 @@ test("cancelling a queued click prevents it from ever reaching the UI", { skip }
   });
 });
 
+test("Computer Use refuses to drive Codex itself", { skip }, async () => {
+  await withSession(async (client) => {
+    // The reference states this limit, so assert it rather than trusting prose.
+    // If a future Codex release lifts the restriction, this fails and the
+    // documentation gets corrected instead of quietly going stale.
+    const refused = await client.callTool(
+      "get_app_state",
+      { app: "com.openai.codex", full_tree: true },
+      90000,
+    );
+    assert.equal(refused.result.isError, true);
+    assert.match(
+      toolText(refused),
+      /not allowed to use the app 'com\.openai\.codex' for safety reasons/,
+      "the refusal must still be the documented one",
+    );
+  });
+});
+
+test("a mutating call reporting ok is not evidence the UI changed", { skip }, async () => {
+  await withSession(async (client) => {
+    const before = await resetCalculator(client);
+    const tree = await readTree(client);
+
+    // Build a pending operation, then try to clear it with Escape. The upstream
+    // reports success for a keystroke the application ignores, which is why the
+    // reference tells callers to read state back instead of trusting `ok`.
+    for (const key of [["ID: Nine"], ["button Divide"]]) {
+      const index = findIndex(await readTree(client), ...key);
+      await client.callTool("click", { app: APP, element_index: index }, 90000);
+    }
+    // The premise has to be proven, not inferred from "the display changed":
+    // if the Divide click had failed, the display would read 9 and Escape
+    // leaving 9 would still satisfy a mere inequality against the cleared state.
+    const pending = displayValue(await readTree(client));
+    assert.notEqual(pending, before, "the entry is visible");
+    assert.match(pending, /÷/, "a pending operation must actually be established");
+
+    const escaped = await client.callTool("press_key", { app: APP, key: "Escape" }, 90000);
+    // The documented claim is about `ok` specifically, so assert that value
+    // rather than merely the absence of an error.
+    assert.equal(toolText(escaped).trim(), "ok", "the keystroke is reported as delivered");
+    assert.equal(
+      displayValue(await readTree(client)),
+      pending,
+      "yet the display is unchanged, so ok did not mean the app acted",
+    );
+
+    await resetCalculator(client);
+  });
+});
+
 test("the bridge recovers when its app-server child dies mid-session", { skip }, async () => {
   await withSession(async (client) => {
     assert.match(await readTree(client), /Window: "Calculator"/);
