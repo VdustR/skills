@@ -20,6 +20,8 @@ Situation 1 routes to `references/attachments.md`:
 
 - Upload with one `POST` to `uploads.github.com/user-attachments/assets` carrying
   `name`, `content_type`, and `repository_id`, authorized with a bearer token.
+- Keep the bearer token out of process arguments by passing the authorization
+  header through curl's standard-input config.
 - Embed the returned `user-attachments` URL as a bare URL on its own line.
 - Warn that the endpoint is undocumented and unversioned, and name the release
   asset fallback.
@@ -52,6 +54,7 @@ Situation 3 routes to `references/markdown-rendering.md`:
 ## Regression Coverage
 
 - media attachments use the token endpoint and a bare URL on its own line;
+- bearer tokens are not expanded into curl process arguments;
 - non-media attachments are not promised on a token, and the verified-fetch nonce
   is not treated as a spoofable header;
 - unattended non-media delivery falls back to a release asset;
