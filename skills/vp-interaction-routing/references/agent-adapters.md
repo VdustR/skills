@@ -10,6 +10,10 @@ file records routing intent rather than a permanent tool inventory.
 - Use the connected Chrome plugin when the task requires the user's real Chrome
   state. Use agent-browser for isolated or managed-profile automation.
 - Use Codex first-party Computer Use for ordinary native applications.
+- Do not route Codex through a Codex Computer Use MCP bridge. The bridge exists
+  to open this capability to other harnesses; as Codex, the bundled `node_repl`
+  and `@oai/sky` surface is the direct path and keeps the Computer Use
+  confirmations policy in the loop.
 - Use Peekaboo for macOS system surfaces, unfocused applications, deep AX work,
   capture, and troubleshooting.
 
@@ -21,7 +25,8 @@ file records routing intent rather than a permanent tool inventory.
   managed-profile automation.
 - Use Claude Code first-party computer use when available and appropriate.
 - A compatible Codex Computer Use MCP bridge is the next native-application
-  option when it is installed and healthy.
+  option when it is installed and healthy; this skill ships one at
+  `scripts/codex-cua-bridge.mjs`.
 - Use Peekaboo for its macOS-specific extended surface and fallback role.
 
 ## Antigravity
@@ -32,7 +37,8 @@ file records routing intent rather than a permanent tool inventory.
   managed-profile automation.
 - Use Antigravity first-party computer use when available and appropriate.
 - A compatible Codex Computer Use MCP bridge is the next native-application
-  option when it is installed and healthy.
+  option when it is installed and healthy; this skill ships one at
+  `scripts/codex-cua-bridge.mjs`.
 - Use Peekaboo as the macOS fallback when first-party computer use and the
   bridge are unavailable, and for its extended system and inspection surface.
 

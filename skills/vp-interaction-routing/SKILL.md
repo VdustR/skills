@@ -25,7 +25,11 @@ token or latency savings.
    [references/native-ui-routing.md](references/native-ui-routing.md).
 4. When product-specific tool names or availability matter, read
    [references/agent-adapters.md](references/agent-adapters.md).
-5. Use screenshot-coordinate interaction only when semantic, DOM, and
+5. To give a non-Codex harness access to macOS Codex Computer Use, read
+   [references/codex-cua-bridge.md](references/codex-cua-bridge.md). Codex itself
+   must not use that bridge; its own `node_repl` and `@oai/sky` surface is the
+   direct path.
+6. Use screenshot-coordinate interaction only when semantic, DOM, and
    accessibility interfaces cannot complete the operation.
 
 An explicitly named interface remains a user constraint. Do not substitute a
