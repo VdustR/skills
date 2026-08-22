@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Interaction Routing"
+  short_description: "Choose connectors, browsers, and native UI tools"
+  default_prompt: "Use $vp-interaction-routing to choose the lowest-cost reliable interface for this application or service interaction."

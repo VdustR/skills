@@ -90,6 +90,10 @@ GitHub platform behavior: attaching media and files to issues and PRs, markdown 
 
 Use structured questions to align on requirements before planning or complex tasks.
 
+### vp-interaction-routing
+
+Choose among connectors, APIs, CLIs, browser sessions, computer use, and macOS desktop automation.
+
 ### vp-long-running-processes
 
 Find reusable dev servers and watchers by project path, and stop or restart processes safely.

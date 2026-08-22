@@ -25,6 +25,7 @@ required_skills=(
   "vp-recording"
   "vp-github"
   "vp-agent-browser-session"
+  "vp-interaction-routing"
   "vp-session-wrapup"
 )
 
@@ -53,6 +54,7 @@ stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
 github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
+interaction_routing_fixture="fixtures/smoke/vp-interaction-routing.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 
@@ -146,6 +148,19 @@ require_pattern "$agent_browser_session_fixture" 'running profiles?.*not deleted
   "vp-agent-browser-session fixture must cover in-use profile deletion refusal"
 require_pattern "$agent_browser_session_fixture" 'worktree-scoped' \
   "vp-agent-browser-session fixture must cover stable worktree sessions"
+
+require_pattern "$interaction_routing_fixture" 'connector.*GitHub|GitHub.*connector' \
+  "vp-interaction-routing fixture must prefer semantic connectors"
+require_pattern "$interaction_routing_fixture" 'Chrome plugin.*(current|real).*(tabs|login|session)|current Chrome' \
+  "vp-interaction-routing fixture must cover shared Chrome state"
+require_pattern "$interaction_routing_fixture" 'agent-browser.*(isolated|repeatable|managed)' \
+  "vp-interaction-routing fixture must cover isolated agent-browser state"
+require_pattern "$interaction_routing_fixture" 'app-server.*MCP bridge|MCP bridge.*app-server' \
+  "vp-interaction-routing fixture must require an app-server bridge"
+require_pattern "$interaction_routing_fixture" 'Peekaboo.*(windows|menus|dialogs|Spaces|unfocused|accessibility)' \
+  "vp-interaction-routing fixture must preserve Peekaboo's extended role"
+require_pattern "$interaction_routing_fixture" 'Do not reuse selectors|invalidates prior selectors' \
+  "vp-interaction-routing fixture must invalidate selectors after switching"
 
 require_pattern "$session_wrapup_fixture" 'risk-free cleanup authorization does not extend' \
   "vp-session-wrapup fixture must cover bounded risk-free cleanup authorization"
