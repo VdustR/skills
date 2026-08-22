@@ -1076,23 +1076,24 @@ function startMcpServer() {
       }
       return;
     }
-    if (!initialized && !isNotification && method !== "initialize" && method !== "ping") {
-      replyError(id ?? null, -32002, `server not initialized: call initialize before ${method}`);
-      return;
-    }
-    const isNotificationMethod = method.startsWith("notifications/");
+    // Message shape is decided before server state, so a malformed request gets
+    // the same answer whether or not the session is initialized.
     if (isNotification) {
       if (method !== "notifications/initialized" && method !== "notifications/cancelled") {
         log(`ignoring unexpected notification: ${method}`);
       }
       return;
     }
-    if (isNotificationMethod) {
+    if (method.startsWith("notifications/")) {
       replyError(
         id ?? null,
         -32600,
         `${method} is a notification and must be sent without an id member`,
       );
+      return;
+    }
+    if (!initialized && method !== "initialize" && method !== "ping") {
+      replyError(id ?? null, -32002, `server not initialized: call initialize before ${method}`);
       return;
     }
 
