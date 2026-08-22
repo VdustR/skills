@@ -1217,6 +1217,35 @@ function startMcpServer() {
     try {
       switch (method) {
         case "initialize": {
+          // MCP requires protocolVersion, capabilities and clientInfo. Accepting
+          // a partial request would report a negotiated session that the client
+          // never actually agreed to.
+          const missing = [];
+          if (params === null || typeof params !== "object" || Array.isArray(params)) {
+            replyError(id ?? null, -32602, "initialize requires a params object");
+            return;
+          }
+          if (typeof params.protocolVersion !== "string") missing.push("protocolVersion");
+          if (
+            params.capabilities === null ||
+            typeof params.capabilities !== "object" ||
+            Array.isArray(params.capabilities)
+          ) {
+            missing.push("capabilities");
+          }
+          if (
+            params.clientInfo === null ||
+            typeof params.clientInfo !== "object" ||
+            Array.isArray(params.clientInfo) ||
+            typeof params.clientInfo.name !== "string"
+          ) {
+            missing.push("clientInfo.name");
+          }
+          if (missing.length) {
+            replyError(id ?? null, -32602, `initialize is missing ${missing.join(", ")}`);
+            return;
+          }
+
           clientName = params?.clientInfo?.name ?? null;
           if (clientName && /codex/i.test(clientName)) {
             log(`client "${clientName}" looks like Codex; it should use sky directly`);
