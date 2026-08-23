@@ -46,20 +46,53 @@ needs no UI.
 
 ## Register
 
+Registering an MCP server is a persistent, privileged configuration change:
+get explicit user authorization first.
+
+The script lives beside this file, at `scripts/codex-cua-bridge.mjs` inside this
+skill's own directory. Resolve that to an absolute path rather than assuming an
+install location, because the skill can be installed globally or per project:
+
+```bash
+# From the skill directory reported when the skill loads.
+BRIDGE="$(cd "<this skill's directory>" && pwd)/scripts/codex-cua-bridge.mjs"
+```
+
+### Claude Code
+
+Use the CLI rather than hand-editing config:
+
+```bash
+claude mcp add -s user codex-cua -- node "$BRIDGE"
+```
+
+`-s user` matters. The default scope is `local`, which registers the server for
+the current directory only, so omitting it appears to work and then silently does
+nothing elsewhere. Verify where it landed, and remove with
+`claude mcp remove -s user codex-cua`.
+
+### Another MCP client
+
+Add a stdio server with `node` as the command and the absolute script path as its
+only argument. In Claude Code's own config this is stored as:
+
 ```json
 {
   "mcpServers": {
     "codex-cua": {
+      "type": "stdio",
       "command": "node",
-      "args": ["~/.agents/skills/vp-interaction-routing/scripts/codex-cua-bridge.mjs"]
+      "args": ["/absolute/path/to/scripts/codex-cua-bridge.mjs"]
     }
   }
 }
 ```
 
-Expand `~` to an absolute path if the client does not. Registering an MCP server
-is a persistent, privileged configuration change: get explicit user
-authorization first.
+A relative path or a bare `~` will not be expanded by every client, so use an
+absolute path.
+
+Once the client lists the server, confirm it works by calling the `health` tool.
+If the tools do not appear, restart the client and check again.
 
 ## Verify before relying on it
 

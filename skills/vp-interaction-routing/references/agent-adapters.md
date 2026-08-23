@@ -25,8 +25,9 @@ file records routing intent rather than a permanent tool inventory.
   managed-profile automation.
 - Use Claude Code first-party computer use when available and appropriate.
 - A compatible Codex Computer Use MCP bridge is the next native-application
-  option when it is installed and healthy; this skill ships one at
-  `scripts/codex-cua-bridge.mjs`.
+  option when it is registered in this client and healthy; this skill ships one
+  at `scripts/codex-cua-bridge.mjs`, which still has to be registered before its
+  tools exist in a session.
 - Use Peekaboo for its macOS-specific extended surface and fallback role.
 
 ## Antigravity
@@ -37,8 +38,9 @@ file records routing intent rather than a permanent tool inventory.
   managed-profile automation.
 - Use Antigravity first-party computer use when available and appropriate.
 - A compatible Codex Computer Use MCP bridge is the next native-application
-  option when it is installed and healthy; this skill ships one at
-  `scripts/codex-cua-bridge.mjs`.
+  option when it is registered in this client and healthy; this skill ships one
+  at `scripts/codex-cua-bridge.mjs`, which still has to be registered before its
+  tools exist in a session.
 - Use Peekaboo as the macOS fallback when first-party computer use and the
   bridge are unavailable, and for its extended system and inspection surface.
 
