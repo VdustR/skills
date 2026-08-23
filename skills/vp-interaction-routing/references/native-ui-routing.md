@@ -25,6 +25,14 @@ This skill ships one such bridge at
 registration, verification procedure, tool surface, and cost comparison against
 Peekaboo.
 
+Shipping it is not the same as it being available. It is available only once the
+current client has it registered as an MCP server, which shows up as bridge tools
+in the session's tool list. When those tools are absent the bridge is installed
+but not registered, and registering it is a privileged change that needs the
+user's authorization: say so and offer the command rather than assuming the
+capability is missing. The reference has the registration and verification
+steps.
+
 **The bridge is for harnesses other than Codex.** Codex reaches the same
 capability natively through its bundled `node_repl` and `@oai/sky` surface, so
 routing Codex through a bridge adds a hop, loses the integration, and moves the
