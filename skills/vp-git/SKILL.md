@@ -32,10 +32,19 @@ remote state, and hosting-platform state as separate sources of truth.
 - Branch, worktree, stash, and ref cleanup: read `references/cleanup.md`.
 - Draft, ready, review, and merge decisions: read
   `references/pull-requests.md`.
-- Stacks of dependent PRs or branches: use vp-stacked-pr instead. On GitHub with
-  every layer in one repository, prefer native `gh stack` over hand-rebuilding
-  history.
 
 Load only the references needed for the request. Specialized PR skills remain
-authoritative for their narrower workflows. Apply vp-tldr to a pull request
-summary only when the user requests its TL;DR logic.
+authoritative for their narrower workflows.
+
+## Related skills
+
+- [`vp-stacked-pr`](https://github.com/VdustR/skills/tree/main/skills/vp-stacked-pr)
+  for dependent branches or pull requests.
+- [`vp-pr-briefing`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-briefing)
+  for understanding an unfamiliar pull request before acting.
+- [`vp-checklist-runner`](https://github.com/VdustR/skills/tree/main/skills/vp-checklist-runner)
+  for verifying an existing PR or issue checklist.
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  for author-side PR feedback.
+- [`vp-pr-review-followup`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-review-followup)
+  for reviewer-side PR follow-up.

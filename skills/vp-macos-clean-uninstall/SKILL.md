@@ -26,3 +26,8 @@ uninstaller, and separate application removal from optional user-data cleanup.
 Use the bundled detection scripts as evidence helpers, not deletion authority.
 Stop when ownership is ambiguous, the product protects its own data, or removal
 would affect other applications or accounts.
+
+## Related skills
+
+- [`vp-long-running-processes`](https://github.com/VdustR/skills/tree/main/skills/vp-long-running-processes)
+  for identifying or stopping application-owned processes before removal.

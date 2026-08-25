@@ -33,3 +33,10 @@ Read only the relevant reference:
 - `references/repo-conventions.md`
 - `references/context7-integration.md`
 - `references/confidence-index.md`
+
+## Related skills
+
+- [`vp-deps-upgrade`](https://github.com/VdustR/skills/tree/main/skills/vp-deps-upgrade)
+  when the work changes versions within the same dependency.
+- [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
+  when the migration must continue through PR delivery and review.

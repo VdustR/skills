@@ -64,3 +64,14 @@ GitHub's documented file-type and size lists describe the web interface. Endpoin
 enforce their own, narrower rules, and the two disagree. Probe the endpoint with a
 throwaway file in a scratch repository rather than reading the docs and asserting
 the result. `references/attachments.md` records what the probes returned.
+
+## Related skills
+
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git
+  changes and ordinary pull-request lifecycle work.
+- [`vp-stacked-pr`](https://github.com/VdustR/skills/tree/main/skills/vp-stacked-pr)
+  for dependent pull requests or branches.
+- [`vp-recording`](https://github.com/VdustR/skills/tree/main/skills/vp-recording)
+  when the attachment must first be recorded or rendered.
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  for author-side PR discussion and review threads.

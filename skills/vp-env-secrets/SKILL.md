@@ -25,3 +25,8 @@ values, unless the user explicitly requests a safe destination.
 
 Inspect the helper's current help before use. Verify only key presence and the
 authorized operation's outcome.
+
+## Related skills
+
+- [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
+  when a session may have left staged or temporary secret material.

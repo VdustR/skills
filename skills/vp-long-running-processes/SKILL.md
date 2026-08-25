@@ -20,3 +20,10 @@ Keep persistent commands detached from the task's blocking execution path and
 record where their output can be inspected. Verify service readiness rather than
 assuming a live process is healthy. Report conflicts instead of killing unknown
 processes.
+
+## Related skills
+
+- [`vp-agent-browser-session`](https://github.com/VdustR/skills/tree/main/skills/vp-agent-browser-session)
+  for persistent agent-browser sessions and managed Chrome profiles.
+- [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
+  when a session ends with processes that must be stopped or reported.

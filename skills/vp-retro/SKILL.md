@@ -23,3 +23,8 @@ authorization.
 Read `references/dimensions.md` for analysis lenses and
 `references/subagent-guide.md` only when delegated evidence gathering is useful
 and permitted.
+
+## Related skills
+
+- [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
+  when the session needs operational closeout in addition to reflection.

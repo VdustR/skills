@@ -30,3 +30,10 @@ replies.
 
 Read `references/workflow.md` for state transitions and
 `references/reply-templates.md` for concise response shapes.
+
+## Related skills
+
+- [`vp-pr-briefing`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-briefing)
+  when the reviewer needs a current briefing before following up.
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  when acting as the PR author instead of the reviewer.

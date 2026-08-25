@@ -60,16 +60,16 @@ from one bot surface as proof that every review signal has completed.
 
 ## Problems discovered during the work
 
-Route each distinct problem through
-[`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator).
-Record third-party dependency problems in the user's repository or chosen
-internal tracker first. Do not open an upstream issue without separate
-authorization. Continue the primary task when the new problem is non-blocking;
-stop and report it when proceeding would be unsafe or would materially expand
-scope.
+Investigate each distinct problem before recording it. Record third-party
+dependency problems in the user's repository or chosen internal tracker first.
+Do not open an upstream issue without separate authorization. Continue the
+primary task when the new problem is non-blocking; stop and report it when
+proceeding would be unsafe or would materially expand scope.
 
 ## Related skills
 
+- [`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator)
+  for validating and recording a distinct problem found during development.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
   for a re-runnable failure.
 - [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git and

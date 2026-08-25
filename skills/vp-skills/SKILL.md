@@ -26,3 +26,8 @@ compatibility check. Inspect the selected version's current help before acting.
 Read `references/workflows.md` for operation decisions,
 `references/troubleshooting.md` for stale source paths and partial installs, and
 `references/command-reference.md` only when current help is insufficient.
+
+## Related skills
+
+- [`vp-foreign-agent-skill-loader`](https://github.com/VdustR/skills/tree/main/skills/vp-foreign-agent-skill-loader)
+  when the user wants temporary reuse without installation or conversion.
