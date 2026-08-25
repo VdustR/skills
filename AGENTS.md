@@ -49,8 +49,8 @@ of the same workflow. Omit the section when no relationship changes routing.
   dependency or grant permission.
 - Add reciprocal links only when both directions help the agent choose the next
   skill.
-- For hub skills, prioritize the most useful outbound handoffs. Inbound links do
-  not need a reciprocal entry, and routing boundaries remain discoverable from
+- Prioritize the most useful outbound handoffs. An inbound link does not require
+  a reciprocal entry, and routing boundaries remain discoverable from
   frontmatter.
 
 Use this shape:
