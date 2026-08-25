@@ -33,7 +33,7 @@ test("related skills sections follow the repository convention", () => {
     const section = source.slice(markerIndex + marker.length).trim();
     assert.doesNotMatch(
       section,
-      /^## /m,
+      /^#{1,6} /m,
       `${skillName} must keep Related skills as its final section`,
     );
 
@@ -69,6 +69,11 @@ test("related skills sections follow the repository convention", () => {
       assert.ok(
         phrase.length > 0,
         `${skillName} must state the handoff for ${relatedName}`,
+      );
+      assert.match(
+        url,
+        /^https:\/\/[^\s)]+$/,
+        `${skillName} must use an absolute HTTPS URL for ${relatedName}`,
       );
 
       if (url.startsWith("https://github.com/VdustR/skills/tree/main/skills/")) {

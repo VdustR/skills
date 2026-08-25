@@ -59,8 +59,7 @@ its URL and any gap between the intended and rendered result.
 - [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr) for the
   opening summary.
 - [`no-ai-slop`](https://github.com/petergyang/no-ai-slop/tree/main/skills/no-ai-slop)
-  for the issue body when it is available; it is optional, not a runtime
-  dependency.
+  for editing the issue body.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
   when a repeatable reproduction would materially improve the evidence.
 - [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)

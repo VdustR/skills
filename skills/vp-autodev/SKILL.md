@@ -4,8 +4,10 @@ description: >-
   Take a valid issue or development task through research, reproduction,
   solution design, implementation, verification, draft PR review, feedback
   loops, merge readiness, and release follow-up. Use for end-to-end development
-  in repositories the user owns or is authorized to change. Boundary: does not
-  grant permission for external writes, merge, release, or unrelated fixes.
+  in repositories the user owns or is authorized to change. Boundary: use a
+  narrower dependency, reproduction, checklist, or PR skill when the request
+  covers only that step. Does not grant permission for external writes, merge,
+  release, or unrelated fixes.
 ---
 
 # Auto Development
@@ -14,14 +16,13 @@ Take an owned-repository issue or development task through the authorized
 delivery lifecycle. Follow repository instructions and the user's preferred
 language, framework, Git, GitHub, review, and release skills.
 
-## Outcome
+## Workflow
 
 Keep evidence for each decision from issue validation through delivery:
 
-1. Validate that the issue or task describes a real, current problem or desired
-   change. Identify stale scope, assumptions, acceptance criteria, or impact
-   before implementation. Propose or make external corrections only when
-   authorized, and explain material changes.
+1. Start from a current issue disposition and acceptance criteria. Use
+   `vp-issue-investigator` first when the problem is still suspected, stale, or
+   unverified. Propose or make external corrections only when authorized.
 2. Research the root cause and verify the failure at the strongest practical
    level: the real situation, a faithful simulation, or a minimal reproduction.
    State what each method does and does not prove.
@@ -41,12 +42,11 @@ Keep evidence for each decision from issue validation through delivery:
    emoji on the main post or comments. Treat a changed emoji as new state, using
    that repository's convention instead of a universal mapping. Re-check that a
    positive signal applies to the current head.
-8. Verify feedback before acting, make focused corrections, respond on the
-   original surface, and repeat verification and monitoring. Stop when all
-   required signals pass, the repository reports that automated review finished
-   with no feedback, or a blocker or human decision is explicit. If the
-   repository exposes no completion signal, perform a fresh final check and
-   report that limitation instead of claiming every bot passed.
+8. Route actionable comments and threads through `vp-pr-comment-resolver`, then
+   repeat verification and monitoring. Stop when all required signals pass, the
+   repository reports that automated review finished with no feedback, or a
+   blocker or human decision is explicit. If the repository exposes no
+   completion signal, perform a fresh final check and report that limitation.
 9. Merge only when authorized, repository policy permits it, required evidence
    is green, feedback is handled, and the remaining risk is low enough for that
    repository. Do not infer merge permission from the skill invocation alone.

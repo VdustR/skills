@@ -42,8 +42,8 @@ authoritative for their narrower workflows.
   for dependent branches or pull requests.
 - [`vp-pr-briefing`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-briefing)
   for understanding an unfamiliar pull request before acting.
-- [`vp-checklist-runner`](https://github.com/VdustR/skills/tree/main/skills/vp-checklist-runner)
-  for verifying an existing PR or issue checklist.
+- [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) for
+  attachments, Markdown rendering, and GitHub credential boundaries.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
   for author-side PR feedback.
 - [`vp-pr-review-followup`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-review-followup)
