@@ -1,0 +1,4 @@
+interface:
+  display_name: "Issue Investigator"
+  short_description: "Validate and record suspected software problems"
+  default_prompt: "Use $vp-issue-investigator to validate this suspected problem and prepare an evidence-backed issue."
