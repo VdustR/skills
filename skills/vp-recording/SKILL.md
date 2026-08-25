@@ -115,3 +115,10 @@ rectangle, which is not necessarily the target window. Capture by window id
 instead. `references/macos-window-capture.md` has the rule and the command; treat
 it as mandatory when anyone else's content could be on screen. The same hazard
 applies to any platform's rectangle-based recorder.
+
+## Related skills
+
+- [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
+  the finished recording must appear in an issue or pull request.
+- [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
+  when a bug video also needs a re-runnable reproduction.

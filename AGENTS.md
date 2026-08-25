@@ -31,6 +31,36 @@ skills/
 - Do not include secrets or credential material.
 - Keep public skill docs in American English.
 
+## Related Skills Convention
+
+Add `## Related skills` as the final section of `SKILL.md` when another skill
+directly hands work to this skill, receives its output, or owns a distinct part
+of the same workflow. Omit the section when no relationship changes routing.
+
+- List one to five skills. Do not build an exhaustive catalog of adjacent
+  capabilities.
+- Link the skill name to its canonical GitHub directory. Use
+  `https://github.com/VdustR/skills/tree/main/skills/<skill-name>` for skills in
+  this repository and the canonical repository URL for external skills.
+- Follow each link with one short phrase that states the handoff condition or
+  owned outcome. Do not copy the other skill's procedure.
+- Keep boundaries and required routing in the frontmatter description or main
+  workflow. The related-skills list helps composition; it does not create a
+  dependency or grant permission.
+- Add reciprocal links only when both directions help the agent choose the next
+  skill. An inbound link does not require a reciprocal entry.
+- Prioritize the most useful outbound handoffs. Routing boundaries remain
+  discoverable from frontmatter.
+
+Use this shape:
+
+```markdown
+## Related skills
+
+- [`vp-example`](https://github.com/VdustR/skills/tree/main/skills/vp-example)
+  when the example workflow owns the next step.
+```
+
 ## Installation Guidance
 
 Default to the pinned `npx skills@1.5.3` CLI for installation and management:

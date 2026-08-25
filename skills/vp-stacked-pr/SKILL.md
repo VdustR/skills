@@ -80,3 +80,10 @@ than a memorized recipe:
 Other hosts ship their own dependency features on their own schedules, and none of
 them were checked here. Before assuming a host has nothing, look up whether it
 offers dependent or stacked merge requests, and what its plan tier requires.
+
+## Related skills
+
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for
+  single-branch commits, cleanup, and ordinary pull-request lifecycle work.
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  when a PR in the stack has actionable author-side feedback.

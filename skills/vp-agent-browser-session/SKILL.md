@@ -54,3 +54,10 @@ it or fetch instructions from GitHub without user authorization.
 
 Use the bundled session helper and read its current help for operations and
 options. Do not manually reproduce its profile or session identity logic.
+
+## Related skills
+
+- [`vp-long-running-processes`](https://github.com/VdustR/skills/tree/main/skills/vp-long-running-processes)
+  for browser processes that must remain running outside the current task.
+- [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
+  when a session ends with managed profiles or browser state to report.

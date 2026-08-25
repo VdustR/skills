@@ -78,8 +78,13 @@ its place, and the summary does not contradict the body. Remove filler,
 unsupported intensifiers, process narration, and detail that belongs in the
 body. Use `references/anti-slop.md` for the final language check.
 
-## Route
-
 Use a workflow-specific skill when the user needs investigation, review,
 verification, lifecycle work, or edits beyond the summary. Apply this skill to
 the summary portion only when the user requests its TL;DR logic there.
+
+## Related skills
+
+- [`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator)
+  when the summary opens a problem investigation or issue.
+- [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
+  when the summary opens an implementation or pull request.

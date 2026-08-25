@@ -29,3 +29,10 @@ without the required evidence.
 Read `references/classification-patterns.md` for item classification,
 `references/verification-recipes.md` for evidence patterns, and
 `references/checkbox-update-rules.md` before writing checkbox state.
+
+## Related skills
+
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  when a checklist failure is also actionable PR feedback.
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for the
+  surrounding pull-request lifecycle.

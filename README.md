@@ -66,6 +66,11 @@ if you work with stacks.
 
 Manage persistent agent-browser sessions with dedicated Chrome profiles.
 
+### vp-autodev
+
+Take an owned-repository issue or development task through validation,
+implementation, PR feedback loops, merge readiness, and release follow-up.
+
 ### vp-checklist-runner
 
 Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
@@ -101,6 +106,11 @@ GitHub platform behavior: attaching media and files to issues and PRs, markdown 
 ### vp-guided-focus
 
 Use structured questions to align on requirements before planning or complex tasks.
+
+### vp-issue-investigator
+
+Validate a suspected software problem, find related work, and prepare or file an
+evidence-backed issue.
 
 ### vp-long-running-processes
 

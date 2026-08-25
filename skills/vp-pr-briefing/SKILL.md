@@ -28,3 +28,14 @@ Separate repository evidence, hosting-platform state, and inference. Explain
 unfamiliar code paths at the reader's altitude and link to the most useful
 primary context. A checked-out branch is not proof that the local checkout
 matches the PR head.
+
+## Related skills
+
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  when the PR author needs to address actionable feedback.
+- [`vp-pr-review-followup`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-review-followup)
+  when a reviewer needs to verify the author's response or fix.
+- [`vp-checklist-runner`](https://github.com/VdustR/skills/tree/main/skills/vp-checklist-runner)
+  when the PR contains an existing checklist to verify.
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for the
+  next authorized pull-request lifecycle action.

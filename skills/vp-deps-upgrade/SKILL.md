@@ -30,3 +30,10 @@ than trusting the bot summary. Read only the relevant reference:
 - `references/context7-integration.md`
 - `references/confidence-index.md`
 - `references/deps-bot-handling.md`
+
+## Related skills
+
+- [`vp-deps-migrate`](https://github.com/VdustR/skills/tree/main/skills/vp-deps-migrate)
+  when the work replaces the dependency or API family.
+- [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
+  when a dependency-bot PR has actionable review feedback.

@@ -40,8 +40,15 @@ reporting, and leave credential files to the user.
 Wrap-up closes work; it does not start new work. Record a newly found problem
 as a follow-up.
 
-## Route
+## Related skills
 
-Use vp-git for Git and pull request state, vp-long-running-processes for
-services, vp-env-secrets for secret material, and vp-agent-browser-session for
-managed browser sessions and profiles.
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git
+  and pull-request state found during closeout.
+- [`vp-long-running-processes`](https://github.com/VdustR/skills/tree/main/skills/vp-long-running-processes)
+  for services that must be stopped or left running intentionally.
+- [`vp-env-secrets`](https://github.com/VdustR/skills/tree/main/skills/vp-env-secrets)
+  for staged or temporary secret material.
+- [`vp-agent-browser-session`](https://github.com/VdustR/skills/tree/main/skills/vp-agent-browser-session)
+  for managed browser sessions and profiles.
+- [`vp-retro`](https://github.com/VdustR/skills/tree/main/skills/vp-retro) when
+  the user also wants workflow improvement analysis.

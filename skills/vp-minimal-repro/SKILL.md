@@ -53,9 +53,18 @@ De-identify before a reproduction leaves the machine, and treat what survives
 de-identification as a measure of whether it is minimal. See
 `references/de-identification.md`.
 
-## Route
-
 Report where a kept reproduction lives, along with anything it installed or
-started, so it is not left behind silently. Use vp-session-wrapup for that
-leftover state, vp-long-running-processes for anything the reproduction keeps
-running, and vp-git if the reproduction or its fix is to be committed.
+started, so it is not left behind silently.
+
+## Related skills
+
+- [`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator)
+  when the reproduction should support a problem report.
+- [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
+  when the reproduced failure should proceed through a fix and PR delivery.
+- [`vp-long-running-processes`](https://github.com/VdustR/skills/tree/main/skills/vp-long-running-processes)
+  for processes the reproduction must keep running.
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) when the
+  reproduction or fix should be committed.
+- [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
+  for reporting or cleaning up reproduction artifacts.

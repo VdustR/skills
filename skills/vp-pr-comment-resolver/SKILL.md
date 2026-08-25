@@ -35,3 +35,12 @@ external write not already authorized. Read only the relevant reference:
 - `references/commit-strategy.md`
 - `references/reply-templates.md`
 - `references/github-cli.md`
+
+## Related skills
+
+- [`vp-pr-briefing`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-briefing)
+  when the PR needs orientation before feedback is resolved.
+- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for commit
+  strategy and pull-request lifecycle decisions.
+- [`vp-pr-review-followup`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-review-followup)
+  when acting as the reviewer instead of the PR author.
