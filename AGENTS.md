@@ -48,10 +48,9 @@ of the same workflow. Omit the section when no relationship changes routing.
   workflow. The related-skills list helps composition; it does not create a
   dependency or grant permission.
 - Add reciprocal links only when both directions help the agent choose the next
-  skill.
-- Prioritize the most useful outbound handoffs. An inbound link does not require
-  a reciprocal entry, and routing boundaries remain discoverable from
-  frontmatter.
+  skill. An inbound link does not require a reciprocal entry.
+- Prioritize the most useful outbound handoffs. Routing boundaries remain
+  discoverable from frontmatter.
 
 Use this shape:
 
