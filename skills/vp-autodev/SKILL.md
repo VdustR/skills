@@ -3,11 +3,13 @@ name: vp-autodev
 description: >-
   Take a valid issue or development task through research, reproduction,
   solution design, implementation, verification, draft PR review, feedback
-  loops, merge readiness, and release follow-up. Use for end-to-end development
+  loops, merge, and release follow-up. Use for end-to-end development
   in repositories the user owns or is authorized to change. Boundary: use a
   narrower dependency, reproduction, checklist, or PR skill when the request
-  covers only that step. Does not grant permission for external writes, merge,
-  release, or unrelated fixes.
+  covers only that step. In a user-specified repository the user owns, this
+  workflow may merge and release a low-risk, fully verified change when the
+  repository's own rules permit it. It does not authorize unrelated fixes or
+  writes outside that delivery workflow.
 ---
 
 # Auto Development
@@ -35,8 +37,9 @@ Keep evidence for each decision from issue validation through delivery:
 5. Verify the fix against the reproduction and relevant tests, checks, builds,
    or real behavior. Compare before and after evidence and retain any unverified
    environment or hardware cases.
-6. Create a draft pull request when authorized. Review the full diff, commits,
-   and PR text as a maintainer before requesting human or automated review.
+6. Create a draft pull request as part of the requested delivery workflow.
+   Review the full diff, commits, and PR text as a maintainer before requesting
+   human or automated review.
 7. Record the current head commit, then monitor all repository-defined signals:
    CI, check runs, bot comments, inline threads, PR discussion, and reaction
    emoji on the main post or comments. Treat a changed emoji as new state, using
@@ -47,12 +50,18 @@ Keep evidence for each decision from issue validation through delivery:
    repository reports that automated review finished with no feedback, or a
    blocker or human decision is explicit. If the repository exposes no
    completion signal, perform a fresh final check and report that limitation.
-9. Merge only when authorized, repository policy permits it, required evidence
-   is green, feedback is handled, and the remaining risk is low enough for that
-   repository. Do not infer merge permission from the skill invocation alone.
+9. For a user-specified repository the user owns, merge when repository policy
+   permits it, required evidence is green, feedback is handled, the change is
+   fully verified, and the remaining risk is low. Treat the request to auto
+   develop the change as authorization for this in-scope merge. Ask before
+   merging when ownership is unclear, policy requires a human decision, risk is
+   material, verification is incomplete, or the merge would expand scope.
 10. After merge, determine from repository policy and release mechanics whether
-    a release is required. Run the authorized release workflow and verify the
-    published result, or record why no release is needed.
+    a release is required. Under the same ownership, policy, verification, and
+    low-risk conditions, run the in-scope release workflow and verify the
+    published result. Ask before a release with material operational impact,
+    ambiguous versioning or release policy, incomplete verification, or scope
+    beyond the requested change. Otherwise, record why no release is needed.
 
 Keep the pull request draft while material design, verification, or feedback is
 unresolved. Do not treat CI success as proof that the issue is fixed, or silence

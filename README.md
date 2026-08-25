@@ -69,7 +69,8 @@ Manage persistent agent-browser sessions with dedicated Chrome profiles.
 ### vp-autodev
 
 Take an owned-repository issue or development task through validation,
-implementation, PR feedback loops, merge readiness, and release follow-up.
+implementation, PR feedback loops, and low-risk verified merge and release when
+repository policy permits.
 
 ### vp-checklist-runner
 
