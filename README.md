@@ -69,8 +69,8 @@ Manage persistent agent-browser sessions with dedicated Chrome profiles.
 ### vp-autodev
 
 Take an owned-repository issue or development task through validation,
-implementation, PR feedback loops, and low-risk verified merge and release when
-repository policy permits.
+implementation, authorized Git and PR delivery, and low-risk verified merge and
+release follow-up when repository policy permits.
 
 ### vp-checklist-runner
 
@@ -195,10 +195,10 @@ Validation layers:
 - `npm run validate:latest` checks compatibility with the latest `skills` CLI for monitoring only.
 
 Smoke fixtures live under `fixtures/smoke/` and cover behavior that is hard to
-prove with static validation, such as PR comment resolution policy, branch and
-stash deletion evidence, stacked branch history-rewrite safety, screen-capture
-scoping on a shared machine, GitHub attachment visibility, and session cleanup
-authorization limits.
+prove with static validation, such as auto-development terminal states, PR
+comment resolution policy, branch and stash deletion evidence, stacked branch
+history-rewrite safety, screen-capture scoping on a shared machine, GitHub
+attachment visibility, and session cleanup authorization limits.
 
 ## License
 

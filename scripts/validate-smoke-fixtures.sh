@@ -18,6 +18,7 @@ require_pattern() {
 }
 
 required_skills=(
+  "vp-autodev"
   "vp-skills"
   "vp-pr-comment-resolver"
   "vp-git"
@@ -55,6 +56,30 @@ github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
+autodev_fixture="fixtures/smoke/vp-autodev.md"
+autodev_skill="skills/vp-autodev/SKILL.md"
+
+require_pattern "$autodev_fixture" 'branch creation.*commit.*push.*Draft PR' \
+  "vp-autodev fixture must cover authorization through Draft PR creation"
+require_pattern "$autodev_fixture" 'Draft-to-Ready|mark.*Ready' \
+  "vp-autodev fixture must cover the Draft-to-Ready transition"
+require_pattern "$autodev_fixture" 'Ready PR.*not.*terminal|not.*stop.*Ready PR' \
+  "vp-autodev fixture must reject a Ready PR as a successful terminal state"
+require_pattern "$autodev_fixture" 'merge.*release follow-up|release follow-up.*merge' \
+  "vp-autodev fixture must cover merge and release follow-up"
+require_pattern "$autodev_skill" 'branch creation' \
+  "vp-autodev must explicitly authorize branch creation"
+require_pattern "$autodev_skill" 'commit, push' \
+  "vp-autodev must explicitly authorize commit and push"
+require_pattern "$autodev_skill" 'Draft PR creation' \
+  "vp-autodev must explicitly authorize Draft PR creation"
+require_pattern "$autodev_skill" 'Draft-to-Ready' \
+  "vp-autodev must explicitly authorize the Draft-to-Ready transition"
+require_pattern "$autodev_skill" 'changes, a Draft PR, or a Ready PR' \
+  "vp-autodev must reject local, Draft, and Ready states as successful completion"
+if grep -Fq 'Stop when all required signals pass' "$autodev_skill"; then
+  fail "vp-autodev review success must advance to merge evaluation"
+fi
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"
