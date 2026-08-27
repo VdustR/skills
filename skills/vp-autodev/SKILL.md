@@ -7,9 +7,9 @@ description: >-
   in repositories the user owns or is authorized to change. Boundary: use a
   narrower dependency, reproduction, checklist, or PR skill when the request
   covers only that step. In a user-specified repository the user owns, this
-  workflow may merge and release a low-risk, fully verified change when the
-  repository's own rules permit it. It does not authorize unrelated fixes or
-  writes outside that delivery workflow.
+  workflow owns delivery through merge and required release follow-up when the
+  repository's rules permit it and the change is low risk and fully verified.
+  It does not authorize unrelated fixes or writes outside that workflow.
 ---
 
 # Auto Development
@@ -17,6 +17,14 @@ description: >-
 Take an owned-repository issue or development task through the authorized
 delivery lifecycle. Follow repository instructions and the user's preferred
 language, framework, Git, GitHub, review, and release skills.
+
+An explicit auto-development request authorizes these in-scope operations:
+branch creation, commit, push, Draft PR creation, the Draft-to-Ready transition,
+merge, and required release follow-up as one delivery workflow. Proceed without
+repeated authorization when ownership is clear, repository policy permits the
+action, required evidence applies to the current head, verification is
+complete, feedback is handled, and remaining risk is low. Ask only when a
+safety gate in this workflow requires a human decision.
 
 ## Workflow
 
@@ -32,24 +40,29 @@ Keep evidence for each decision from issue validation through delivery:
    addresses the cause, fits repository conventions, and avoids foreseeable
    regressions. Record material alternatives, trade-offs, and the reason for the
    selected approach.
-4. Implement the smallest coherent change. Preserve unrelated user work and
-   avoid opportunistic fixes.
+4. Create the working branch when needed and implement the smallest coherent
+   change. Preserve unrelated user work and avoid opportunistic fixes. Commit
+   and push the verified change as part of the delivery workflow.
 5. Verify the fix against the reproduction and relevant tests, checks, builds,
    or real behavior. Compare before and after evidence and retain any unverified
    environment or hardware cases.
-6. Create a draft pull request as part of the requested delivery workflow.
-   Review the full diff, commits, and PR text as a maintainer before requesting
-   human or automated review.
+6. Create a Draft PR as part of the requested delivery workflow. Review the
+   full diff, commits, and PR text as a maintainer before requesting human or
+   automated review. Keep it Draft while material design, verification, or
+   feedback remains unresolved; otherwise complete the Draft-to-Ready
+   transition.
 7. Record the current head commit, then monitor all repository-defined signals:
    CI, check runs, bot comments, inline threads, PR discussion, and reaction
    emoji on the main post or comments. Treat a changed emoji as new state, using
    that repository's convention instead of a universal mapping. Re-check that a
    positive signal applies to the current head.
 8. Route actionable comments and threads through `vp-pr-comment-resolver`, then
-   repeat verification and monitoring. Stop when all required signals pass, the
-   repository reports that automated review finished with no feedback, or a
-   blocker or human decision is explicit. If the repository exposes no
-   completion signal, perform a fresh final check and report that limitation.
+   repeat verification and monitoring. When all required signals pass or the
+   repository reports that automated review finished with no feedback, advance
+   to Ready and merge evaluation. Stop only when a blocker or required human
+   decision is explicit. If the repository exposes no completion signal,
+   perform a fresh final check and report that limitation before evaluating
+   whether the available evidence permits further progress.
 9. For a user-specified repository the user owns, merge when repository policy
    permits it, required evidence is green, feedback is handled, the change is
    fully verified, and the remaining risk is low. Treat the request to auto
@@ -63,9 +76,14 @@ Keep evidence for each decision from issue validation through delivery:
     ambiguous versioning or release policy, incomplete verification, or scope
     beyond the requested change. Otherwise, record why no release is needed.
 
-Keep the pull request draft while material design, verification, or feedback is
-unresolved. Do not treat CI success as proof that the issue is fixed, or silence
-from one bot surface as proof that every review signal has completed.
+Successful completion reaches merge plus required release follow-up. Local
+changes, a Draft PR, or a Ready PR are not successful terminal states when the
+documented low-risk conditions permit further progress. When a safety gate
+prevents progress, report the bounded terminal state and the exact missing
+decision or evidence.
+
+Do not treat CI success as proof that the issue is fixed, or silence from one
+bot surface as proof that every review signal has completed.
 
 ## Problems discovered during the work
 

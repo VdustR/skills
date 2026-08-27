@@ -1,4 +1,4 @@
 interface:
   display_name: "Auto Development"
-  short_description: "Drive an owned-repo change through delivery"
-  default_prompt: "Use $vp-autodev to validate, implement, review, and deliver this owned-repository change through merge and release when repository policy, verification, and risk permit."
+  short_description: "Own an authorized change through delivery"
+  default_prompt: "Use $vp-autodev to validate, implement, commit, open and advance the PR, merge, and complete release follow-up when repository policy, verification, and risk permit."
