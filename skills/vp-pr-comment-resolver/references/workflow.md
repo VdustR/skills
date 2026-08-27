@@ -3,14 +3,25 @@
 ## Establish The Review Snapshot
 
 Record the PR, current head commit, base, author, draft state, and retrieval time.
-Fetch unresolved review threads and relevant PR discussion comments. Include
-author type, body, location, timestamps, outdated state, replies, and resolution
-state.
+Fetch both GitHub feedback collections independently:
+
+1. every issue comment in the PR conversation; and
+2. every pull request review thread, including every inline review comment and
+   reply in each thread.
+
+Exhaust pagination for each top-level collection and each thread's comments.
+Record total fetched counts, page completion, and retrieval time. Retain
+resolved and outdated threads in the snapshot because their replies can explain
+the current state. If either collection cannot be read completely, report the
+gap and do not conclude that feedback is absent or handled.
+
+Include author type, body, location, timestamps, outdated state, replies, and
+resolution state.
 
 Do not ignore:
 
 - outdated but unresolved threads;
-- discussion comments at the bottom of the PR;
+- issue comments in the PR conversation;
 - later replies that may already answer an earlier comment;
 - reaction-only bot signals when the repository uses them for review state.
 
@@ -41,13 +52,13 @@ thread open and report the pending push.
 
 Reply after the evidence exists. Resolve handled bot review threads; leave human
 threads open for the reviewer unless the user explicitly directs otherwise. PR
-discussion comments cannot be resolved.
+conversation issue comments cannot be resolved.
 
 ## Reconcile
 
-Re-fetch the PR after writes. Confirm replies landed on the intended surface,
-eligible bot threads are resolved, human threads remain open, checks refer to
-the current head, and no new feedback appeared.
+Re-fetch both fully paginated collections after writes. Confirm replies landed
+on the intended surface, eligible bot threads are resolved, human threads
+remain open, checks refer to the current head, and no new feedback appeared.
 
 Report outcomes by feedback kind and decision, commits and verification,
 resolved versus remaining threads, and anything requiring user judgment.

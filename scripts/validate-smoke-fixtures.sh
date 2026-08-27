@@ -102,8 +102,14 @@ require_pattern "$pr_resolver_fixture" 'resolve.*bot review thread|bot review th
   "vp-pr-comment-resolver fixture must cover bot-only resolution"
 require_pattern "$pr_resolver_fixture" 'human review threads?.*unresolved|unresolved.*human review threads?' \
   "vp-pr-comment-resolver fixture must cover human unresolved policy"
-require_pattern "$pr_resolver_fixture" 'PR discussion comment' \
-  "vp-pr-comment-resolver fixture must cover PR discussion comments"
+require_pattern "$pr_resolver_fixture" 'PR conversation issue comment' \
+  "vp-pr-comment-resolver fixture must cover PR conversation issue comments"
+require_pattern "$pr_resolver_fixture" 'both GitHub feedback surfaces.*independently paginated|independently paginated.*both GitHub feedback surfaces' \
+  "vp-pr-comment-resolver fixture must require complete independent pagination"
+require_pattern "$pr_resolver_fixture" 'nested inline review-comment replies.*fully paginated|fully paginated.*nested inline review-comment replies' \
+  "vp-pr-comment-resolver fixture must cover nested review-comment pagination"
+require_pattern "$autodev_fixture" 'partial reads.*feedback.*handled|feedback.*handled.*partial reads' \
+  "vp-autodev fixture must reject partial feedback snapshots"
 require_pattern "$pr_resolver_fixture" 'outdated unresolved review thread' \
   "vp-pr-comment-resolver fixture must cover outdated unresolved threads"
 require_pattern "$pr_resolver_fixture" 'explicit Markdown commit link' \

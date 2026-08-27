@@ -17,6 +17,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
   unresolved, then mark it Ready when those gates pass.
 - Treat successful review completion as a transition to merge evaluation.
 - Verify required evidence against the current head before advancing.
+- Require complete, independently paginated snapshots of PR conversation issue
+  comments and pull request review threads with all inline comments and replies.
 - Merge when repository policy permits, verification is complete, feedback is
   handled, and remaining risk is low.
 - Determine whether a release is required after merge, perform a low-risk and
@@ -32,6 +34,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
 - authorization covers branch creation, commit, push, Draft PR creation, and
   the Draft-to-Ready transition
 - passing review signals advance to merge evaluation
+- partial reads cannot establish that feedback is handled on either GitHub
+  feedback surface
 - a local change, Draft PR, or Ready PR is not a successful terminal state
 - merge is followed by release follow-up and published-result verification
 - safety gates and scope boundaries remain intact

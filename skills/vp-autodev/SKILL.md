@@ -52,12 +52,16 @@ Keep evidence for each decision from issue validation through delivery:
    feedback remains unresolved; otherwise complete the Draft-to-Ready
    transition.
 7. Record the current head commit, then monitor all repository-defined signals:
-   CI, check runs, bot comments, inline threads, PR discussion, and reaction
+   CI, check runs, bot comments, pull request review comments (inline code
+   comments), issue comments in the PR conversation, and reaction
    emoji on the main post or comments. Treat a changed emoji as new state, using
    that repository's convention instead of a universal mapping. Re-check that a
    positive signal applies to the current head.
-8. Route actionable comments and threads through `vp-pr-comment-resolver`, then
-   repeat verification and monitoring. When all required signals pass or the
+8. Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
+   a complete, independently paginated snapshot of PR conversation issue
+   comments and review threads with all inline comments and replies; a partial
+   read cannot establish that feedback is handled. Then repeat verification and
+   monitoring. When all required signals pass or the
    repository reports that automated review finished with no feedback, advance
    to Ready and merge evaluation. Stop only when a blocker or required human
    decision is explicit. If the repository exposes no completion signal,
