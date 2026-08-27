@@ -28,6 +28,7 @@ link.
 > There are two valid interpretations: `<A>` and `<B>`. I have not changed or
 > resolved this thread pending `<decision>`.
 
-For PR discussion comments, mention the author and quote only the minimum excerpt
-needed to identify the concern. Avoid duplicating a later answer. Never claim a
-test, check, reply, or resolution that was not verified after the write.
+For PR conversation issue comments, mention the author and quote only the
+minimum excerpt needed to identify the concern. Avoid duplicating a later
+answer. Never claim a test, check, reply, or resolution that was not verified
+after the write.

@@ -12,8 +12,9 @@ For each feedback item:
 4. Is the author a bot, human, or ambiguous?
    - Resolve handled bot review threads. Human threads require explicit user
      direction.
-5. Is this a review thread or PR discussion comment?
-   - Reply on the matching surface; discussion comments cannot be resolved.
+5. Is this a review thread or PR conversation issue comment?
+   - Reply on the matching surface; PR conversation issue comments cannot be
+     resolved.
 
 Pause for disagreement, multiple valid product interpretations, architectural
 scope expansion, or history rewriting.

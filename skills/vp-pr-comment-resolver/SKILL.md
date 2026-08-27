@@ -3,7 +3,8 @@ name: vp-pr-comment-resolver
 description: >-
   Process author-side GitHub PR feedback: verify comments, make focused fixes,
   reply to the correct surface, and resolve eligible threads. Use for unresolved
-  review threads or actionable PR discussion comments. Boundary: not for writing
+  pull request review comments (inline code comments) or actionable issue
+  comments in the PR conversation. Boundary: not for writing
   reviews or verifying checklists.
 ---
 
@@ -14,16 +15,19 @@ current head, repository rules, code, and tests before deciding.
 
 ## Workflow
 
-1. Fetch unresolved review threads and relevant PR discussion comments,
-   including author type, timestamps, location, and outdated state.
+1. Build a complete two-surface snapshot: all issue comments in the PR
+   conversation and all pull request review threads with every inline review
+   comment and reply. Exhaust pagination independently, retain resolved and
+   outdated items for context, and record counts and retrieval cursors. An
+   incomplete surface is a blocker, not evidence that feedback is absent.
 2. Classify each item as fix, already handled, no fix, disagreement, uncertain,
    or out of scope.
 3. Apply only validated fixes, verify them, and commit by coherent topic.
-4. Reply on the original surface with evidence. Review threads and PR discussion
-   comments require different reply mechanisms.
+4. Reply on the original surface with evidence. Review threads and issue
+   comments in the PR conversation require different reply mechanisms.
 5. Resolve handled bot review threads. Leave human review threads unresolved
-   unless the user explicitly directs otherwise. Discussion comments have no
-   resolvable state.
+   unless the user explicitly directs otherwise. PR conversation issue comments
+   have no resolvable state.
 6. Re-fetch feedback and report remaining risk or required user judgment.
 
 Ask before disagreement, ambiguity, scope expansion, history rewriting, or any
