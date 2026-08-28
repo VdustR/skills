@@ -6,10 +6,11 @@ Record the PR, current head commit, base, author, draft state, and retrieval tim
 Fetch both GitHub feedback collections independently:
 
 1. every issue comment in the PR conversation; and
-2. every pull request review thread, including every inline review comment and
-   reply in each thread.
+2. the pull request review surface: every submitted review plus every review
+   thread, including every inline review comment and reply in each thread.
 
-Exhaust pagination for each top-level collection and each thread's comments.
+Exhaust pagination independently for issue comments, submitted reviews, review
+threads, and each thread's comments.
 Record total fetched counts, page completion, and retrieval time. Retain
 resolved and outdated threads in the snapshot because their replies can explain
 the current state. If either collection cannot be read completely, report the
@@ -22,6 +23,7 @@ Do not ignore:
 
 - outdated but unresolved threads;
 - issue comments in the PR conversation;
+- actionable bodies on submitted reviews, including body-only reviews;
 - later replies that may already answer an earlier comment;
 - reaction-only bot signals when the repository uses them for review state.
 
@@ -50,9 +52,12 @@ For fixes, push only when authorized and verify the PR's remote head contains th
 commit before replying or resolving. If the fix is not on the PR head, leave the
 thread open and report the pending push.
 
-Reply after the evidence exists. Resolve handled bot review threads; leave human
-threads open for the reviewer unless the user explicitly directs otherwise. PR
-conversation issue comments cannot be resolved.
+Reply after the evidence exists. Reply to actionable submitted-review bodies in
+the PR conversation, identifying and linking the original review because GitHub
+has no top-level review reply mutation. Resolve handled bot review threads;
+leave human threads open for the reviewer unless the user explicitly directs
+otherwise. Submitted reviews and PR conversation issue comments cannot be
+resolved.
 
 ## Reconcile
 

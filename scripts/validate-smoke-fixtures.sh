@@ -49,6 +49,7 @@ done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
 pr_resolver_reply_templates="skills/vp-pr-comment-resolver/references/reply-templates.md"
+pr_resolver_agent="skills/vp-pr-comment-resolver/agents/openai.yaml"
 git_fixture="fixtures/smoke/vp-git.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
@@ -58,6 +59,7 @@ vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 autodev_fixture="fixtures/smoke/vp-autodev.md"
 autodev_skill="skills/vp-autodev/SKILL.md"
+autodev_reviewer_signals="skills/vp-autodev/references/reviewer-terminal-signals.md"
 
 require_pattern "$autodev_fixture" 'branch creation.*commit.*push.*Draft PR' \
   "vp-autodev fixture must cover authorization through Draft PR creation"
@@ -80,6 +82,46 @@ require_pattern "$autodev_skill" 'changes, a Draft PR, or a Ready PR' \
 if grep -Fq 'Stop when all required signals pass' "$autodev_skill"; then
   fail "vp-autodev review success must advance to merge evaluation"
 fi
+require_pattern "$autodev_fixture" 'Ready.*(new review trigger|final observation)' \
+  "vp-autodev fixture must start a final observation gate after Ready"
+require_pattern "$autodev_fixture" 'Ready-only reviewer.*circular pre-Ready prerequisite' \
+  "vp-autodev fixture must not require Ready-triggered evidence before Ready"
+require_pattern "$autodev_fixture" 'delayed inline Codex review.*block' \
+  "vp-autodev fixture must block on a delayed Ready-triggered Codex review"
+require_pattern "$autodev_fixture" 'reaction-only no-finding signal' \
+  "vp-autodev fixture must cover the Codex no-finding reaction"
+require_pattern "$autodev_fixture" 'delayed bot replies' \
+  "vp-autodev fixture must include delayed bot replies"
+require_pattern "$autodev_fixture" 'terminal review signal.*settle/readback.*does not permit immediate merge' \
+  "vp-autodev fixture must not merge immediately on the first terminal signal"
+require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment.*reactions' \
+  "vp-autodev fixture must include every required reaction surface"
+require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \
+  "vp-autodev fixture must reconcile CI and feedback after the last mutation"
+require_pattern "$autodev_fixture" 'Independently paginate submitted reviews' \
+  "vp-autodev fixture must cover body-only submitted reviews"
+require_pattern "$autodev_fixture" 'pre-Ready-only reviewer survives Ready' \
+  "vp-autodev fixture must preserve valid pre-Ready-only reviewer evidence"
+require_pattern "$autodev_fixture" 'bounded wait.*safe blocker' \
+  "vp-autodev fixture must safely block when terminal evidence never arrives"
+require_pattern "$autodev_reviewer_signals" 'silence.*(not completion|pending)' \
+  "vp-autodev reviewer gate must reject silence as a terminal signal"
+require_pattern "$autodev_reviewer_signals" 'independently complete pagination' \
+  "vp-autodev reviewer gate must require complete nested pagination"
+require_pattern "$autodev_reviewer_signals" 'PR-level reactions.*review-level reactions.*inline-comment reactions' \
+  "vp-autodev reviewer gate must enumerate reaction surfaces"
+require_pattern "$autodev_reviewer_signals" 'mutation restarts this final snapshot' \
+  "vp-autodev reviewer gate must reconcile after the final mutation"
+require_pattern "$autodev_reviewer_signals" 'terminal signal starts? the final settle and readback phase' \
+  "vp-autodev reviewer gate must observe delayed replies after a terminal signal"
+require_pattern "$autodev_reviewer_signals" 'Queued.*reviewing.*nonterminal bot replies remain.*pending' \
+  "vp-autodev reviewer gate must not treat status replies as terminal findings"
+require_pattern "$autodev_reviewer_signals" 'Authorship alone does not prove reviewer completion' \
+  "vp-autodev reviewer gate must require terminal semantics beyond bot authorship"
+require_pattern "$autodev_reviewer_signals" 'Fetch every submitted review with independent complete pagination' \
+  "vp-autodev reviewer gate must independently paginate submitted reviews"
+require_pattern "$autodev_reviewer_signals" 'Independently.*paginate every reaction collection.*record.*pagination completion' \
+  "vp-autodev reviewer gate must fully paginate every reaction target"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"
@@ -116,6 +158,12 @@ require_pattern "$pr_resolver_fixture" 'explicit Markdown commit link' \
   "vp-pr-comment-resolver fixture must cover linked commit evidence"
 require_pattern "$pr_resolver_reply_templates" '\[`<short-sha>`\]\(<canonical-commit-url>\)' \
   "vp-pr-comment-resolver fixed reply must use an explicit commit link"
+require_pattern "$pr_resolver_fixture" 'Paginate submitted reviews independently' \
+  "vp-pr-comment-resolver fixture must cover body-only submitted reviews"
+require_pattern "$pr_resolver_fixture" 'submitted-review body.*reply.*PR conversation' \
+  "vp-pr-comment-resolver fixture must define the supported review-body reply"
+require_pattern "$pr_resolver_agent" 'submitted-review bodies' \
+  "vp-pr-comment-resolver agent prompt must include submitted-review bodies"
 
 require_pattern "$git_fixture" 'force deletion harmless' \
   "vp-git fixture must cover squash-merge state not justifying force deletion"

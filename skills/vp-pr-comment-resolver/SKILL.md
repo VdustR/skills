@@ -2,9 +2,10 @@
 name: vp-pr-comment-resolver
 description: >-
   Process author-side GitHub PR feedback: verify comments, make focused fixes,
-  reply to the correct surface, and resolve eligible threads. Use for unresolved
-  pull request review comments (inline code comments) or actionable issue
-  comments in the PR conversation. Boundary: not for writing
+  reply through the supported mechanism, and resolve eligible threads. Use for
+  actionable submitted-review bodies, unresolved pull request review comments
+  (inline code comments), or actionable issue comments in the PR conversation.
+  Boundary: not for writing
   reviews or verifying checklists.
 ---
 
@@ -16,18 +17,22 @@ current head, repository rules, code, and tests before deciding.
 ## Workflow
 
 1. Build a complete two-surface snapshot: all issue comments in the PR
-   conversation and all pull request review threads with every inline review
-   comment and reply. Exhaust pagination independently, retain resolved and
-   outdated items for context, and record counts and retrieval cursors. An
-   incomplete surface is a blocker, not evidence that feedback is absent.
+   conversation, plus the pull request review surface containing all submitted
+   reviews and all review threads with every inline review comment and reply.
+   Exhaust pagination independently for issue comments, submitted reviews,
+   review threads, and nested replies; retain resolved and outdated items for
+   context; and record counts and retrieval cursors. An incomplete surface is a
+   blocker, not evidence that feedback is absent.
 2. Classify each item as fix, already handled, no fix, disagreement, uncertain,
    or out of scope.
 3. Apply only validated fixes, verify them, and commit by coherent topic.
-4. Reply on the original surface with evidence. Review threads and issue
-   comments in the PR conversation require different reply mechanisms.
+4. Reply with evidence through the supported mechanism. Reply directly to a
+   review thread or PR conversation issue comment. GitHub has no reply mutation
+   for a top-level submitted-review body, so answer it in the PR conversation
+   with the review author and link identified.
 5. Resolve handled bot review threads. Leave human review threads unresolved
-   unless the user explicitly directs otherwise. PR conversation issue comments
-   have no resolvable state.
+   unless the user explicitly directs otherwise. Submitted reviews and PR
+   conversation issue comments have no resolvable state.
 6. Re-fetch feedback and report remaining risk or required user judgment.
 
 Ask before disagreement, ambiguity, scope expansion, history rewriting, or any
