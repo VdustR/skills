@@ -50,6 +50,7 @@ Assume the branch is checked out locally and `gh` is authenticated.
 - PR conversation issue comments use mention-plus-quote replies
 - both GitHub feedback surfaces are mandatory and independently paginated
 - submitted reviews are independently paginated within the review surface
+- the agent default prompt includes actionable submitted-review bodies
 - nested inline review-comment replies are fully paginated
 - resolved threads are retained during retrieval and filtered afterward
 - bot review threads are terminal after a decided outcome

@@ -51,7 +51,7 @@ After Ready and after every later mutation:
 4. Fetch every review thread, every inline comment, and every nested reply with
    independently complete pagination, including resolved and outdated threads.
 5. Fetch PR-level reactions, review-level reactions, inline-comment reactions,
-   and reactions on repository-specified comments or commands.
+   and reactions on repository-specified comments or commands. Independently paginate every reaction collection and record its pagination completion.
 6. Read delayed bot replies on both feedback surfaces and map each signal to its
    actor, target, timestamp, trigger, and head.
 7. Re-evaluate the matrix for every configured reviewer. Any actionable item or

@@ -31,6 +31,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
   body-only reviews cannot be missed.
 - Include delayed bot replies plus PR-level, review-level, and inline-comment reactions
   in the final snapshot.
+- Independently paginate every reaction collection and record completion so a
+  no-finding or conflicting signal cannot be omitted.
 - A terminal review signal starts settle/readback and does not permit immediate merge;
   finish the bounded observation and refresh again.
 - Re-read current-head CI and feedback after the last mutation, including Ready,

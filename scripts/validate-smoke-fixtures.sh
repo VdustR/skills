@@ -49,6 +49,7 @@ done
 
 pr_resolver_fixture="fixtures/smoke/vp-pr-comment-resolver.md"
 pr_resolver_reply_templates="skills/vp-pr-comment-resolver/references/reply-templates.md"
+pr_resolver_agent="skills/vp-pr-comment-resolver/agents/openai.yaml"
 git_fixture="fixtures/smoke/vp-git.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
@@ -119,6 +120,8 @@ require_pattern "$autodev_reviewer_signals" 'Authorship alone does not prove rev
   "vp-autodev reviewer gate must require terminal semantics beyond bot authorship"
 require_pattern "$autodev_reviewer_signals" 'Fetch every submitted review with independent complete pagination' \
   "vp-autodev reviewer gate must independently paginate submitted reviews"
+require_pattern "$autodev_reviewer_signals" 'Independently.*paginate every reaction collection.*record.*pagination completion' \
+  "vp-autodev reviewer gate must fully paginate every reaction target"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"
@@ -159,6 +162,8 @@ require_pattern "$pr_resolver_fixture" 'Paginate submitted reviews independently
   "vp-pr-comment-resolver fixture must cover body-only submitted reviews"
 require_pattern "$pr_resolver_fixture" 'submitted-review body.*reply.*PR conversation' \
   "vp-pr-comment-resolver fixture must define the supported review-body reply"
+require_pattern "$pr_resolver_agent" 'submitted-review bodies' \
+  "vp-pr-comment-resolver agent prompt must include submitted-review bodies"
 
 require_pattern "$git_fixture" 'force deletion harmless' \
   "vp-git fixture must cover squash-merge state not justifying force deletion"
