@@ -7,10 +7,16 @@ of truth for which reviewers run and how they signal completion.
 ## Observation Record
 
 Record the pull request, Ready or review-request trigger time, current head,
-configured reviewers, repository-documented terminal signals, bounded wait
-policy, retrieval times, and pagination completion. Silence is not completion.
+configured reviewers, each reviewer's trigger phase, repository-documented
+terminal signals, bounded wait policy, retrieval times, and pagination
+completion. Silence is not completion.
 Do not infer a terminal signal from evidence that cannot be attributed to this
 trigger and head.
+
+Bind post-Ready evidence only for reviewers triggered by Ready or a later
+review-request command. Preserve valid current-head terminal evidence from a
+pre-Ready-only reviewer. A signal predating Ready is ambiguous only when that
+reviewer was triggered again and the repository contract requires a new result.
 
 ## Signal Matrix
 

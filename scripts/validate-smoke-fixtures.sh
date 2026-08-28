@@ -99,6 +99,8 @@ require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation'
   "vp-autodev fixture must reconcile CI and feedback after the last mutation"
 require_pattern "$autodev_fixture" 'Independently paginate submitted reviews' \
   "vp-autodev fixture must cover body-only submitted reviews"
+require_pattern "$autodev_fixture" 'pre-Ready-only reviewer survives Ready' \
+  "vp-autodev fixture must preserve valid pre-Ready-only reviewer evidence"
 require_pattern "$autodev_fixture" 'bounded wait.*safe blocker' \
   "vp-autodev fixture must safely block when terminal evidence never arrives"
 require_pattern "$autodev_reviewer_signals" 'silence.*(not completion|pending)' \
@@ -153,6 +155,10 @@ require_pattern "$pr_resolver_fixture" 'explicit Markdown commit link' \
   "vp-pr-comment-resolver fixture must cover linked commit evidence"
 require_pattern "$pr_resolver_reply_templates" '\[`<short-sha>`\]\(<canonical-commit-url>\)' \
   "vp-pr-comment-resolver fixed reply must use an explicit commit link"
+require_pattern "$pr_resolver_fixture" 'Paginate submitted reviews independently' \
+  "vp-pr-comment-resolver fixture must cover body-only submitted reviews"
+require_pattern "$pr_resolver_fixture" 'submitted-review body.*reply.*PR conversation' \
+  "vp-pr-comment-resolver fixture must define the supported review-body reply"
 
 require_pattern "$git_fixture" 'force deletion harmless' \
   "vp-git fixture must cover squash-merge state not justifying force deletion"

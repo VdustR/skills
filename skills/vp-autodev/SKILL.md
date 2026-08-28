@@ -66,9 +66,11 @@ Keep evidence for each decision from issue validation through delivery:
    terminal signal from a reviewer that is configured to start only after Ready;
    step 9 observes that reviewer after its trigger exists.
 9. After Ready, start the final reviewer observation gate described in
-   `references/reviewer-terminal-signals.md`. Bind the gate to the Ready trigger
-   time and current head. Wait a documented, bounded interval for every
-   configured reviewer to reach a terminal signal; silence is not completion.
+   `references/reviewer-terminal-signals.md`. Bind reviewers triggered by Ready
+   to the Ready trigger time and current head. Retain valid current-head evidence
+   from pre-Ready-only reviewers instead of requiring a signal they will never
+   re-emit. Wait a documented, bounded interval for every pending configured
+   reviewer to reach a terminal signal; silence is not completion.
    For Codex, accept an authored review or thread, or the repository-documented
    no-finding reaction. Include PR-level, review-level, and inline-comment
    reactions plus delayed bot replies. Independently paginate PR conversation

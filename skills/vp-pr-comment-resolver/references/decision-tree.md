@@ -12,9 +12,12 @@ For each feedback item:
 4. Is the author a bot, human, or ambiguous?
    - Resolve handled bot review threads. Human threads require explicit user
      direction.
-5. Is this a review thread or PR conversation issue comment?
-   - Reply on the matching surface; PR conversation issue comments cannot be
-     resolved.
+5. Is this a review thread, submitted-review body, or PR conversation issue
+   comment?
+   - Reply to a review thread or PR conversation issue comment directly.
+   - For a submitted-review body, reply in the PR conversation and identify and
+     link the review because GitHub has no top-level review reply mutation.
+   - Submitted reviews and PR conversation issue comments cannot be resolved.
 
 Pause for disagreement, multiple valid product interpretations, architectural
 scope expansion, or history rewriting.

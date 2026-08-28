@@ -53,6 +53,7 @@ follow-up without asking me to authorize each Git or pull-request operation.
 - a Ready-triggered delayed inline review cannot be bypassed by a pre-Ready
   snapshot
 - a Ready-only reviewer cannot create a circular pre-Ready prerequisite
+- valid current-head evidence from a pre-Ready-only reviewer survives Ready
 - submitted reviews are a separate fully paginated collection
 - a documented Codex no-finding reaction is recorded as an attributable
   reaction-only terminal signal
