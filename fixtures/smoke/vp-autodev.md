@@ -15,6 +15,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
   operations.
 - Keep the PR Draft while material design, verification, or feedback is
   unresolved, then mark it Ready when those gates pass.
+- Apply the pre-Ready gates before Ready without requiring terminal evidence
+  from a reviewer that starts only after Ready.
 - Treat Ready as a new review trigger and start a bounded final observation
   gate. A delayed inline Codex review blocks merge until its actionable finding
   is processed through `vp-pr-comment-resolver` and reconciled.
@@ -25,6 +27,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
 - Verify required evidence against the current head before advancing.
 - Require complete, independently paginated snapshots of PR conversation issue
   comments and pull request review threads with all inline comments and replies.
+- Independently paginate submitted reviews so approvals and actionable
+  body-only reviews cannot be missed.
 - Include delayed bot replies plus PR-level, review-level, and inline-comment reactions
   in the final snapshot.
 - A terminal review signal starts settle/readback and does not permit immediate merge;
@@ -48,6 +52,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
 - passing review signals advance to merge evaluation
 - a Ready-triggered delayed inline review cannot be bypassed by a pre-Ready
   snapshot
+- a Ready-only reviewer cannot create a circular pre-Ready prerequisite
+- submitted reviews are a separate fully paginated collection
 - a documented Codex no-finding reaction is recorded as an attributable
   reaction-only terminal signal
 - delayed bot replies and all configured reaction surfaces are included

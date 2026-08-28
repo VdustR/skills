@@ -62,24 +62,26 @@ Keep evidence for each decision from issue validation through delivery:
    a complete, independently paginated snapshot of PR conversation issue
    comments and review threads with all inline comments and replies; a partial
    read cannot establish that feedback is handled. Then repeat verification and
-   monitoring. When all required signals pass or the
-   repository reports that automated review finished with no feedback, advance
-   to Ready.
+   monitoring. When all pre-Ready gates pass, advance to Ready. Do not require a
+   terminal signal from a reviewer that is configured to start only after Ready;
+   step 9 observes that reviewer after its trigger exists.
 9. After Ready, start the final reviewer observation gate described in
    `references/reviewer-terminal-signals.md`. Bind the gate to the Ready trigger
    time and current head. Wait a documented, bounded interval for every
    configured reviewer to reach a terminal signal; silence is not completion.
    For Codex, accept an authored review or thread, or the repository-documented
    no-finding reaction. Include PR-level, review-level, and inline-comment
-   reactions plus delayed bot replies. Re-fetch both feedback surfaces with
-   independent top-level and nested pagination, route actionable items through
+   reactions plus delayed bot replies. Independently paginate PR conversation
+   issue comments, submitted reviews, and review threads with every nested
+   inline comment and reply. Route actionable items through
    `vp-pr-comment-resolver`, and block merge while any reviewer is pending or
    its terminal state is ambiguous.
 10. After the last mutation, including Ready, a reply, fix, push, or thread
     resolution, reconcile again. Record the current head; re-read current-head
-    CI and checks; completely re-fetch both feedback surfaces, their nested
-    replies, and all configured reaction surfaces; and confirm every reviewer
-    terminal signal still applies. A mutation invalidates the prior final
+    CI and checks; completely re-fetch PR conversation issue comments,
+    submitted reviews, review threads and their nested replies, and all
+    configured reaction surfaces; and confirm every reviewer terminal signal
+    still applies. A mutation invalidates the prior final
     snapshot. If a bounded wait expires without an attributable terminal
     signal, stop with the reviewer, head, trigger time, surfaces checked, wait
     policy, and exact missing evidence.

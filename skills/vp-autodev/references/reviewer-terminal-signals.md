@@ -40,15 +40,17 @@ After Ready and after every later mutation:
 
 1. Record the current head and current-head CI and check states.
 2. Fetch every PR conversation issue comment with complete pagination.
-3. Fetch every review thread, every inline comment, and every nested reply with
+3. Fetch every submitted review with independent complete pagination, including
+   its body, state, author, submission time, commit, and reactions.
+4. Fetch every review thread, every inline comment, and every nested reply with
    independently complete pagination, including resolved and outdated threads.
-4. Fetch PR-level reactions, review-level reactions, inline-comment reactions,
+5. Fetch PR-level reactions, review-level reactions, inline-comment reactions,
    and reactions on repository-specified comments or commands.
-5. Read delayed bot replies on both feedback surfaces and map each signal to its
+6. Read delayed bot replies on both feedback surfaces and map each signal to its
    actor, target, timestamp, trigger, and head.
-6. Re-evaluate the matrix for every configured reviewer. Any actionable item or
+7. Re-evaluate the matrix for every configured reviewer. Any actionable item or
    mutation restarts this final snapshot.
-7. After every reviewer is terminal, satisfy the documented settle condition or
+8. After every reviewer is terminal, satisfy the documented settle condition or
    finish the bounded observation, then repeat the complete readback before
    merge evaluation.
 

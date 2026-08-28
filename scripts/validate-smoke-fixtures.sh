@@ -83,6 +83,8 @@ if grep -Fq 'Stop when all required signals pass' "$autodev_skill"; then
 fi
 require_pattern "$autodev_fixture" 'Ready.*(new review trigger|final observation)' \
   "vp-autodev fixture must start a final observation gate after Ready"
+require_pattern "$autodev_fixture" 'Ready-only reviewer.*circular pre-Ready prerequisite' \
+  "vp-autodev fixture must not require Ready-triggered evidence before Ready"
 require_pattern "$autodev_fixture" 'delayed inline Codex review.*block' \
   "vp-autodev fixture must block on a delayed Ready-triggered Codex review"
 require_pattern "$autodev_fixture" 'reaction-only no-finding signal' \
@@ -95,6 +97,8 @@ require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment.*reac
   "vp-autodev fixture must include every required reaction surface"
 require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \
   "vp-autodev fixture must reconcile CI and feedback after the last mutation"
+require_pattern "$autodev_fixture" 'Independently paginate submitted reviews' \
+  "vp-autodev fixture must cover body-only submitted reviews"
 require_pattern "$autodev_fixture" 'bounded wait.*safe blocker' \
   "vp-autodev fixture must safely block when terminal evidence never arrives"
 require_pattern "$autodev_reviewer_signals" 'silence.*(not completion|pending)' \
@@ -111,6 +115,8 @@ require_pattern "$autodev_reviewer_signals" 'Queued.*reviewing.*nonterminal bot 
   "vp-autodev reviewer gate must not treat status replies as terminal findings"
 require_pattern "$autodev_reviewer_signals" 'Authorship alone does not prove reviewer completion' \
   "vp-autodev reviewer gate must require terminal semantics beyond bot authorship"
+require_pattern "$autodev_reviewer_signals" 'Fetch every submitted review with independent complete pagination' \
+  "vp-autodev reviewer gate must independently paginate submitted reviews"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"
