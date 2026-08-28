@@ -58,6 +58,7 @@ vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 autodev_fixture="fixtures/smoke/vp-autodev.md"
 autodev_skill="skills/vp-autodev/SKILL.md"
+autodev_reviewer_signals="skills/vp-autodev/references/reviewer-terminal-signals.md"
 
 require_pattern "$autodev_fixture" 'branch creation.*commit.*push.*Draft PR' \
   "vp-autodev fixture must cover authorization through Draft PR creation"
@@ -80,6 +81,32 @@ require_pattern "$autodev_skill" 'changes, a Draft PR, or a Ready PR' \
 if grep -Fq 'Stop when all required signals pass' "$autodev_skill"; then
   fail "vp-autodev review success must advance to merge evaluation"
 fi
+require_pattern "$autodev_fixture" 'Ready.*(new review trigger|final observation)' \
+  "vp-autodev fixture must start a final observation gate after Ready"
+require_pattern "$autodev_fixture" 'delayed inline Codex review.*block' \
+  "vp-autodev fixture must block on a delayed Ready-triggered Codex review"
+require_pattern "$autodev_fixture" 'reaction-only no-finding signal' \
+  "vp-autodev fixture must cover the Codex no-finding reaction"
+require_pattern "$autodev_fixture" 'delayed bot replies' \
+  "vp-autodev fixture must include delayed bot replies"
+require_pattern "$autodev_fixture" 'terminal review signal.*settle/readback.*does not permit immediate merge' \
+  "vp-autodev fixture must not merge immediately on the first terminal signal"
+require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment.*reactions' \
+  "vp-autodev fixture must include every required reaction surface"
+require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \
+  "vp-autodev fixture must reconcile CI and feedback after the last mutation"
+require_pattern "$autodev_fixture" 'bounded wait.*safe blocker' \
+  "vp-autodev fixture must safely block when terminal evidence never arrives"
+require_pattern "$autodev_reviewer_signals" 'silence.*(not completion|pending)' \
+  "vp-autodev reviewer gate must reject silence as a terminal signal"
+require_pattern "$autodev_reviewer_signals" 'independently complete pagination' \
+  "vp-autodev reviewer gate must require complete nested pagination"
+require_pattern "$autodev_reviewer_signals" 'PR-level reactions.*review-level reactions.*inline-comment reactions' \
+  "vp-autodev reviewer gate must enumerate reaction surfaces"
+require_pattern "$autodev_reviewer_signals" 'mutation restarts this final snapshot' \
+  "vp-autodev reviewer gate must reconcile after the final mutation"
+require_pattern "$autodev_reviewer_signals" 'terminal signal starts? the final settle and readback phase' \
+  "vp-autodev reviewer gate must observe delayed replies after a terminal signal"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"

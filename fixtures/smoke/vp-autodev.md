@@ -15,10 +15,22 @@ follow-up without asking me to authorize each Git or pull-request operation.
   operations.
 - Keep the PR Draft while material design, verification, or feedback is
   unresolved, then mark it Ready when those gates pass.
+- Treat Ready as a new review trigger and start a bounded final observation
+  gate. A delayed inline Codex review blocks merge until its actionable finding
+  is processed through `vp-pr-comment-resolver` and reconciled.
+- Require an attributable terminal signal for every configured reviewer. For
+  Codex, accept an authored review or thread, or a repository-documented
+  reaction-only no-finding signal; silence after Ready remains pending.
 - Treat successful review completion as a transition to merge evaluation.
 - Verify required evidence against the current head before advancing.
 - Require complete, independently paginated snapshots of PR conversation issue
   comments and pull request review threads with all inline comments and replies.
+- Include delayed bot replies plus PR-level, review-level, and inline-comment reactions
+  in the final snapshot.
+- A terminal review signal starts settle/readback and does not permit immediate merge;
+  finish the bounded observation and refresh again.
+- Re-read current-head CI and feedback after the last mutation, including Ready,
+  a reply, fix, push, or thread resolution.
 - Merge when repository policy permits, verification is complete, feedback is
   handled, and remaining risk is low.
 - Determine whether a release is required after merge, perform a low-risk and
@@ -34,6 +46,16 @@ follow-up without asking me to authorize each Git or pull-request operation.
 - authorization covers branch creation, commit, push, Draft PR creation, and
   the Draft-to-Ready transition
 - passing review signals advance to merge evaluation
+- a Ready-triggered delayed inline review cannot be bypassed by a pre-Ready
+  snapshot
+- a documented Codex no-finding reaction is recorded as an attributable
+  reaction-only terminal signal
+- delayed bot replies and all configured reaction surfaces are included
+- a terminal signal cannot bypass the final bounded settle/readback
+- actionable findings block merge until `vp-pr-comment-resolver` completes and
+  the workflow reconciles again
+- current-head CI and feedback are both re-read after the last mutation
+- a bounded wait ends in a safe blocker when a reviewer has no terminal signal
 - partial reads cannot establish that feedback is handled on either GitHub
   feedback surface
 - a local change, Draft PR, or Ready PR is not a successful terminal state

@@ -50,7 +50,8 @@ Keep evidence for each decision from issue validation through delivery:
    full diff, commits, and PR text as a maintainer before requesting human or
    automated review. Keep it Draft while material design, verification, or
    feedback remains unresolved; otherwise complete the Draft-to-Ready
-   transition.
+   transition. Treat Ready as a new mutation that may trigger review automation,
+   not as evidence that the pre-Ready feedback snapshot remains final.
 7. Record the current head commit, then monitor all repository-defined signals:
    CI, check runs, bot comments, pull request review comments (inline code
    comments), issue comments in the PR conversation, and reaction
@@ -63,17 +64,32 @@ Keep evidence for each decision from issue validation through delivery:
    read cannot establish that feedback is handled. Then repeat verification and
    monitoring. When all required signals pass or the
    repository reports that automated review finished with no feedback, advance
-   to Ready and merge evaluation. Stop only when a blocker or required human
-   decision is explicit. If the repository exposes no completion signal,
-   perform a fresh final check and report that limitation before evaluating
-   whether the available evidence permits further progress.
-9. For a user-specified repository the user owns, merge when repository policy
+   to Ready.
+9. After Ready, start the final reviewer observation gate described in
+   `references/reviewer-terminal-signals.md`. Bind the gate to the Ready trigger
+   time and current head. Wait a documented, bounded interval for every
+   configured reviewer to reach a terminal signal; silence is not completion.
+   For Codex, accept an authored review or thread, or the repository-documented
+   no-finding reaction. Include PR-level, review-level, and inline-comment
+   reactions plus delayed bot replies. Re-fetch both feedback surfaces with
+   independent top-level and nested pagination, route actionable items through
+   `vp-pr-comment-resolver`, and block merge while any reviewer is pending or
+   its terminal state is ambiguous.
+10. After the last mutation, including Ready, a reply, fix, push, or thread
+    resolution, reconcile again. Record the current head; re-read current-head
+    CI and checks; completely re-fetch both feedback surfaces, their nested
+    replies, and all configured reaction surfaces; and confirm every reviewer
+    terminal signal still applies. A mutation invalidates the prior final
+    snapshot. If a bounded wait expires without an attributable terminal
+    signal, stop with the reviewer, head, trigger time, surfaces checked, wait
+    policy, and exact missing evidence.
+11. For a user-specified repository the user owns, merge when repository policy
    permits it, required evidence is green, feedback is handled, the change is
    fully verified, and the remaining risk is low. Treat the request to auto
    develop the change as authorization for this in-scope merge. Ask before
    merging when ownership is unclear, policy requires a human decision, risk is
    material, verification is incomplete, or the merge would expand scope.
-10. After merge, determine from repository policy and release mechanics whether
+12. After merge, determine from repository policy and release mechanics whether
     a release is required. Under the same ownership, policy, verification, and
     low-risk conditions, run the in-scope release workflow and verify the
     published result. Ask before a release with material operational impact,
