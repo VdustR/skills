@@ -107,6 +107,10 @@ require_pattern "$autodev_reviewer_signals" 'mutation restarts this final snapsh
   "vp-autodev reviewer gate must reconcile after the final mutation"
 require_pattern "$autodev_reviewer_signals" 'terminal signal starts? the final settle and readback phase' \
   "vp-autodev reviewer gate must observe delayed replies after a terminal signal"
+require_pattern "$autodev_reviewer_signals" 'Queued.*reviewing.*nonterminal bot replies remain.*pending' \
+  "vp-autodev reviewer gate must not treat status replies as terminal findings"
+require_pattern "$autodev_reviewer_signals" 'Authorship alone does not prove reviewer completion' \
+  "vp-autodev reviewer gate must require terminal semantics beyond bot authorship"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"

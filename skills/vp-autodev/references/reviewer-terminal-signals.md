@@ -16,7 +16,7 @@ trigger and head.
 
 | Reviewer state | Evidence | Result |
 | --- | --- | --- |
-| Finding | An attributable authored review, review thread, or bot reply | Route all actionable feedback through `vp-pr-comment-resolver`; merge remains blocked until the fix and final reconcile complete. |
+| Finding | An attributable authored review, review thread, or bot reply with actionable content or documented terminal semantics | Route all actionable feedback through `vp-pr-comment-resolver`; merge remains blocked until the fix and final reconcile complete. |
 | No findings | The repository-documented reaction-only signal on its specified target, attributable to the current observation | Record the target, reaction, actor, timestamp, trigger, and head as terminal evidence. |
 | Completed by check | A repository-documented terminal check or review status for the current head | Record it as terminal only when the documented contract says it represents reviewer completion. |
 | Pending | The reviewer is requested, running, queued, or has no attributable terminal signal | Continue the bounded wait; merge remains blocked. |
@@ -25,6 +25,8 @@ trigger and head.
 For Codex, an authored review or thread is a terminal result with feedback. A
 repository-documented no-finding reaction is a terminal result without feedback.
 The mere absence of a Codex review after Ready is pending, not no findings.
+Queued, reviewing, acknowledged, and other nonterminal bot replies remain pending.
+Authorship alone does not prove reviewer completion.
 Reaching a terminal signal starts the final settle and readback phase; it does
 not authorize an immediate merge. Continue through the repository-documented
 settle condition or bounded observation policy so delayed replies are included.

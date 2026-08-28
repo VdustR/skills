@@ -51,6 +51,8 @@ follow-up without asking me to authorize each Git or pull-request operation.
 - a documented Codex no-finding reaction is recorded as an attributable
   reaction-only terminal signal
 - delayed bot replies and all configured reaction surfaces are included
+- queued, reviewing, and acknowledgment bot replies remain pending unless their
+  documented semantics establish a terminal result
 - a terminal signal cannot bypass the final bounded settle/readback
 - actionable findings block merge until `vp-pr-comment-resolver` completes and
   the workflow reconciles again
