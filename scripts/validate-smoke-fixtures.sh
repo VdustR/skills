@@ -250,6 +250,13 @@ refute_frontmatter_pattern "$recording_skill" 'rather than a screenshot' \
   "vp-recording frontmatter must not exclude screenshots from routing"
 require_frontmatter_pattern "$recording_skill" 'vp-minimal-repro' \
   "vp-recording frontmatter must keep re-runnable reproductions with vp-minimal-repro"
+# The display requirement for an authenticated still is stated in three places
+# that a router may read independently; none of them may promise unconditionally.
+require_frontmatter_pattern "$recording_skill" 'a still behind a login needs a display' \
+  "vp-recording frontmatter must not promise a displayless authenticated still"
+if grep -Fq 'run on any platform and inside a container.' "$recording_skill"; then
+  fail "vp-recording environment summary must qualify the container guarantee"
+fi
 require_pattern "$recording_still_capture" 'window id names one window|Only a window id' \
   "vp-recording still capture must require window-id targeting"
 require_pattern "$recording_still_capture" 'Application name, or process id' \

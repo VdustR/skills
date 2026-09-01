@@ -9,7 +9,8 @@ description: >-
   image or a video, and any request to record, film, screenshot, or show what an
   interface is doing, including a UI behind a login. Every path ends at a file on
   disk. The browser paths, still and video, and the render path are
-  cross-platform; capturing a native window, still or video, is macOS only.
+  cross-platform, though a still behind a login needs a display; capturing a
+  native window, still or video, is macOS only.
   Boundary: use vp-minimal-repro for a re-runnable reproduction that needs no
   image, and vp-github to attach the result to an issue or pull request.
 ---
@@ -38,15 +39,18 @@ ask about anything missing before starting.
 
 | Path | Depends on |
 |---|---|
-| Still of a web UI | Node and Playwright with a browser binary. No ffmpeg |
+| Still of a web UI | Node and Playwright with a browser binary. No ffmpeg. A display too, but only when the capture needs an interactive login |
 | Still of a macOS window | Screen Recording permission for the calling process, and Swift for the bundled window-id script or a desktop automation tool that lists window ids. An accessibility-capable automation tool as well, if the paired text assertion is read from the window rather than written by hand |
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | macOS window capture | Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov`. Window-id lookup needs either Swift for the bundled script or a desktop automation tool. An input tool as well, but only if the app has to do something on camera |
 
-The browser paths, still and video, run on any platform and inside a container.
-The macOS window paths depend on macOS system tools and have no equivalent here
-for Linux or Windows.
+The browser paths, still and video, run on any platform and inside a container,
+with one exception: a still that needs an interactive login needs a display for
+the whole capture, so it does not run on a displayless runner. That exception is
+stated once, under Prefer the browser path, and every platform claim here defers
+to it. The macOS window paths depend on macOS system tools and have no equivalent
+here for Linux or Windows.
 
 ## Prefer the browser path
 
