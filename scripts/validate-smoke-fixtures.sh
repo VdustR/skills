@@ -281,6 +281,14 @@ require_pattern "$recording_still_capture" 'accessibility tree' \
   "vp-recording still capture must give the native path a textual assertion"
 require_pattern "$recording_still_capture" 'the display has to remain available through the capture' \
   "vp-recording still capture must keep the display available past the sign-in"
+require_pattern "$recording_still_capture" 'Closing first and planning to fall back does not work' \
+  "vp-recording still capture must not offer a fallback to an already-closed context"
+# AGENTS.md keeps required routing in the frontmatter or main workflow, so a
+# handoff that only appears under Related skills does not establish routing.
+if ! awk '/^## Related skills$/{exit} {print}' "$recording_skill" \
+  | grep -Fq 'vp-agent-browser-session'; then
+  fail "vp-recording must state the managed-profile handoff outside Related skills"
+fi
 
 require_pattern "$github_fixture" 'public by URL' \
   "vp-github fixture must cover attachments being public by URL"

@@ -39,7 +39,7 @@ ask about anything missing before starting.
 | Path | Depends on |
 |---|---|
 | Still of a web UI | Node and Playwright with a browser binary. No ffmpeg |
-| Still of a macOS window | Screen Recording permission for the calling process, and Swift for the bundled window-id script or a desktop automation tool that lists window ids |
+| Still of a macOS window | Screen Recording permission for the calling process, and Swift for the bundled window-id script or a desktop automation tool that lists window ids. An accessibility-capable automation tool as well, if the paired text assertion is read from the window rather than written by hand |
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | macOS window capture | Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov`. Window-id lookup needs either Swift for the bundled script or a desktop automation tool. An input tool as well, but only if the app has to do something on camera |
@@ -54,6 +54,12 @@ If the subject runs in a browser, use the browser path for a still or a video,
 even when a desktop recorder is already open. Without a login it is fully
 headless, so it never takes window focus or moves the real pointer, and it
 survives being run from a scheduled job.
+
+Two logins route elsewhere before this path applies. Use vp-agent-browser-session
+when the profile has to survive the task instead of being discarded, and when the
+login needs complete Chrome state such as IndexedDB, service workers, or SSO. It
+owns managed profile identity, permissions, and deletion. The throwaway-profile
+sequence below is for a login that begins and ends inside this capture.
 
 A still behind a login is the exception, and it stays the exception through the
 whole sequence. The interactive sign-in needs a visible window and a display, and
@@ -91,13 +97,18 @@ Never hand over a file you have not looked at. Capture silently produces
 plausible garbage: a blank first frame, a cursor parked off-target, a click that
 missed, a window that was not the one you named.
 
-For a still, open the image. That is the whole check, and it is the one that
-catches the wrong window. Read a text assertion from the same state as well, so
-the caption and the pixels have to agree: a browser still reads it from the page,
-and a native window reads it from that window's accessibility tree. Take the
-assertion from the state the image was taken in, after waiting for the thing the
-image is evidence for. `references/still-capture.md` has both producers and the
-waiting rule. The rest of this section is the video check.
+For a still, open the image and confirm it is the window you meant and the state
+you are claiming. That check is mandatory on every path and needs no tool beyond
+an image viewer.
+
+Pair the image with a text assertion as well, so the caption and the pixels have
+to agree. A browser still reads it from the page. A native window reads it from
+that window's accessibility tree, which needs an accessibility-capable automation
+tool; without one, write the claim out by hand from what the image shows rather
+than skipping the pairing. Take the assertion from the state the image was taken
+in, after waiting for the thing the image is evidence for.
+`references/still-capture.md` has both producers and the waiting rule. The rest of
+this section is the video check.
 
 Derive the sampling rate from the duration so the sheet spans the whole file. A
 fixed `fps=2` into a 4x2 tile covers the first four seconds and nothing else,

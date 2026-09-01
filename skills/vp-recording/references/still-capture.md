@@ -143,10 +143,19 @@ cookie with an expiry. Measured across a close and relaunch of one profile:
 | No `expires`, a session cookie | Signed out |
 
 A session cookie is discarded when the browser closes, so the relaunch lands on
-the login page and the screenshot captures that instead. Check the signed-in
-state after relaunching rather than assuming it carried over, and fall back to
-capturing in the headed context when it did not. This also means the profile
-cannot be deleted between the two launches.
+the login page and the screenshot captures that instead.
+
+Order this so a signed-out relaunch costs nothing. Take every image the task
+needs in the headed context first, while the session is certainly there. Only
+then close and relaunch headless, and treat that as an addition for further
+captures rather than as the way to get the ones already taken.
+
+Closing first and planning to fall back does not work. The fallback would be the
+headed context, and closing it is what destroyed the session; relaunching headed
+lands on the login page too, so the only route back is asking the user to sign in
+again. Check the signed-in state after relaunching rather than assuming it carried
+over, and when it did not, either accept the images already captured or ask for
+another sign-in. Do not delete the profile between the two launches.
 
 Route to vp-agent-browser-session when the profile has to survive the task rather
 than be discarded, or when the login needs full Chrome state such as IndexedDB,
@@ -183,6 +192,11 @@ peekaboo see --window-id 592 --tree --no-screenshot
 Measured: 41 elements with roles and labels for one id-scoped window, no image
 written. Flags change, so read the tool's own `--help`; what stays is that the
 accessibility tree is the native equivalent of reading the page.
+
+This needs an accessibility-capable automation tool, which `screencapture` and
+the bundled Swift script do not require. On a machine without one, write the claim
+out by hand from what the image shows. That is weaker evidence than a read value,
+and it is still better than an image with no stated claim beside it.
 
 ## Native window: name the window
 
