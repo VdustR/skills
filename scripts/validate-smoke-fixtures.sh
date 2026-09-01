@@ -17,6 +17,33 @@ require_pattern() {
   grep -Eiq -- "$pattern" "$fixture" || fail "$message"
 }
 
+# Skill routing is decided by the frontmatter description, so a whole-file grep
+# passes on body prose that never reaches a routing decision.
+frontmatter_of() {
+  awk '
+    NR == 1 && $0 == "---" { in_fm = 1; next }
+    in_fm && $0 == "---" { exit }
+    in_fm { print }
+  ' "$1"
+}
+
+require_frontmatter_pattern() {
+  local skill_md="$1"
+  local pattern="$2"
+  local message="$3"
+
+  frontmatter_of "$skill_md" | grep -Eiq -- "$pattern" || fail "$message"
+}
+
+refute_frontmatter_pattern() {
+  local skill_md="$1"
+  local pattern="$2"
+  local message="$3"
+
+  frontmatter_of "$skill_md" | grep -Eiq -- "$pattern" && fail "$message"
+  return 0
+}
+
 required_skills=(
   "vp-autodev"
   "vp-skills"
@@ -53,6 +80,8 @@ pr_resolver_agent="skills/vp-pr-comment-resolver/agents/openai.yaml"
 git_fixture="fixtures/smoke/vp-git.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
+recording_skill="skills/vp-recording/SKILL.md"
+recording_still_capture="skills/vp-recording/references/still-capture.md"
 github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
@@ -199,6 +228,74 @@ require_pattern "$recording_fixture" 'live geometry' \
   "vp-recording fixture must cover resolving targets from live geometry"
 require_pattern "$recording_fixture" 'verified by looking at frames|contact sheet' \
   "vp-recording fixture must cover verifying output before delivery"
+require_pattern "$recording_fixture" 'still image of a running UI has a producer' \
+  "vp-recording fixture must route a still image to a producer"
+require_pattern "$recording_fixture" 'application- and process-id targeting' \
+  "vp-recording fixture must cover application- and process-id targeted capture"
+require_pattern "$recording_fixture" 'never by extracting a session token from another browser' \
+  "vp-recording fixture must reject extracting a session token for an authenticated capture"
+require_pattern "$recording_fixture" 'isolated profile that is deleted' \
+  "vp-recording fixture must dispose of the profile it creates for a login"
+require_pattern "$recording_fixture" 'confirmed before upload' \
+  "vp-recording fixture must confirm image contents before upload"
+require_pattern "$recording_fixture" 'public before the comment is posted' \
+  "vp-recording fixture must state that an upload publishes before posting"
+require_pattern "$recording_fixture" 'textual assertion from the same page state' \
+  "vp-recording fixture must pair a still with a textual assertion"
+require_frontmatter_pattern "$recording_skill" 'still (screenshot|image)' \
+  "vp-recording frontmatter description must include still images"
+require_frontmatter_pattern "$recording_skill" 'screenshots?' \
+  "vp-recording frontmatter description must route screenshot requests"
+refute_frontmatter_pattern "$recording_skill" 'rather than a screenshot' \
+  "vp-recording frontmatter must not exclude screenshots from routing"
+require_frontmatter_pattern "$recording_skill" 'vp-minimal-repro' \
+  "vp-recording frontmatter must keep re-runnable reproductions with vp-minimal-repro"
+# The display requirement for an authenticated still is stated in three places
+# that a router may read independently; none of them may promise unconditionally.
+require_frontmatter_pattern "$recording_skill" 'a still behind a login needs a display' \
+  "vp-recording frontmatter must not promise a displayless authenticated still"
+if grep -Fq 'run on any platform and inside a container.' "$recording_skill"; then
+  fail "vp-recording environment summary must qualify the container guarantee"
+fi
+require_pattern "$recording_still_capture" 'window id names one window|Only a window id' \
+  "vp-recording still capture must require window-id targeting"
+require_pattern "$recording_still_capture" 'Application name, or process id' \
+  "vp-recording still capture must enumerate application and process-id targeting"
+require_pattern "$recording_still_capture" 'as soon as it is uploaded, before any comment is posted' \
+  "vp-recording still capture must state that an upload publishes before posting"
+require_pattern "$recording_still_capture" 'Delete the profile directory' \
+  "vp-recording still capture must dispose of the login profile"
+require_pattern "$recording_still_capture" 'Close the context' \
+  "vp-recording still capture must close the browser before deleting the profile"
+require_pattern "$recording_fixture" 'no browser path to fall back on' \
+  "vp-recording fixture must force window-id targeting where no browser path exists"
+require_pattern "$recording_fixture" "output scale is checked against the window's point size" \
+  "vp-recording fixture must check a capture tool's output scale"
+require_pattern "$recording_fixture" 'four capture requests' \
+  "vp-recording fixture prompt must declare every situation it contains"
+if [ "$(grep -c '^\*\*Situation ' "$recording_fixture")" -ne 4 ]; then
+  fail "vp-recording fixture must contain exactly the four situations its prompt declares"
+fi
+require_pattern "$recording_still_capture" 'filters on the owning application.s name, not the window title' \
+  "vp-recording still capture must not pass a window title to the owner-name filter"
+require_pattern "$recording_still_capture" 'switch a running context to headless' \
+  "vp-recording still capture must not promise headless capture after an interactive sign-in"
+require_pattern "$recording_still_capture" 'Two nested .finally. blocks' \
+  "vp-recording still capture must remove the profile even when the context close fails"
+require_pattern "$recording_still_capture" 'Wait for the state you are claiming, not for load' \
+  "vp-recording still capture must wait for the claimed UI state before screenshotting"
+require_pattern "$recording_still_capture" 'accessibility tree' \
+  "vp-recording still capture must give the native path a textual assertion"
+require_pattern "$recording_still_capture" 'the display has to remain available through the capture' \
+  "vp-recording still capture must keep the display available past the sign-in"
+require_pattern "$recording_still_capture" 'Closing first and planning to fall back does not work' \
+  "vp-recording still capture must not offer a fallback to an already-closed context"
+# AGENTS.md keeps required routing in the frontmatter or main workflow, so a
+# handoff that only appears under Related skills does not establish routing.
+if ! awk '/^## Related skills$/{exit} {print}' "$recording_skill" \
+  | grep -Fq 'vp-agent-browser-session'; then
+  fail "vp-recording must state the managed-profile handoff outside Related skills"
+fi
 
 require_pattern "$github_fixture" 'public by URL' \
   "vp-github fixture must cover attachments being public by URL"

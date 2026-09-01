@@ -143,7 +143,7 @@ Generate concise session titles based on the whole conversation theme.
 
 ### vp-recording
 
-Produce a demo video: a scripted browser walkthrough, a frame-accurate render of generated motion, or a macOS window capture.
+Capture a still screenshot or a demo video: a screenshot of a running interface, a scripted browser walkthrough, a frame-accurate render of generated motion, or a macOS window capture.
 
 ### vp-retro
 
