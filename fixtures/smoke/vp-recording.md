@@ -19,6 +19,12 @@ attach them to a pull request. The agent's own in-app browser can already displa
 the signed-in page but writes no file to disk. A desktop automation tool is
 available and the host application has eleven open windows.
 
+**Situation 4 — still of a native window.** Produce a single screenshot of the
+native macOS app window titled `Inventory Editor` for the same pull request. The
+desktop automation tool accepts an application name, a process id, or a window
+id, and the target application has eleven windows open. There is no browser
+involved, so the browser path does not apply.
+
 Assume Screen Recording permission is already granted and ffmpeg is installed.
 
 ## Expected Behavior
@@ -55,9 +61,6 @@ Situation 3 routes to `references/still-capture.md`:
   profile the run creates, screenshot from that context, then delete the profile.
 - Set `deviceScaleFactor: 2`; the default 1x image is too small for a reviewer to
   read the interface text that the screenshot is evidence for.
-- Capture the native window, if one is needed, by window id. Targeting the
-  eleven-window application by name or process id lets the tool pick the window,
-  so read back the reported window id and compare it with the intended one.
 - Pair each image with a textual assertion read from the same page state, so the
   claim is checkable without reading pixels.
 - Confirm what each image contains before uploading it. The upload publishes: an
@@ -66,6 +69,21 @@ Situation 3 routes to `references/still-capture.md`:
   a capture of the wrong window.
 - Write PNG, which is on the media endpoint's accepted content types, and keep
   the filename extension matching the declared type.
+
+Situation 4 also routes to `references/still-capture.md`, and there is no browser
+fallback available:
+
+- Resolve the window id first and target the capture by id. Targeting the
+  eleven-window application by name or by process id lets the tool select the
+  window, and it may not select the one that was meant.
+- Read the tool's machine-readable output and compare the window id it reports
+  against the intended id. A plain success message names no window and is not
+  that evidence.
+- Check the output dimensions against the window's point size rather than
+  trusting a default. A capture tool may write half the window's point size,
+  which is a quarter of the pixels the system recorder writes.
+- Confirm what the image contains before uploading it, for the same reason as
+  Situation 3.
 
 Situations 1 and 2:
 
@@ -87,7 +105,10 @@ All situations:
 - desktop capture uses window id, never a screen rectangle, when other content
   could be on screen;
 - application- and process-id targeting is treated as the same hazard as
-  rectangle capture, and the reported window id is read back;
+  rectangle capture, and the reported window id is read back, in a situation with
+  no browser path to fall back on;
+- a capture tool's output scale is checked against the window's point size rather
+  than assumed;
 - a login behind a capture is entered once in an isolated profile that is deleted
   afterwards, never by extracting a session token from another browser;
 - what an image contains is confirmed before upload, because an `/assets/` upload
