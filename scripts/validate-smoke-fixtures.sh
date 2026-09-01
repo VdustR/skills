@@ -53,6 +53,8 @@ pr_resolver_agent="skills/vp-pr-comment-resolver/agents/openai.yaml"
 git_fixture="fixtures/smoke/vp-git.md"
 stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
+recording_skill="skills/vp-recording/SKILL.md"
+recording_still_capture="skills/vp-recording/references/still-capture.md"
 github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
@@ -199,6 +201,33 @@ require_pattern "$recording_fixture" 'live geometry' \
   "vp-recording fixture must cover resolving targets from live geometry"
 require_pattern "$recording_fixture" 'verified by looking at frames|contact sheet' \
   "vp-recording fixture must cover verifying output before delivery"
+require_pattern "$recording_fixture" 'still image of a running UI has a producer' \
+  "vp-recording fixture must route a still image to a producer"
+require_pattern "$recording_fixture" 'application- and process-id targeting' \
+  "vp-recording fixture must cover application- and process-id targeted capture"
+require_pattern "$recording_fixture" 'never by extracting a session token from another browser' \
+  "vp-recording fixture must reject extracting a session token for an authenticated capture"
+require_pattern "$recording_fixture" 'isolated profile that is deleted' \
+  "vp-recording fixture must dispose of the profile it creates for a login"
+require_pattern "$recording_fixture" 'confirmed before upload' \
+  "vp-recording fixture must confirm image contents before upload"
+require_pattern "$recording_fixture" 'public before the comment is posted' \
+  "vp-recording fixture must state that an upload publishes before posting"
+require_pattern "$recording_fixture" 'textual assertion from the same page state' \
+  "vp-recording fixture must pair a still with a textual assertion"
+require_pattern "$recording_skill" 'still (screenshot|image)' \
+  "vp-recording description must include still images"
+if grep -Fq 'rather than a screenshot' "$recording_skill"; then
+  fail "vp-recording must not exclude screenshots from its routing description"
+fi
+require_pattern "$recording_still_capture" 'window id names one window|Only a window id' \
+  "vp-recording still capture must require window-id targeting"
+require_pattern "$recording_still_capture" 'Application name, or process id' \
+  "vp-recording still capture must enumerate application and process-id targeting"
+require_pattern "$recording_still_capture" 'as soon as it is uploaded, before any comment is posted' \
+  "vp-recording still capture must state that an upload publishes before posting"
+require_pattern "$recording_still_capture" 'Delete the profile directory' \
+  "vp-recording still capture must dispose of the login profile"
 
 require_pattern "$github_fixture" 'public by URL' \
   "vp-github fixture must cover attachments being public by URL"

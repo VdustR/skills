@@ -72,6 +72,6 @@ the result. `references/attachments.md` records what the probes returned.
 - [`vp-stacked-pr`](https://github.com/VdustR/skills/tree/main/skills/vp-stacked-pr)
   for dependent pull requests or branches.
 - [`vp-recording`](https://github.com/VdustR/skills/tree/main/skills/vp-recording)
-  when the attachment must first be recorded or rendered.
+  when the attachment must first be captured, recorded, or rendered.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
   for author-side PR discussion and review threads.

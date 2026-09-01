@@ -53,7 +53,7 @@ ffprobe -v error -show_entries stream=width,height,nb_frames \
 The real cursor does appear in window-scoped capture, confirmed frame by frame.
 The click highlight is documented but was not visually confirmed.
 
-## Capture by window id, never by rectangle
+## Capture by window id, never by rectangle or by application
 
 `screencapture -R<x,y,w,h>` records whatever is composited on top of that screen
 rectangle. If the target window is behind another app, the file contains the
@@ -64,6 +64,13 @@ supposed to show a test page.
 Anything in front of it, behind it, or beside it is absent. Use it whenever
 anyone else's content could be on screen, which on a shared workstation is
 always.
+
+A desktop automation tool usually accepts an application name or a process id as
+well, and those carry the same failure mode from the other direction: the tool
+selects one of that application's windows, and the more windows the application
+has open, the less likely that is the one you meant. Pass the window id there
+too, and read back the id the tool reports. `still-capture.md` has the measured
+targeting table.
 
 `scripts/window-id.swift` reads `CGWindowListCopyWindowInfo` directly and needs
 nothing but Swift from Xcode or the Command Line Tools. Confirm it is there once
@@ -103,8 +110,8 @@ every measurement and the screen point it should map to.
 pointer parked at the same coordinate for both variants, so record with `-o`
 whether or not the cursor matters.
 
-To plan a click before recording, take a still with the same flag and measure on
-it:
+The same command without `-v` writes a still, which is the deliverable in
+`still-capture.md` and also how to measure a click target before recording:
 
 ```bash
 screencapture -x -o -l37528 shot.png

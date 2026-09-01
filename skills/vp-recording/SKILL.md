@@ -1,30 +1,34 @@
 ---
 name: vp-recording
 description: >-
-  Produce a video of software: a scripted browser walkthrough with a visible
-  cursor and subtitles, a frame-accurate render of generated or mathematical
-  motion, or a macOS window capture. Use for demo videos, screencasts,
-  walkthroughs, bug reproductions on video, animated GIFs, and any request to
-  record, film, or show something moving rather than a screenshot. The browser and
-  render paths are cross-platform; the window-capture path is macOS only.
-  Boundary: use vp-github to attach the result to an issue or pull request.
+  Capture software as a file: a still screenshot of a running interface, a
+  scripted browser walkthrough with a visible cursor and subtitles, a
+  frame-accurate render of generated or mathematical motion, or a macOS window
+  capture. Use for screenshots, before-and-after images, demo videos, screencasts,
+  walkthroughs, bug reproductions, animated GIFs, and any request to record, film,
+  screenshot, or show what an interface is doing, including a UI behind a login.
+  Every path ends at a file on disk. The still, browser, and render paths are
+  cross-platform; the window-capture path is macOS only. Boundary: use vp-github
+  to attach the result to an issue or pull request.
 ---
 
-# Recording
+# Capture
 
-Pick the producer by what is being filmed. All three produce comparable output;
-they differ in where the pixels come from, and only the first two run unattended.
+Pick the producer by what is being captured and whether it moves. Every path ends
+at a file on disk, which is what a destination such as vp-github takes as input.
 
-| Filming | Path | Unattended |
+| Capturing | Path | Unattended |
 |---|---|---|
+| A still image of a running interface | Screenshot straight to a file. Read `references/still-capture.md`. | Yes, apart from one interactive login |
 | A web app being used | Headless browser driven by a script. Read `references/web-demo.md`. | Yes |
 | Generated or mathematical motion, no interaction | Deterministic frame render. Read `references/generated-video.md`. | Yes |
 | A native app or anything outside a browser, on macOS | Window-scoped screen capture. Read `references/macos-window-capture.md`. | Capture yes, driving no |
 
-Then read `references/encoding.md` before delivering the file. Default output
-settings decide whether the video plays inline or downloads as a blob.
+Read `references/encoding.md` before delivering a video: default output settings
+decide whether it plays inline or downloads as a blob. Its size-ceiling table
+applies to a still as well.
 
-## Check the environment before recording
+## Check the environment before capturing
 
 Every path has dependencies, and a missing one fails late, after a long render.
 Confirm what the chosen path needs is present and working first, and install or
@@ -32,18 +36,22 @@ ask about anything missing before starting.
 
 | Path | Depends on |
 |---|---|
+| Still of a web UI | Node and Playwright with a browser binary. No ffmpeg |
+| Still of a macOS window | Screen Recording permission for the calling process, and Swift for the bundled window-id script or a desktop automation tool that lists window ids |
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | macOS window capture | Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov`. Window-id lookup needs either Swift for the bundled script or a desktop automation tool. An input tool as well, but only if the app has to do something on camera |
 
-The first two run on any platform and inside a container. The third depends on
-macOS system tools and has no equivalent here for Linux or Windows.
+The browser paths, still and video, run on any platform and inside a container.
+The macOS window paths depend on macOS system tools and have no equivalent here
+for Linux or Windows.
 
 ## Prefer the browser path
 
-If the subject runs in a browser, use the browser path even when a desktop
-recorder is already open. It is fully headless, so it never takes window focus or
-moves the real pointer, and it survives being run from a scheduled job.
+If the subject runs in a browser, use the browser path for a still or a video,
+even when a desktop recorder is already open. It is fully headless, so it never
+takes window focus or moves the real pointer, and it survives being run from a
+scheduled job.
 
 A tool that drives the local machine cannot show a visible cursor without
 interfering, because the machine has one system cursor and drawing it in the
@@ -69,9 +77,14 @@ input commands, because flags get renamed and a copied invocation goes stale.
 
 ## Check what you produced
 
-Never hand over a video you have not looked at. Rendering silently produces
+Never hand over a file you have not looked at. Capture silently produces
 plausible garbage: a blank first frame, a cursor parked off-target, a click that
-missed.
+missed, a window that was not the one you named.
+
+For a still, open the image. That is the whole check, and it is the one that
+catches the wrong window. Read the paired text assertion from the same page state
+as well, so the caption and the pixels have to agree; the pattern is in
+`references/still-capture.md`. The rest of this section is the video check.
 
 Derive the sampling rate from the duration so the sheet spans the whole file. A
 fixed `fps=2` into a 4x2 tile covers the first four seconds and nothing else,
@@ -108,17 +121,32 @@ ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames \
   -show_entries format=duration,size -of default=noprint_wrappers=1 out/demo.mp4
 ```
 
-## Never record the wrong pixels
+## Never capture the wrong pixels
 
-Screen capture by rectangle records whatever is composited on top of that
-rectangle, which is not necessarily the target window. Capture by window id
-instead. `references/macos-window-capture.md` has the rule and the command; treat
-it as mandatory when anyone else's content could be on screen. The same hazard
-applies to any platform's rectangle-based recorder.
+Only a window id names one window. A screen rectangle, a display, the frontmost
+window, an application name, and a process id all leave the selection to the
+capturer. A rectangle records whatever is composited on top of it. An application
+name or a process id selects one of that application's windows, and the selection
+is the tool's. This is how an unrelated conversation ends up in a capture that was
+supposed to show a test page.
+
+Name the window by id, then confirm the result before using it. Ask for the
+tool's machine-readable output and compare the window id it reports against the
+id you intended; a plain success message does not carry that evidence.
+`references/macos-window-capture.md` has the lookup and the command,
+`references/still-capture.md` has the measured targeting table, and both are
+mandatory when anyone else's content could be on screen.
+
+Confirming the file is not optional when it is bound for a GitHub attachment. The
+upload publishes: vp-github records that an `/assets/` URL is downloadable without
+authentication as soon as it is uploaded, before the comment is posted, so
+discarding the draft does not recall a capture of the wrong window.
 
 ## Related skills
 
 - [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
-  the finished recording must appear in an issue or pull request.
+  the finished image or recording must appear in an issue or pull request.
+- [`vp-agent-browser-session`](https://github.com/VdustR/skills/tree/main/skills/vp-agent-browser-session)
+  when the login behind a capture needs a managed profile that outlives the task.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
-  when a bug video also needs a re-runnable reproduction.
+  when a bug capture also needs a re-runnable reproduction.
