@@ -92,9 +92,12 @@ plausible garbage: a blank first frame, a cursor parked off-target, a click that
 missed, a window that was not the one you named.
 
 For a still, open the image. That is the whole check, and it is the one that
-catches the wrong window. Read the paired text assertion from the same page state
-as well, so the caption and the pixels have to agree; the pattern is in
-`references/still-capture.md`. The rest of this section is the video check.
+catches the wrong window. Read a text assertion from the same state as well, so
+the caption and the pixels have to agree: a browser still reads it from the page,
+and a native window reads it from that window's accessibility tree. Take the
+assertion from the state the image was taken in, after waiting for the thing the
+image is evidence for. `references/still-capture.md` has both producers and the
+waiting rule. The rest of this section is the video check.
 
 Derive the sampling rate from the duration so the sheet spans the whole file. A
 fixed `fps=2` into a 4x2 tile covers the first four seconds and nothing else,

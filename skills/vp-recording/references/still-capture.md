@@ -34,6 +34,8 @@ try {
   });
   const page = await context.newPage();
   await page.goto(url, { waitUntil: "load" });
+  // Wait for the thing the screenshot is evidence for, not just for load.
+  await page.getByRole("tab", { name: "Overview" }).waitFor({ state: "visible" });
   await page.screenshot({ path: "out/before.png" });
 } finally {
   await browser.close();
@@ -42,6 +44,29 @@ try {
 
 Close the browser in a `finally`. A navigation or screenshot that throws
 otherwise leaves Chromium running and the script alive with it.
+
+## Wait for the state you are claiming, not for load
+
+`waitUntil: "load"` reports that the document loaded. It says nothing about
+whether the interface rendered, so an app that paints after load gets
+photographed mid-load. Measured on a page that fills its container 700 ms after
+the load event:
+
+| Sequence | What the image contained |
+|---|---|
+| `goto({waitUntil:"load"})`, then screenshot | `Loading…` |
+| `goto`, then `locator.waitFor({state:"visible"})`, then screenshot | The interface |
+
+The first row is a screenshot of a spinner presented as evidence of a feature.
+
+It also breaks the pairing below. In the same measurement, the text read after
+the unwaited screenshot returned `[]`, because `allInnerTexts()` on a list
+locator resolves immediately rather than waiting for matches. A single-element
+locator auto-waits; a list does not. So the caption and the image can disagree,
+or the caption can come back empty, and neither failure announces itself.
+
+Wait on the specific element that carries the claim, then screenshot, then read
+the assertion from that settled state.
 
 Set `deviceScaleFactor: 2`. Measured: a 900x300 viewport wrote 1800x600 at
 `deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
@@ -70,7 +95,10 @@ One interactive login into a profile the run owns:
 1. Create an empty profile directory the run can delete.
 2. Launch with `headless: false` and hand the window to the user to sign in. A
    visible window is required for a real credential entry and for challenges the
-   user must answer. This is the one step that needs a display and takes focus.
+   user must answer. This is the only step that needs the user, and it is not the
+   only step that needs the display: the context stays visible until step 4, so
+   the display has to remain available through the capture. Releasing it after
+   the sign-in fails the run.
 3. Screenshot from the same context, now that the session lives in the profile.
 4. Close the context, which closes Chromium.
 5. Delete the profile directory, then confirm it is gone.
@@ -131,13 +159,30 @@ Read the same claim out of the same page state, in the same run, and put the tex
 next to the image. A reviewer can then check the claim without reading pixels, and
 a wrong or stale image stops matching its own caption.
 
+In a browser, read it from the page:
+
 ```js
+await page.getByRole("tab", { name: "Overview" }).waitFor({ state: "visible" });
 const tabs = await page.getByRole("tab").allInnerTexts();
 // ["Overview", "Activity", "Settings"]
 ```
 
 Verified in the same run as the screenshot above: the returned strings matched the
-labels visible in the image.
+labels visible in the image. Wait first, for the reason in the section above.
+
+For a native window there is no page, so read the window's accessibility tree
+instead. It is scoped by the same window id as the capture, and it produces text
+without producing a second image:
+
+```bash
+peekaboo see --window-id 592 --tree --no-screenshot
+#   elem_9  [button] Percent
+#   elem_11 [button] 7
+```
+
+Measured: 41 elements with roles and labels for one id-scoped window, no image
+written. Flags change, so read the tool's own `--help`; what stays is that the
+accessibility tree is the native equivalent of reading the page.
 
 ## Native window: name the window
 

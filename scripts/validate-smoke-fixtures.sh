@@ -275,6 +275,12 @@ require_pattern "$recording_still_capture" 'switch a running context to headless
   "vp-recording still capture must not promise headless capture after an interactive sign-in"
 require_pattern "$recording_still_capture" 'Two nested .finally. blocks' \
   "vp-recording still capture must remove the profile even when the context close fails"
+require_pattern "$recording_still_capture" 'Wait for the state you are claiming, not for load' \
+  "vp-recording still capture must wait for the claimed UI state before screenshotting"
+require_pattern "$recording_still_capture" 'accessibility tree' \
+  "vp-recording still capture must give the native path a textual assertion"
+require_pattern "$recording_still_capture" 'the display has to remain available through the capture' \
+  "vp-recording still capture must keep the display available past the sign-in"
 
 require_pattern "$github_fixture" 'public by URL' \
   "vp-github fixture must cover attachments being public by URL"
