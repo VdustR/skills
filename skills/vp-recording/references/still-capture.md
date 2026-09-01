@@ -58,13 +58,32 @@ One interactive login into a profile the run owns:
 1. Create an empty profile directory the run can delete.
 2. Launch with `headless: false` and hand the window to the user to sign in. A
    visible window is required for a real credential entry and for challenges the
-   user must answer.
+   user must answer. This is the one step that needs a display and takes focus.
 3. Screenshot from the same context, now that the session lives in the profile.
-4. Delete the profile directory.
+4. Close the context, which closes Chromium.
+5. Delete the profile directory, then confirm it is gone.
 
-Verified: session state carried by the profile changed the rendered page, and the
-screenshot captured the signed-in view. Creating and removing the directory both
-succeeded in the same run.
+Step 4 is not optional. Chromium holds the profile open and keeps writing to it,
+so a delete while it is running can fail on a platform that locks the files, or
+succeed and then be undone when the browser flushes its state back. Either way the
+throwaway profile and the session material inside it survive the run.
+
+```js
+try {
+  // steps 2 and 3
+} finally {
+  await context.close();
+}
+rmSync(profileDir, { recursive: true, force: true });
+if (existsSync(profileDir)) throw new Error(`profile survived: ${profileDir}`);
+```
+
+The `finally` matters as much as the order: a screenshot that throws must not
+leave a signed-in browser and its profile behind.
+
+Verified in this sequence: session state carried by the profile changed the
+rendered page, the screenshot captured the signed-in view, and the profile
+directory was created and confirmed removed in the same run.
 
 Route to vp-agent-browser-session when the profile has to survive the task rather
 than be discarded, or when the login needs full Chrome state such as IndexedDB,
