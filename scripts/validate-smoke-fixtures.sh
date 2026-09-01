@@ -264,6 +264,17 @@ require_pattern "$recording_fixture" 'no browser path to fall back on' \
   "vp-recording fixture must force window-id targeting where no browser path exists"
 require_pattern "$recording_fixture" "output scale is checked against the window's point size" \
   "vp-recording fixture must check a capture tool's output scale"
+require_pattern "$recording_fixture" 'four capture requests' \
+  "vp-recording fixture prompt must declare every situation it contains"
+if [ "$(grep -c '^\*\*Situation ' "$recording_fixture")" -ne 4 ]; then
+  fail "vp-recording fixture must contain exactly the four situations its prompt declares"
+fi
+require_pattern "$recording_still_capture" 'filters on the owning application.s name, not the window title' \
+  "vp-recording still capture must not pass a window title to the owner-name filter"
+require_pattern "$recording_still_capture" 'switch a running context to headless' \
+  "vp-recording still capture must not promise headless capture after an interactive sign-in"
+require_pattern "$recording_still_capture" 'Two nested .finally. blocks' \
+  "vp-recording still capture must remove the profile even when the context close fails"
 
 require_pattern "$github_fixture" 'public by URL' \
   "vp-github fixture must cover attachments being public by URL"

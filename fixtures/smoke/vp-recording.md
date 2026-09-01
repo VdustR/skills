@@ -2,8 +2,9 @@
 
 ## Prompt
 
-Use `$vp-recording` for two capture requests on a shared macOS workstation where
+Use `$vp-recording` for four capture requests on a shared macOS workstation where
 a colleague's chat window and an unrelated document are open behind the target.
+Handle all four; none of them is optional.
 
 **Situation 1 — desktop app.** Record a 20-second walkthrough of a native macOS
 app window titled `Inventory Editor`, with the cursor visible, while the app is
