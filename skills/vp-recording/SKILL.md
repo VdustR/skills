@@ -5,11 +5,13 @@ description: >-
   scripted browser walkthrough with a visible cursor and subtitles, a
   frame-accurate render of generated or mathematical motion, or a macOS window
   capture. Use for screenshots, before-and-after images, demo videos, screencasts,
-  walkthroughs, bug reproductions, animated GIFs, and any request to record, film,
-  screenshot, or show what an interface is doing, including a UI behind a login.
-  Every path ends at a file on disk. The still, browser, and render paths are
-  cross-platform; the window-capture path is macOS only. Boundary: use vp-github
-  to attach the result to an issue or pull request.
+  walkthroughs, animated GIFs, a bug reproduction that has to be delivered as an
+  image or a video, and any request to record, film, screenshot, or show what an
+  interface is doing, including a UI behind a login. Every path ends at a file on
+  disk. The browser paths, still and video, and the render path are
+  cross-platform; capturing a native window, still or video, is macOS only.
+  Boundary: use vp-minimal-repro for a re-runnable reproduction that needs no
+  image, and vp-github to attach the result to an issue or pull request.
 ---
 
 # Capture
@@ -19,7 +21,7 @@ at a file on disk, which is what a destination such as vp-github takes as input.
 
 | Capturing | Path | Unattended |
 |---|---|---|
-| A still image of a running interface | Screenshot straight to a file. Read `references/still-capture.md`. | Yes, apart from one interactive login |
+| A still image of a running interface | Screenshot straight to a file. Read `references/still-capture.md`. Native windows are macOS only | Yes, apart from one interactive login |
 | A web app being used | Headless browser driven by a script. Read `references/web-demo.md`. | Yes |
 | Generated or mathematical motion, no interaction | Deterministic frame render. Read `references/generated-video.md`. | Yes |
 | A native app or anything outside a browser, on macOS | Window-scoped screen capture. Read `references/macos-window-capture.md`. | Capture yes, driving no |
@@ -49,9 +51,14 @@ for Linux or Windows.
 ## Prefer the browser path
 
 If the subject runs in a browser, use the browser path for a still or a video,
-even when a desktop recorder is already open. It is fully headless, so it never
-takes window focus or moves the real pointer, and it survives being run from a
-scheduled job.
+even when a desktop recorder is already open. Without a login it is fully
+headless, so it never takes window focus or moves the real pointer, and it
+survives being run from a scheduled job.
+
+A still behind a login is the exception. Its one interactive sign-in needs a
+visible window and a display, and it takes focus while the user signs in, so it
+does not run from a scheduled job or a headless container. Everything after the
+sign-in is headless again. `references/still-capture.md` has the sequence.
 
 A tool that drives the local machine cannot show a visible cursor without
 interfering, because the machine has one system cursor and drawing it in the
