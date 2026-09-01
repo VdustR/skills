@@ -27,14 +27,21 @@ A page that needs no session needs no profile.
 
 ```js
 const browser = await chromium.launch();
-const context = await browser.newContext({
-  viewport: { width: 1280, height: 800 },
-  deviceScaleFactor: 2,
-});
-const page = await context.newPage();
-await page.goto(url, { waitUntil: "load" });
-await page.screenshot({ path: "out/before.png" });
+try {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 800 },
+    deviceScaleFactor: 2,
+  });
+  const page = await context.newPage();
+  await page.goto(url, { waitUntil: "load" });
+  await page.screenshot({ path: "out/before.png" });
+} finally {
+  await browser.close();
+}
 ```
+
+Close the browser in a `finally`. A navigation or screenshot that throws
+otherwise leaves Chromium running and the script alive with it.
 
 Set `deviceScaleFactor: 2`. Measured: a 900x300 viewport wrote 1800x600 at
 `deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
@@ -44,6 +51,11 @@ interface is too small for a reviewer to read the text that proves the claim.
 
 Here the profile is the point, so switch to `launchPersistentContext`, which is
 the only mode that keeps a session across launches.
+
+This context stays visible from launch until it is closed. Playwright cannot
+switch a running context to headless, so the capture happens in the window the
+user signed in through. Plan for a display for the whole sequence, not just the
+sign-in.
 
 ```js
 const context = await chromium.launchPersistentContext(profileDir, {
@@ -70,20 +82,43 @@ throwaway profile and the session material inside it survive the run.
 
 ```js
 try {
-  // steps 2 and 3
+  try {
+    // steps 2 and 3
+  } finally {
+    await context.close();
+  }
 } finally {
-  await context.close();
+  rmSync(profileDir, { recursive: true, force: true });
+  if (existsSync(profileDir)) throw new Error(`profile survived: ${profileDir}`);
 }
-rmSync(profileDir, { recursive: true, force: true });
-if (existsSync(profileDir)) throw new Error(`profile survived: ${profileDir}`);
 ```
 
-The `finally` matters as much as the order: a screenshot that throws must not
-leave a signed-in browser and its profile behind.
+Two nested `finally` blocks, not one. Removal has to sit outside the block that
+closes the context, because `context.close()` can itself reject after Chromium
+crashes or disconnects, and a single `finally` would let that rejection skip the
+removal and leave the signed-in profile on disk. The inner block still runs the
+close first, so the normal path closes before deleting.
 
 Verified in this sequence: session state carried by the profile changed the
 rendered page, the screenshot captured the signed-in view, and the profile
 directory was created and confirmed removed in the same run.
+
+### A later capture can go headless, conditionally
+
+Closing the context and relaunching the same profile with `headless: true` gets a
+headless capture of the signed-in view, but only when the site's login left a
+cookie with an expiry. Measured across a close and relaunch of one profile:
+
+| Login cookie | Same profile relaunched headless |
+|---|---|
+| Carries an `expires` | Still signed in |
+| No `expires`, a session cookie | Signed out |
+
+A session cookie is discarded when the browser closes, so the relaunch lands on
+the login page and the screenshot captures that instead. Check the signed-in
+state after relaunching rather than assuming it carried over, and fall back to
+capturing in the headed context when it did not. This also means the profile
+cannot be deleted between the two launches.
 
 Route to vp-agent-browser-session when the profile has to survive the task rather
 than be discarded, or when the login needs full Chrome state such as IndexedDB,
@@ -108,10 +143,24 @@ labels visible in the image.
 
 Paths below are relative to the skill directory.
 
+`window-id.swift` filters on the owning application's name, not the window title.
+Measured: passing a real window title exits with `no on-screen window found`,
+while passing that window's owner name resolves it. A request that names a window
+by title, which is the usual way a person describes one, therefore has to select
+the title from the rows.
+
 ```bash
-./scripts/window-id.swift "Inventory Editor"
+# The argument is the owner name. Column 3 is the title.
+./scripts/window-id.swift "Inventory" \
+  | awk -F'\t' '$3 == "Inventory Editor" { print $1 }'
+# Owner unknown? List every on-screen window and match on the title.
+./scripts/window-id.swift | awk -F'\t' '$3 == "Inventory Editor" { print $1, $2, $4 }'
+
 screencapture -x -o -l37528 out/before.png
 ```
+
+Print the owner and size alongside the id and check them before capturing. Two
+windows of one application can carry the same title.
 
 `macos-window-capture.md` has the id lookup, the `-o` rule, and the point-to-pixel
 mapping. All three apply unchanged to a still.

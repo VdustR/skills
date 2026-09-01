@@ -55,10 +55,13 @@ even when a desktop recorder is already open. Without a login it is fully
 headless, so it never takes window focus or moves the real pointer, and it
 survives being run from a scheduled job.
 
-A still behind a login is the exception. Its one interactive sign-in needs a
-visible window and a display, and it takes focus while the user signs in, so it
-does not run from a scheduled job or a headless container. Everything after the
-sign-in is headless again. `references/still-capture.md` has the sequence.
+A still behind a login is the exception, and it stays the exception through the
+whole sequence. The interactive sign-in needs a visible window and a display, and
+Playwright cannot switch that running context to headless afterwards, so the
+capture happens in the same visible window. Plan for a display for the entire
+run, and expect it to take focus. It does not run from a scheduled job or a
+headless container. `references/still-capture.md` has the sequence and the one
+case where a later capture can go headless.
 
 A tool that drives the local machine cannot show a visible cursor without
 interfering, because the machine has one system cursor and drawing it in the
