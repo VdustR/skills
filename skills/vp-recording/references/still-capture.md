@@ -23,9 +23,11 @@ a throwaway profile instead, as below.
 
 ## Web app: Playwright writes the file
 
+A page that needs no session needs no profile.
+
 ```js
-const context = await chromium.launchPersistentContext(profileDir, {
-  headless: true,
+const browser = await chromium.launch();
+const context = await browser.newContext({
   viewport: { width: 1280, height: 800 },
   deviceScaleFactor: 2,
 });
@@ -38,17 +40,25 @@ Set `deviceScaleFactor: 2`. Measured: a 900x300 viewport wrote 1800x600 at
 `deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
 interface is too small for a reviewer to read the text that proves the claim.
 
-`launch()` plus `newContext()` is enough when the page needs no session. Use
-`launchPersistentContext` only for the login case, where the profile is the point.
-
 ## A UI behind a login
+
+Here the profile is the point, so switch to `launchPersistentContext`, which is
+the only mode that keeps a session across launches.
+
+```js
+const context = await chromium.launchPersistentContext(profileDir, {
+  headless: false, // the user has to see the login window
+  viewport: { width: 1280, height: 800 },
+  deviceScaleFactor: 2,
+});
+```
 
 One interactive login into a profile the run owns:
 
 1. Create an empty profile directory the run can delete.
-2. Launch `launchPersistentContext` with `headless: false` and hand the window to
-   the user to sign in. A visible window is required for a real credential entry
-   and for challenges the user must answer.
+2. Launch with `headless: false` and hand the window to the user to sign in. A
+   visible window is required for a real credential entry and for challenges the
+   user must answer.
 3. Screenshot from the same context, now that the session lives in the profile.
 4. Delete the profile directory.
 
