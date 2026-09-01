@@ -55,11 +55,12 @@ even when a desktop recorder is already open. Without a login it is fully
 headless, so it never takes window focus or moves the real pointer, and it
 survives being run from a scheduled job.
 
-Two logins route elsewhere before this path applies. Use vp-agent-browser-session
-when the profile has to survive the task instead of being discarded, and when the
-login needs complete Chrome state such as IndexedDB, service workers, or SSO. It
-owns managed profile identity, permissions, and deletion. The throwaway-profile
-sequence below is for a login that begins and ends inside this capture.
+Two conditions route a login away from this path before it applies. Use
+vp-agent-browser-session when the profile has to survive the task instead of being
+discarded, and when the login needs complete Chrome state such as IndexedDB,
+service workers, or SSO. It owns managed profile identity, permissions, and
+deletion. The throwaway-profile sequence in `references/still-capture.md` is for a
+login that begins and ends inside one capture.
 
 A still behind a login is the exception, and it stays the exception through the
 whole sequence. The interactive sign-in needs a visible window and a display, and

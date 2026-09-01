@@ -45,6 +45,10 @@ try {
 Close the browser in a `finally`. A navigation or screenshot that throws
 otherwise leaves Chromium running and the script alive with it.
 
+Set `deviceScaleFactor: 2`. Measured: a 900x300 viewport wrote 1800x600 at
+`deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
+interface is too small for a reviewer to read the text that proves the claim.
+
 ## Wait for the state you are claiming, not for load
 
 `waitUntil: "load"` reports that the document loaded. It says nothing about
@@ -67,10 +71,6 @@ or the caption can come back empty, and neither failure announces itself.
 
 Wait on the specific element that carries the claim, then screenshot, then read
 the assertion from that settled state.
-
-Set `deviceScaleFactor: 2`. Measured: a 900x300 viewport wrote 1800x600 at
-`deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
-interface is too small for a reviewer to read the text that proves the claim.
 
 ## A UI behind a login
 
@@ -131,6 +131,12 @@ Verified in this sequence: session state carried by the profile changed the
 rendered page, the screenshot captured the signed-in view, and the profile
 directory was created and confirmed removed in the same run.
 
+This sequence is for a login that begins and ends inside one capture. Route to
+vp-agent-browser-session instead when the profile has to survive the task, or when
+the login needs complete Chrome state such as IndexedDB, service workers, or SSO.
+That skill owns managed profile identity, permissions, and deletion; do not
+reimplement its lifecycle here.
+
 ### A later capture can go headless, conditionally
 
 Closing the context and relaunching the same profile with `headless: true` gets a
@@ -156,11 +162,6 @@ lands on the login page too, so the only route back is asking the user to sign i
 again. Check the signed-in state after relaunching rather than assuming it carried
 over, and when it did not, either accept the images already captured or ask for
 another sign-in. Do not delete the profile between the two launches.
-
-Route to vp-agent-browser-session when the profile has to survive the task rather
-than be discarded, or when the login needs full Chrome state such as IndexedDB,
-service workers, or SSO. That skill owns managed profile identity, permissions,
-and deletion; do not reimplement its lifecycle here.
 
 ## Pair the image with a text assertion
 
