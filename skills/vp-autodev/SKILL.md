@@ -52,6 +52,9 @@ Keep evidence for each decision from issue validation through delivery:
    feedback remains unresolved; otherwise complete the Draft-to-Ready
    transition. Treat Ready as a new mutation that may trigger review automation,
    not as evidence that the pre-Ready feedback snapshot remains final.
+   When local screenshots, recordings, diagrams, or other files materially show
+   the result, route their publication in the PR through `vp-github` even if the
+   development request did not separately say to upload them.
 7. Record the current head commit, then monitor all repository-defined signals:
    CI, check runs, bot comments, pull request review comments (inline code
    comments), issue comments in the PR conversation, and reaction
@@ -125,7 +128,7 @@ proceeding would be unsafe or would materially expand scope.
   for a re-runnable failure.
 - [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git and
   pull-request lifecycle decisions.
+- [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
+  local evidence should be attached to an issue, pull request, or comment.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
   for author-side feedback resolution.
-- [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr) for a
-  concise PR or issue opening.

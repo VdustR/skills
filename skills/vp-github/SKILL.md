@@ -2,26 +2,31 @@
 name: vp-github
 description: >-
   Work with GitHub platform behavior that is not a Git operation: attaching
-  images, videos, or files to issues and pull requests, controlling how markdown
-  renders on GitHub surfaces, and choosing a credential that can reach the
-  endpoint. Use when something must appear inline in an issue, PR, discussion, or
-  README, or when a GitHub request is refused and the cause is unclear. Boundary:
-  use vp-git for local Git work, vp-stacked-pr for stacks, and the vp-pr-* skills
-  for review workflows.
+  images, videos, or files to issues, pull requests, and comments; controlling
+  how Markdown renders on GitHub surfaces; and choosing a credential that can
+  reach the endpoint. Use for any request to upload, attach, embed, or show a
+  local artifact on GitHub. Also use proactively when writing or editing GitHub
+  content and an available screenshot, recording, diagram, or other local file
+  would provide material evidence, even when the user did not say "upload."
+  Boundary: use vp-git for local Git work, vp-stacked-pr for stacks, and the
+  vp-pr-* skills for review workflows.
 ---
 
 # GitHub Platform Behavior
 
 ## Route
 
-- Putting an image, video, or file into an issue, PR, discussion, or README: read
+- Putting an image, video, or file into an issue, PR, comment, discussion, or
+  README: read
   `references/attachments.md`.
 - Getting markdown to render the way you intend, especially inline video: read
   `references/markdown-rendering.md`.
 
-Everything here needs an authenticated `gh` CLI. Non-media attachment upload also
-needs a browser signed in to GitHub and a way to run scripts in its page context.
-Confirm what the chosen path needs is available before promising the result.
+Media upload through the supported path needs an authenticated GitHub CLI
+v2.99.0 or later. Non-media attachment upload also needs a browser signed in to
+GitHub and a way to run scripts in its page context. Confirm what the chosen path
+needs before promising the result, and never treat choosing the upload method as
+authorization to publish.
 
 ## Start from the credential
 
@@ -30,7 +35,7 @@ not obvious from the error message.
 
 | Credential | Reaches |
 |---|---|
-| `gh auth token`, a user PAT | REST and GraphQL, plus the media attachment upload endpoint |
+| GitHub CLI OAuth token, classic PAT | REST and GraphQL, plus `gh --attach` media upload |
 | A workflow's built-in `GITHUB_TOKEN` | REST and GraphQL for its own repository; media upload is unverified |
 | A logged-in browser session | Everything above, plus web-only flows gated on a per-page nonce |
 
@@ -57,6 +62,15 @@ body instead of guessing from the source:
 ```bash
 gh api repos/<owner>/<repo>/issues/<n> -H "Accept: application/vnd.github.html+json" --jq '.body_html'
 ```
+
+## Prefer the supported media path
+
+For a local image or video bound for an issue, pull request, or comment, use the
+repeatable `--attach` flag on `gh issue create`, `gh issue edit`,
+`gh issue comment`, `gh pr create`, `gh pr edit`, or `gh pr comment`. Read
+`references/attachments.md` for version, permissions, partial-failure, body
+rewrite, and fallback behavior. Do not reconstruct the upload request when the
+supported CLI path is available.
 
 ## Verify before claiming a limit
 

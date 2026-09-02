@@ -1,4 +1,4 @@
 interface:
   display_name: "VP GitHub"
-  short_description: "GitHub platform behavior: attachments, markdown rendering, token reach"
-  default_prompt: "Use $vp-github for this GitHub platform question."
+  short_description: "Upload and render GitHub attachments safely"
+  default_prompt: "Use $vp-github to upload or render this local artifact in GitHub content."

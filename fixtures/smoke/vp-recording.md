@@ -64,12 +64,12 @@ Situation 3 routes to `references/still-capture.md`:
   read the interface text that the screenshot is evidence for.
 - Pair each image with a textual assertion read from the same page state, so the
   claim is checkable without reading pixels.
-- Confirm what each image contains before uploading it. The upload publishes: an
-  `/assets/` URL is downloadable without authentication as soon as it is
-  uploaded, before the comment is posted, so discarding the draft does not recall
-  a capture of the wrong window.
-- Write PNG, which is on the media endpoint's accepted content types, and keep
-  the filename extension matching the declared type.
+- Confirm what each image contains before uploading it. The upload has no
+  documented deletion path; access depends on repository visibility and whether
+  posted content references the asset, and later changes can expand access.
+  Discarding a draft does not reliably recall a capture of the wrong window.
+- Write PNG, which is on the supported media list, and keep the filename
+  extension matching the file type.
 
 Situation 4 also routes to `references/still-capture.md`, and there is no browser
 fallback available:
@@ -112,8 +112,8 @@ All situations:
   than assumed;
 - a login behind a capture is entered once in an isolated profile that is deleted
   afterwards, never by extracting a session token from another browser;
-- what an image contains is confirmed before upload, because an `/assets/` upload
-  is public before the comment is posted;
+- what an image contains is confirmed before upload, because the attachment has
+  no documented deletion path and later changes can expand access;
 - a still is paired with a textual assertion from the same page state;
 - the visible-cursor and background-operation tradeoff is stated rather than
   silently resolved;
