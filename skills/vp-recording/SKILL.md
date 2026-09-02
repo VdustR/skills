@@ -167,9 +167,10 @@ id you intended; a plain success message does not carry that evidence.
 mandatory when anyone else's content could be on screen.
 
 Confirming the file is not optional when it is bound for a GitHub attachment. The
-upload publishes: vp-github records that an `/assets/` URL is downloadable without
-authentication as soon as it is uploaded, before the comment is posted, so
-discarding the draft does not recall a capture of the wrong window.
+upload has no documented deletion path. vp-github records that access depends on
+repository visibility and whether posted content references the asset, and a
+later reference or visibility change can expand that access. Discarding a draft
+does not provide a reliable way to recall a capture of the wrong window.
 
 ## Related skills
 

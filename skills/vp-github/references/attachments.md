@@ -5,9 +5,10 @@
 GitHub CLI v2.99.0 introduced a supported `--attach` path for images and videos.
 Other files still require GitHub's web upload flow or a link-based fallback.
 
-| File type | Path | Needs |
+| File and target | Path | Needs |
 |---|---|---|
-| PNG, JPEG, GIF, WebP, SVG, MP4, MOV, WebM | `gh ... --attach` | GitHub CLI v2.99.0+, repository write access |
+| Supported media in an issue, PR, or comment | `gh ... --attach` | GitHub CLI v2.99.0+, repository write access |
+| Supported media in a README or discussion | Standalone legacy upload, then embed the returned URL | A bearer token, repository write access |
 | Everything else | GitHub's own web upload flow | A logged-in browser session |
 
 GitHub Enterprise Server does not support `--attach` in this release. Check
@@ -64,13 +65,35 @@ interface's broader attachment list.
 Size ceilings are GitHub's documented attachment limits: 10 MB for images and
 GIFs, 10 MB for video on a free plan and 100 MB on a paid plan.
 
-### Old GitHub CLI
+### Standalone or old-CLI fallback
 
-When `gh` is older than v2.99.0, prefer a temporary current CLI or an approved
-toolchain update. If neither is available, the legacy bearer-token endpoint at
-`uploads.github.com/user-attachments/assets` is undocumented and unversioned.
-Use it only as an explicit fallback with the same eight media types. Keep the
-token out of process arguments, and do not promise continued availability.
+The supported commands cannot upload media directly for a README or discussion.
+The standalone bearer-token endpoint also remains the fallback when `gh` is
+older than v2.99.0 and neither a temporary current CLI nor an approved toolchain
+update is available. It is undocumented and unversioned; use it only for the
+same eight media types and do not promise continued availability.
+
+```bash
+PATH_TO_FILE=out/demo.mp4
+NAME=$(basename "$PATH_TO_FILE")
+MIME=video/mp4
+REPO=owner/name
+GITHUB_UPLOAD_TOKEN=$(gh auth token)
+{
+  printf 'header = "Authorization: Bearer %s"\n' "$GITHUB_UPLOAD_TOKEN"
+} | curl --config - -sS -X POST \
+  "https://uploads.github.com/user-attachments/assets?name=$NAME&content_type=$MIME&repository_id=$(gh api "repos/$REPO" --jq .id)" \
+  -H "Accept: application/json" \
+  --data-binary "@$PATH_TO_FILE"
+unset GITHUB_UPLOAD_TOKEN
+# 201 {"url":"https://github.com/user-attachments/assets/<uuid>"}
+```
+
+The endpoint rejects a filename containing a slash and validates the extension
+against the declared content type. Passing the authorization header through
+curl's standard-input config keeps the token out of process arguments. Embed
+the returned URL in the intended README or discussion only after confirming the
+target and content.
 
 ## Non-media: drive a logged-in page
 

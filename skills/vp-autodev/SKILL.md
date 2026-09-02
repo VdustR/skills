@@ -128,7 +128,7 @@ proceeding would be unsafe or would materially expand scope.
   for a re-runnable failure.
 - [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git and
   pull-request lifecycle decisions.
+- [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
+  local evidence should be attached to an issue, pull request, or comment.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
   for author-side feedback resolution.
-- [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr) for a
-  concise PR or issue opening.

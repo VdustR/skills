@@ -267,11 +267,12 @@ Open the image and check three things: it is the window you meant, it shows the
 state you are claiming, and nothing else is in the frame.
 
 This is mandatory when the image is bound for a GitHub attachment, because the
-upload publishes. vp-github records that an `/assets/` URL is downloadable without
-authentication as soon as it is uploaded, before any comment is posted, so
-discarding the draft does not recall the image. There is no step after this one at
-which a wrong window can be caught.
+upload has no documented deletion path. vp-github records that access depends on
+repository visibility and whether posted content references the asset, and a
+later reference or visibility change can expand that access. Discarding the draft
+does not reliably recall the image. There is no later step that safely substitutes
+for checking the file before upload.
 
-PNG is the format to write. It is on the eight content types the media upload
-endpoint accepts, and the endpoint also validates the filename extension against
-the declared type. See vp-github for the whitelist and the size ceilings.
+PNG is the format to write. It is one of the eight media types supported by the
+GitHub CLI attachment path and legacy endpoint. See vp-github for the whitelist,
+filename rules, and size ceilings.

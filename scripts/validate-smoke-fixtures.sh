@@ -238,8 +238,8 @@ require_pattern "$recording_fixture" 'isolated profile that is deleted' \
   "vp-recording fixture must dispose of the profile it creates for a login"
 require_pattern "$recording_fixture" 'confirmed before upload' \
   "vp-recording fixture must confirm image contents before upload"
-require_pattern "$recording_fixture" 'public before the comment is posted' \
-  "vp-recording fixture must state that an upload publishes before posting"
+require_pattern "$recording_fixture" 'no documented deletion path' \
+  "vp-recording fixture must state that attachment upload is not reliably reversible"
 require_pattern "$recording_fixture" 'textual assertion from the same page state' \
   "vp-recording fixture must pair a still with a textual assertion"
 require_frontmatter_pattern "$recording_skill" 'still (screenshot|image)' \
@@ -261,8 +261,8 @@ require_pattern "$recording_still_capture" 'window id names one window|Only a wi
   "vp-recording still capture must require window-id targeting"
 require_pattern "$recording_still_capture" 'Application name, or process id' \
   "vp-recording still capture must enumerate application and process-id targeting"
-require_pattern "$recording_still_capture" 'as soon as it is uploaded, before any comment is posted' \
-  "vp-recording still capture must state that an upload publishes before posting"
+require_pattern "$recording_still_capture" 'no documented deletion path' \
+  "vp-recording still capture must state that attachment upload is not reliably reversible"
 require_pattern "$recording_still_capture" 'Delete the profile directory' \
   "vp-recording still capture must dispose of the login profile"
 require_pattern "$recording_still_capture" 'Close the context' \
@@ -319,8 +319,14 @@ require_pattern "$github_fixture" 'release asset or repo blob' \
   "vp-github fixture must cover the unattended release-asset fallback"
 require_pattern "$github_fixture" 'survives GitHub.s sanitizer only when' \
   "vp-github fixture must cover inline video requiring a user-attachments source"
-require_pattern skills/vp-github/SKILL.md 'use proactively.*writing or editing GitHub' \
-  "vp-github must advertise proactive invocation for material local evidence"
+if ! awk '/^## Related skills$/{exit} {print}' skills/vp-github/SKILL.md \
+  | grep -Eiq 'use proactively.*writing or editing GitHub'; then
+  fail "vp-github must advertise proactive invocation for material local evidence before Related skills"
+fi
+require_pattern skills/vp-github/references/attachments.md 'README or discussion.*Standalone legacy upload' \
+  "vp-github must retain a standalone media path for README and discussion targets"
+require_pattern skills/vp-github/references/attachments.md 'curl --config -' \
+  "vp-github must retain an executable secure legacy upload fallback"
 
 require_pattern "$agent_browser_session_fixture" 'dedicated managed profiles?' \
   "vp-agent-browser-session fixture must cover dedicated managed profiles"
