@@ -297,10 +297,16 @@ if ! awk '/^## Related skills$/{exit} {print}' "$recording_skill" \
   fail "vp-recording must state the managed-profile handoff outside Related skills"
 fi
 
-require_pattern "$github_fixture" 'public by URL' \
-  "vp-github fixture must cover attachments being public by URL"
-require_pattern "$github_fixture" 'token.*out of process arguments|not expanded into curl process arguments' \
-  "vp-github fixture must keep bearer tokens out of process arguments"
+require_pattern "$github_fixture" 'referenced private-repository asset returned' \
+  "vp-github fixture must preserve the measured private attachment boundary"
+require_pattern "$github_fixture" '404 anonymously and 200 with a repository-readable token' \
+  "vp-github fixture must preserve the measured private attachment result"
+require_pattern "$github_fixture" 'public-repository asset returned 200 anonymously' \
+  "vp-github fixture must preserve the measured public attachment boundary"
+require_pattern "$github_fixture" 'v2\.99\.0.*--attach|--attach.*v2\.99\.0' \
+  "vp-github fixture must prefer the supported GitHub CLI attachment path"
+require_pattern "$github_fixture" 'partial upload failure.*read.*back|read.*back.*partial upload failure' \
+  "vp-github fixture must cover partial-write readback before retry"
 if grep -Fq -- '-H "Authorization: Bearer $(gh auth token)"' \
   skills/vp-github/references/attachments.md; then
   fail "vp-github must not expose gh auth token in curl process arguments"
@@ -313,6 +319,8 @@ require_pattern "$github_fixture" 'release asset or repo blob' \
   "vp-github fixture must cover the unattended release-asset fallback"
 require_pattern "$github_fixture" 'survives GitHub.s sanitizer only when' \
   "vp-github fixture must cover inline video requiring a user-attachments source"
+require_pattern skills/vp-github/SKILL.md 'use proactively.*writing or editing GitHub' \
+  "vp-github must advertise proactive invocation for material local evidence"
 
 require_pattern "$agent_browser_session_fixture" 'dedicated managed profiles?' \
   "vp-agent-browser-session fixture must cover dedicated managed profiles"

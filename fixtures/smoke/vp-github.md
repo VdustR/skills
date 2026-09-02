@@ -18,16 +18,18 @@ README instead.
 
 Situation 1 routes to `references/attachments.md`:
 
-- Upload with one `POST` to `uploads.github.com/user-attachments/assets` carrying
-  `name`, `content_type`, and `repository_id`, authorized with a bearer token.
-- Keep the bearer token out of process arguments by passing the authorization
-  header through curl's standard-input config.
-- Embed the returned `user-attachments` URL as a bare URL on its own line.
-- Warn that the endpoint is undocumented and unversioned, and name the release
-  asset fallback.
-- Warn that the attachment is public by URL: an `/assets/` URL is downloadable
-  without authentication as soon as it is uploaded, even before the comment is
-  posted, so a private repository does not keep it private.
+- Check for GitHub CLI v2.99.0 or later and repository write access, then use
+  `gh pr comment --attach` rather than reconstructing the upload request.
+- Treat `--attach` as repeatable, preserve a local Markdown reference and its alt
+  text when one exists, and let an otherwise unreferenced video append to the
+  comment body.
+- State that a partial upload failure may still create the comment, print its
+  URL, and exit non-zero; read the comment back before any retry.
+- Treat the upload as published to the repository's readers and explain the
+  measured access conditions: a referenced private-repository asset returned
+  404 anonymously and 200 with a repository-readable token, while a referenced
+  public-repository asset returned 200 anonymously. Do not claim that a private
+  repository's attachment is anonymously readable.
 
 Situation 2:
 
@@ -38,8 +40,9 @@ Situation 2:
   session, and do not present header spoofing as a workaround.
 - For an unattended job, deliver through a release asset or repo blob plus a plain
   link rather than attempting the web flow.
-- Treat customer-supplied diagnostics as sensitive: because attachments are public
-  by URL, get the user's decision before uploading them anywhere.
+- Treat customer-supplied diagnostics as sensitive: uploads have no documented
+  deletion path and later references or visibility changes can expand access, so
+  get the user's decision before uploading them anywhere.
 
 Situation 3 routes to `references/markdown-rendering.md`:
 
@@ -53,13 +56,15 @@ Situation 3 routes to `references/markdown-rendering.md`:
 
 ## Regression Coverage
 
-- media attachments use the token endpoint and a bare URL on its own line;
-- bearer tokens are not expanded into curl process arguments;
+- media attachments prefer GitHub CLI v2.99.0 `--attach` over reconstructing an
+  undocumented upload request;
+- partial upload failures are read back before retrying the write;
 - non-media attachments are not promised on a token, and the verified-fetch nonce
   is not treated as a spoofable header;
 - unattended non-media delivery falls back to a release asset;
-- attachments are flagged as public by URL before sensitive files are uploaded;
+- attachment visibility distinguishes public referenced, public unreferenced,
+  and private referenced observations;
 - inline video is only claimed for `user-attachments` sources;
 - README video support is stated correctly rather than repeated from stale advice;
 - rendering claims are verified through `/markdown` or rendered HTML;
-- the undocumented endpoints carry an explicit stability warning.
+- the legacy token endpoint carries an explicit stability warning.

@@ -1,43 +1,51 @@
 # Attachments
 
-GitHub has no documented attachment API. Two undocumented paths exist, split by
-file type, and the split is forced rather than a preference.
+## Route by file and CLI capability
+
+GitHub CLI v2.99.0 introduced a supported `--attach` path for images and videos.
+Other files still require GitHub's web upload flow or a link-based fallback.
 
 | File type | Path | Needs |
 |---|---|---|
-| 8 media types below | `uploads.github.com/user-attachments/assets` | A bearer token |
+| PNG, JPEG, GIF, WebP, SVG, MP4, MOV, WebM | `gh ... --attach` | GitHub CLI v2.99.0+, repository write access |
 | Everything else | GitHub's own web upload flow | A logged-in browser session |
 
-Both are undocumented and unversioned. Do not build anything on them that cannot
-fall back to a release asset plus a plain link.
+GitHub Enterprise Server does not support `--attach` in this release. Check
+`gh version`, the target host, authentication, repository write access, file
+type, and size before the write. Keep a release asset plus a plain link as the
+unattended fallback for unsupported files or hosts.
 
-## Media: one request with a token
+## Media: use `gh --attach`
 
 ```bash
-PATH_TO_FILE=out/demo.mp4
-NAME=$(basename "$PATH_TO_FILE")   # the endpoint rejects a name containing a slash
-MIME=video/mp4
-REPO=owner/name
-GITHUB_UPLOAD_TOKEN=$(gh auth token)
-{
-  printf 'header = "Authorization: Bearer %s"\n' "$GITHUB_UPLOAD_TOKEN"
-} | curl --config - -sS -X POST \
-  "https://uploads.github.com/user-attachments/assets?name=$NAME&content_type=$MIME&repository_id=$(gh api "repos/$REPO" --jq .id)" \
-  -H "Accept: application/json" \
-  --data-binary "@$PATH_TO_FILE"
-unset GITHUB_UPLOAD_TOKEN
-# 201 {"url":"https://github.com/user-attachments/assets/<uuid>"}
+gh issue comment 42 --repo owner/name \
+  --body 'Visual verification:' \
+  --attach './out/demo.mp4'
+
+gh pr create --repo owner/name --title 'Fix login state' \
+  --body-file ./pr-body.md \
+  --attach './out/before.png#Before: empty error area' \
+  --attach './out/after.png#After: validation message is visible'
 ```
 
-Passing the authorization header through curl's standard-input config keeps the
-token out of curl's process arguments. Do not expand `gh auth token` directly in
-the `-H` argument, where another local process may be able to read it.
+The flag is repeatable, with up to 50 files per command. If the body already
+references an attached local path, such as `![Login error](./out/login.png)`,
+GitHub CLI rewrites that reference in place and preserves the body's alt text.
+An attached file not referenced in the body is appended. Image alt text can also
+follow `#` in the flag value; video has no alt text.
 
-That URL is identical to what drag-and-drop produces, so every GitHub surface
-renders it natively. The whole exchange is one HTTP request, so it runs from a
-script, a cron job, or a container.
+Supported commands are `gh issue create`, `gh issue edit`, `gh issue comment`,
+`gh pr create`, `gh pr edit`, and `gh pr comment`. Uploads use the OAuth token
+from `gh auth login` or a classic personal access token and require write access
+to the target repository.
 
-### The whitelist is exactly eight types
+Partial failure is consequential: when some attachments upload and others fail,
+GitHub CLI still performs the issue, pull request, or comment write with the
+successful uploads, prints the resulting URL, and exits non-zero. Read the
+created or edited content back before deciding whether to retry. Do not repeat
+the whole command blindly.
+
+### Supported media is exactly eight types
 
 | Accepted | Rejected with 422 |
 |---|---|
@@ -50,11 +58,19 @@ script, a cron job, or a container.
 | `video/webm` | `application/json` |
 | `video/quicktime` | |
 
-The endpoint also validates the filename extension against the declared content
-type. A `.png` name with `image/jpeg` is refused as an extension mismatch.
+The supported CLI path rejects other types. Do not infer support from the web
+interface's broader attachment list.
 
 Size ceilings are GitHub's documented attachment limits: 10 MB for images and
 GIFs, 10 MB for video on a free plan and 100 MB on a paid plan.
+
+### Old GitHub CLI
+
+When `gh` is older than v2.99.0, prefer a temporary current CLI or an approved
+toolchain update. If neither is available, the legacy bearer-token endpoint at
+`uploads.github.com/user-attachments/assets` is undocumented and unversioned.
+Use it only as an explicit fallback with the same eight media types. Keep the
+token out of process arguments, and do not promise continued availability.
 
 ## Non-media: drive a logged-in page
 
@@ -113,17 +129,29 @@ not preview, and it needs no session.
 
 ## Visibility
 
-Treat an uploaded attachment as published.
+Treat an uploaded attachment as published to the audience that can read the
+owning repository. The final access model depends on repository visibility and
+whether posted content references the asset; do not infer it from the
+`user-attachments` URL alone.
 
-- An `/assets/` URL is downloadable without authentication as soon as it is
-  uploaded, even before the comment is posted. Fetching it returns a 302 to a
-  signed S3 object, then the bytes. The rendered page uses short-lived
-  `private-user-images.githubusercontent.com` links, which hides this.
+- A referenced `/assets/` URL attributed to a public repository returned 200
+  without authentication. The same URL also returned 200 with a bearer token.
+- A referenced `/assets/` URL attributed to a private repository returned 404
+  without authentication and 200 with a token that could read the repository.
+- An unreferenced `/assets/` URL attributed to a public repository returned 404
+  without authentication and 200 with a token that could read the repository.
+- GitHub renders authenticated images through short-lived
+  `private-user-images.githubusercontent.com` URLs carrying signed parameters.
 - A `/files/` URL returns 404 while it is still an unposted draft, and becomes
   publicly downloadable once posted content references it.
 
-## repository_id is attribution, not a fence
+These are observed cases, not a documented stability contract. An upload has no
+documented deletion path, and a later reference or visibility change can expand
+access. Confirm the artifact contains no secret or unintended data before
+uploading it, regardless of when the surrounding issue or comment is posted.
 
-An asset uploaded against one repository renders in another repository's markdown
-context. Upload once against any repository you can read, then embed anywhere you
-can write.
+## Legacy `repository_id` is attribution, not a fence
+
+For the undocumented legacy endpoint, an asset uploaded against one repository
+can render in another repository's Markdown context. This does not relax the
+supported CLI path's requirement for write access to the target repository.

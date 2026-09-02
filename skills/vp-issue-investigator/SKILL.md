@@ -54,6 +54,10 @@ Before writing externally, show or verify the final target and content when the
 host's authorization rules require it. Read the created issue back and report
 its URL and any gap between the intended and rendered result.
 
+When a local screenshot, recording, diagram, or other file is material evidence
+for the issue, route its publication through `vp-github` even if the filing
+request did not separately say to upload it.
+
 ## Related skills
 
 - [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr) for the
@@ -62,5 +66,7 @@ its URL and any gap between the intended and rendered result.
   for editing the issue body.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
   when a repeatable reproduction would materially improve the evidence.
+- [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
+  local evidence should be attached to the issue.
 - [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
   when the confirmed issue should proceed through implementation and delivery.
