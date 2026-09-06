@@ -84,6 +84,7 @@ Before treating a change as done:
 - Run `npm run validate` from the repository root after `npm ci`.
 - Use `npm run validate:offline` for offline repository-owned checks.
 - Use `npm run validate:smoke-fixtures` to verify high-risk workflow fixtures exist and cover regression points.
+- For changed instructions, exercise representative decision scenarios and report whether verification was a manual walkthrough, an executable test, or an independent agent trial. Static fixture checks do not prove agent behavior.
 - Use `npm run validate:parser` for locked `skills@1.5.3` parser compatibility.
 - Use `npm run validate:latest` only as a non-blocking latest-CLI compatibility check.
 - Search for stale plugin or platform-specific wording when extracting skills from another source.

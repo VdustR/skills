@@ -18,6 +18,11 @@ Use `$vp-pr-comment-resolver` to process review feedback on a GitHub PR with:
 
 Assume the branch is checked out locally and `gh` is authenticated.
 
+In a separate case, the user has authorized feedback replies and a bot claims
+that a null check is missing. The current head contains the check and an
+executed regression test confirms the null case is handled. Contrast this with
+a request to change debug logging where the intended product policy is unknown.
+
 ## Expected Behavior
 
 - Fetch every issue comment in the PR conversation and the pull request review
@@ -31,6 +36,9 @@ Assume the branch is checked out locally and `gh` is authenticated.
 - Verify each comment against current code before editing or replying.
 - Fix only the verified `session` issue if the code confirms it.
 - Ask the user before disagreeing with the human debug-logging comment.
+- In the authorized null-check case, reply with current-head code and test
+  evidence without another approval. Do not change correct code to satisfy the
+  bot. Preserve the product-policy question in the debug-logging case.
 - Reply to the PR conversation issue comment with `@reviewer` plus a quoted
   excerpt.
 - For the actionable submitted-review body, reply in the PR conversation and
