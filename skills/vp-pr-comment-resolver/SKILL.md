@@ -35,8 +35,12 @@ current head, repository rules, code, and tests before deciding.
    conversation issue comments have no resolvable state.
 6. Re-fetch feedback and report remaining risk or required user judgment.
 
-Ask before disagreement, ambiguity, scope expansion, history rewriting, or any
-external write not already authorized. Read only the relevant reference:
+Within authorized feedback handling, explain a demonstrably incorrect or
+already-handled claim with current-code or test evidence without asking again.
+Ask when a disagreement requires a product or architectural decision, evidence
+remains ambiguous, scope expands, or history rewriting or an external write is
+not already authorized. Human threads still require explicit direction to
+resolve. Read only the relevant reference:
 
 - `references/workflow.md`
 - `references/decision-tree.md`

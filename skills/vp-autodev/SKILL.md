@@ -112,6 +112,26 @@ decision or evidence.
 Do not treat CI success as proof that the issue is fixed, or silence from one
 bot surface as proof that every review signal has completed.
 
+## Verification and convergence
+
+Before editing, define the acceptance criteria and the evidence needed to show
+the changed behavior. For instruction changes, exercise representative decision
+scenarios, including a case that must still stop for risk or missing authority.
+Syntax and fixture-content checks do not establish agent behavior; distinguish
+manual walkthroughs, executed tests, and independent agent trials in the report.
+
+Batch verified findings into a focused correction pass. Repeat affected checks
+when behavior changes or new evidence appears, and always perform the required
+final reconciliation. Do not request another review on an unchanged head that
+already has valid terminal evidence unless repository policy requires it.
+
+Use the user's iteration budget when provided. Otherwise, after two correction
+passes for the same unresolved finding, reassess the cause and evidence before
+editing again. Continue with a concrete new hypothesis and a discriminating
+check; do not repeat a failed approach or add unrelated improvements. If no safe
+next step exists, report the blocker. A pass count never makes unresolved
+findings, pending reviewers, or incomplete verification safe to merge.
+
 ## Problems discovered during the work
 
 Investigate each distinct problem before recording it. Record third-party

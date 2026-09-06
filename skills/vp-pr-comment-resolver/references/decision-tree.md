@@ -19,5 +19,7 @@ For each feedback item:
      link the review because GitHub has no top-level review reply mutation.
    - Submitted reviews and PR conversation issue comments cannot be resolved.
 
-Pause for disagreement, multiple valid product interpretations, architectural
-scope expansion, or history rewriting.
+An evidence-backed correction of an incorrect or already-handled claim can
+proceed within authorized feedback handling. Pause when evidence cannot settle
+the disagreement, multiple valid product interpretations remain, architecture
+would change beyond scope, or history rewriting is not already authorized.
