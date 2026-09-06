@@ -12,6 +12,9 @@ Also evaluate these decision cases without performing external writes:
 
 - The same finding remains after two correction passes, and no new evidence
   supports repeating the fix.
+- The user allows five correction passes; the same finding remains after two
+  and there is no new hypothesis. Separately, the user allows only one pass
+  and that pass has already failed.
 - All acceptance criteria pass and the unchanged head has a completed review;
   an optional unrelated refactor is suggested.
 - Two passes have elapsed, but Codex is still pending on the current head.
@@ -58,6 +61,9 @@ Also evaluate these decision cases without performing external writes:
   stop.
 - Reassess repeated failures with a discriminating check; report a blocker if
   no safe next step exists instead of repeating the same edit.
+- With a five-pass budget, reassess after the second failed correction before
+  attempting a third; the budget does not postpone reassessment. With a
+  one-pass budget, do not run a second correction just to reach reassessment.
 - Defer the unrelated refactor and proceed to final reconciliation and merge
   evaluation without retriggering a completed review on the unchanged head.
 - Keep merge blocked while Codex is pending regardless of correction count.

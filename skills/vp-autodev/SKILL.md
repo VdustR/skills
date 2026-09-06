@@ -125,9 +125,9 @@ when behavior changes or new evidence appears, and always perform the required
 final reconciliation. Do not request another review on an unchanged head that
 already has valid terminal evidence unless repository policy requires it.
 
-Use the user's iteration budget when provided. Otherwise, after two correction
-passes for the same unresolved finding, reassess the cause and evidence before
-editing again. Continue with a concrete new hypothesis and a discriminating
+Treat the user's iteration budget as an upper bound when provided. After two
+correction passes for the same unresolved finding, reassess the cause and
+evidence before editing again. Continue with a concrete new hypothesis and a discriminating
 check; do not repeat a failed approach or add unrelated improvements. If no safe
 next step exists, report the blocker. A pass count never makes unresolved
 findings, pending reviewers, or incomplete verification safe to merge.
