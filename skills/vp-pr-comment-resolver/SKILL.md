@@ -39,10 +39,10 @@ current head, repository rules, code, and tests before deciding.
 
 Keep bot feedback tied to the requested change, its acceptance criteria, and
 the evidence needed for safe delivery. Fix verified correctness or regression
-problems within scope. When current code and tests disprove a finding, explain
-that evidence and close the eligible bot thread instead of changing correct
-code. Defer speculative hardening, preference-only refactors, and unrelated
-improvements once the delivery criteria are satisfied.
+problems within scope. When current code or proportionate test evidence
+disproves a finding, explain that evidence and close the eligible bot thread
+instead of changing correct code. Defer speculative hardening, preference-only
+refactors, and unrelated improvements once the delivery criteria are satisfied.
 
 Batch related findings into a coherent correction pass. New feedback reopens
 only the affected decision and verification unless it reveals a broader
