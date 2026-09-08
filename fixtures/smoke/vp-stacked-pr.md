@@ -49,9 +49,11 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - Present `fff6666` as uncertain and require the user to decide.
 - Show the classification and obtain pre-execution confirmation.
 - Create a recoverable backup outside `refs/heads` with the exact command
-  `git update-ref refs/backup/<name> <branch>`, and record its object ID before
-  the rewrite. A backup branch pointing into the rebased range is unsafe because
-  `--update-refs` moves it with the stack branches.
+  `git update-ref refs/backup/<name> <branch> ""`, and record its object ID
+  before the rewrite. The expected-empty guard must fail rather than overwrite a
+  retained backup that has the same name. A backup branch pointing into the
+  rebased range is unsafe because `--update-refs` moves it with the stack
+  branches.
 - Reconstruct the child branch from the current remote base with only
   child-owned commits.
 - Ask before semantic conflict decisions and before force-with-lease.
@@ -70,5 +72,6 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - uncertain ownership remains a user decision;
 - destructive rewriting has a backup ref outside `refs/heads` whose object ID is
   verified unchanged;
+- repeated backup creation cannot overwrite a retained recovery point;
 - force-with-lease requires explicit confirmation;
 - backup ref cleanup remains a separate manual action.

@@ -209,13 +209,15 @@ require_pattern "$stacked_rebase_fixture" 'squash[[:space:]-]*merge' \
   "vp-stacked-pr fixture must cover squash merges"
 require_pattern "$stacked_rebase_fixture" 'force-with-lease' \
   "vp-stacked-pr fixture must cover force-with-lease confirmation"
-require_pattern "$stacked_rebase_fixture" 'git update-ref refs/backup/<name> <branch>' \
+require_pattern "$stacked_rebase_fixture" 'git update-ref refs/backup/<name> <branch> ""' \
   "vp-stacked-pr fixture must provide the safe backup-ref command"
+require_pattern "$stacked_rebase_fixture" 'expected-empty guard.*fail.*overwrite|cannot overwrite a retained recovery point' \
+  "vp-stacked-pr fixture must reject overwriting an existing backup ref"
 require_pattern "$stacked_rebase_fixture" 'backup ref.*verified unchanged|Confirm the backup ref did not move' \
   "vp-stacked-pr fixture must verify that the backup ref remains unchanged"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'backup branch.*unsafe|Do not use a local branch' \
   "vp-stacked-pr manual rebase guidance must reject backup branches with --update-refs"
-require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git update-ref refs/backup/<name> <branch>' \
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git update-ref refs/backup/<name> <branch> ""' \
   "vp-stacked-pr manual rebase guidance must provide the safe backup-ref command"
 require_pattern "$stacked_rebase_fixture" 'gh stack (init|add|submit|merge)' \
   "vp-stacked-pr fixture must cover the native gh stack workflow"

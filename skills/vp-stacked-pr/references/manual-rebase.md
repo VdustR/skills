@@ -53,10 +53,12 @@ rebase merges leave different evidence.
   its original object ID so the post-rebase check can prove that it did not move:
 
   ```bash
-  git update-ref refs/backup/<name> <branch>
+  git update-ref refs/backup/<name> <branch> ""
   git rev-parse refs/backup/<name>
   ```
 
+  The empty expected old value makes creation fail if that backup ref already
+  exists. Choose a new name instead of overwriting a retained recovery point.
   Do not use a local branch for this backup when the rewrite uses
   `--update-refs` or `rebase.updateRefs=true`; Git can move any branch that
   points into the rebased range.
