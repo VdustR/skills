@@ -12,6 +12,7 @@ not the frontmost window.
 
 **Situation 2 — web app.** Record a 35-second walkthrough of a local web app at
 `http://localhost:5173`, with a visible cursor, click feedback, and subtitles.
+The flow uses `Command` + `K`, and the user asks for that shortcut to be shown.
 The user is at the keyboard and asks not to be interrupted.
 
 **Situation 3 — still screenshots for a pull request.** Produce before-and-after
@@ -48,7 +49,12 @@ Situation 2 routes to `references/web-demo.md`:
   `mousemove` events, rather than animating a decorative cursor independently of
   the click coordinates.
 - Resolve every click target from live geometry with `boundingBox()`.
-- Render subtitles in the DOM and write a WebVTT sidecar in the same run.
+- Read `references/cursor-and-clicks.md`, `references/keycast.md`, and
+  `references/subtitles.md` because this request needs all three independent
+  layers.
+- Show `Command` + `K` as keycast input. Keep it distinct from the explanatory
+  subtitle, and never use a system-wide key logger.
+- Render subtitles in the DOM and write a WebVTT sidecar from the same cue list.
 - Trim the blank pre-paint lead-in and encode with `format=yuv420p`,
   `-c:v libx264`, and `-movflags +faststart`.
 
@@ -121,6 +127,9 @@ All situations:
 - the browser path is preferred when the subject runs in a browser;
 - the injected pointer follows real mouse events instead of being animated
   separately;
+- cursor emphasis, keycast, and subtitles are independently routed layers;
+- keycast reports input while subtitles explain the step;
+- sensitive input is suppressed before it reaches the overlay or event log;
 - click targets come from live geometry, not remembered coordinates;
 - output is verified by looking at frames before delivery;
 - ffmpeg filter availability is checked rather than assumed.
