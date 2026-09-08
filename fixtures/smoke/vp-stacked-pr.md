@@ -48,12 +48,16 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - Exclude `eee5555` as already integrated through patch equivalence.
 - Present `fff6666` as uncertain and require the user to decide.
 - Show the classification and obtain pre-execution confirmation.
-- Create a recoverable backup branch.
+- Create a recoverable backup outside `refs/heads` with the exact command
+  `git update-ref refs/backup/<name> <branch>`, and record its object ID before
+  the rewrite. A backup branch pointing into the rebased range is unsafe because
+  `--update-refs` moves it with the stack branches.
 - Reconstruct the child branch from the current remote base with only
   child-owned commits.
 - Ask before semantic conflict decisions and before force-with-lease.
 - Verify history, status, diff, and MR metadata.
-- Never use an unguarded force push or delete the backup branch automatically.
+- Confirm the backup ref did not move after the rebase. Never use an unguarded
+  force push or delete the backup ref automatically.
 
 ## Regression Coverage
 
@@ -64,6 +68,7 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - native GitHub stacking is not assumed on a non-GitHub host;
 - squash-merge evidence is not mistaken for ancestry;
 - uncertain ownership remains a user decision;
-- destructive rewriting has a backup branch;
+- destructive rewriting has a backup ref outside `refs/heads` whose object ID is
+  verified unchanged;
 - force-with-lease requires explicit confirmation;
-- backup branch cleanup remains a separate manual action.
+- backup ref cleanup remains a separate manual action.
