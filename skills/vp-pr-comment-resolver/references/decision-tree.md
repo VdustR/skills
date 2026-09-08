@@ -21,5 +21,7 @@ For each feedback item:
 
 An evidence-backed correction of an incorrect or already-handled claim can
 proceed within authorized feedback handling. Pause when evidence cannot settle
-the disagreement, multiple valid product interpretations remain, architecture
-would change beyond scope, or history rewriting is not already authorized.
+a decision required for safe delivery, multiple valid material product
+interpretations remain, architecture would change substantially, feedback
+reveals a severe risk or substantial scope or cost expansion, or history
+rewriting is not already authorized.
