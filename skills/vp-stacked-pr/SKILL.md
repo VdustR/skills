@@ -63,7 +63,10 @@ These hold regardless of host:
   rewriting, and show the classification.
 - Leave uncertain ownership to the user; do not guess from branch names or commit
   messages.
-- Create a backup branch before any rewrite, and never delete it automatically.
+- Create a backup ref outside `refs/heads` before any rewrite, and never delete
+  it automatically. A branch is unsafe with `git rebase --update-refs` because
+  Git can move it with the stack branches. Create a new ref without overwriting
+  an existing recovery point.
 - Require explicit confirmation before `--force-with-lease`, and never use an
   unguarded force push.
 - Verify the resulting history, diff, and PR/MR metadata after the rewrite.

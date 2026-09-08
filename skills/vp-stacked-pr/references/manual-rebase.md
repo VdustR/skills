@@ -20,8 +20,10 @@ for any one platform's stacking feature.
   `git rebase --update-refs` (or set `rebase.updateRefs=true`). It force-updates
   only branches that point at commits being rebased, so rebasing a lower branch
   alone leaves the upper layers stale; branches checked out in another worktree
-  are skipped and must be moved by hand. Requires Git 2.38 or newer. Confirm each
-  intermediate ref moved as intended before force-pushing.
+  are skipped and must be moved by hand. A backup branch inside the rebased range
+  moves too, so create the backup outside `refs/heads` as described in Preserve
+  Work. Requires Git 2.38 or newer. Confirm each intermediate ref moved as
+  intended and the backup ref did not move before force-pushing.
 - When the child's original parent tip is still identifiable,
   `git rebase --onto <new-base> <old-parent-tip>` replays only the child's own
   commits onto the new base and drops the parent-owned ones directly. This handles
@@ -47,7 +49,19 @@ rebase merges leave different evidence.
 - Show every classification and its keep or exclude decision before rewriting
   history.
 - Require the user to decide every uncertain ownership classification.
-- Create a recoverable backup reference before execution.
+- Create a recoverable backup ref outside `refs/heads` before execution. Record
+  its original object ID so the post-rebase check can prove that it did not move:
+
+  ```bash
+  git update-ref refs/backup/<name> <branch> ""
+  git rev-parse refs/backup/<name>
+  ```
+
+  The empty expected old value makes creation fail if that backup ref already
+  exists. Choose a new name instead of overwriting a retained recovery point.
+  Do not use a local branch for this backup when the rewrite uses
+  `--update-refs` or `rebase.updateRefs=true`; Git can move any branch that
+  points into the rebased range.
 - Retain the backup after verification; deleting it is a separate cleanup action
   that requires target-specific approval.
 - Prefer reconstruction on a temporary branch when the surviving commit set is
@@ -55,7 +69,8 @@ rebase merges leave different evidence.
 - Resolve conflicts semantically. When multiple behaviorally valid resolutions
   exist, ask the user before choosing; never choose a side globally.
 
-Verify commit range, diff against the intended base, tests, and PR/MR metadata.
-History rewriting and force pushing require separate explicit authorization.
-When a rewritten branch must be pushed, require force-with-lease; never use an
-unguarded force push.
+Verify the backup ref still resolves to its recorded pre-rebase object ID, then
+verify the commit range, diff against the intended base, tests, and PR/MR
+metadata. History rewriting and force pushing require separate explicit
+authorization. When a rewritten branch must be pushed, require force-with-lease;
+never use an unguarded force push.
