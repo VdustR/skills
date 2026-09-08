@@ -124,6 +124,14 @@ Batch verified findings into a focused correction pass. Repeat affected checks
 when behavior changes or new evidence appears, and always perform the required
 final reconciliation. Do not request another review on an unchanged head that
 already has valid terminal evidence unless repository policy requires it.
+When `vp-pr-comment-resolver` handles automated feedback, keep each decision
+tied to the requested change and its acceptance criteria. A new suggestion
+reopens only the affected decision and verification unless it exposes a broader
+problem. Once delivery criteria are satisfied, defer speculative hardening,
+preference-only refactors, and unrelated improvements rather than extending the
+feedback loop. Pause for severe risk, a material product or architecture
+decision, or a substantial expansion of scope or cost; otherwise converge on
+the narrowest evidence-backed outcome and continue delivery.
 
 Treat the user's iteration budget as an upper bound when provided. After two
 correction passes for the same unresolved finding, reassess the cause and

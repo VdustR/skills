@@ -17,6 +17,9 @@ Also evaluate these decision cases without performing external writes:
   and that pass has already failed.
 - All acceptance criteria pass and the unchanged head has a completed review;
   an optional unrelated refactor is suggested.
+- A later bot pass suggests speculative hardening unrelated to the acceptance
+  criteria. Separately, it reports a credible credential leak whose correction
+  requires a material architecture change.
 - Two passes have elapsed, but Codex is still pending on the current head.
 - A workflow document passes syntax and fixture checks, but no decision
   scenario has been exercised.
@@ -66,6 +69,9 @@ Also evaluate these decision cases without performing external writes:
   one-pass budget, do not run a second correction just to reach reassessment.
 - Defer the unrelated refactor and proceed to final reconciliation and merge
   evaluation without retriggering a completed review on the unchanged head.
+- Defer speculative hardening without reopening unaffected implementation or
+  verification. Pause for user judgment on the credential leak because the
+  severe risk and material architecture expansion change the delivery decision.
 - Keep merge blocked while Codex is pending regardless of correction count.
 - Exercise the document's decisions and state the verification method; do not
   describe syntax or fixture-content checks as an agent trial.
@@ -95,3 +101,4 @@ Also evaluate these decision cases without performing external writes:
 - a local change, Draft PR, or Ready PR is not a successful terminal state
 - merge is followed by release follow-up and published-result verification
 - safety gates and scope boundaries remain intact
+- automated feedback converges without weakening severe-risk escalation

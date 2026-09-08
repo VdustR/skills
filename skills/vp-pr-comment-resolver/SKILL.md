@@ -35,12 +35,33 @@ current head, repository rules, code, and tests before deciding.
    conversation issue comments have no resolvable state.
 6. Re-fetch feedback and report remaining risk or required user judgment.
 
+## Convergence for automated feedback
+
+Keep bot feedback tied to the requested change, its acceptance criteria, and
+the evidence needed for safe delivery. Fix verified correctness or regression
+problems within scope. When current code or proportionate test evidence
+disproves a finding, explain that evidence and close the eligible bot thread
+instead of changing correct code. Defer speculative hardening, preference-only
+refactors, and unrelated improvements once the delivery criteria are satisfied.
+
+Batch related findings into a coherent correction pass. New feedback reopens
+only the affected decision and verification unless it reveals a broader
+problem. Do not keep expanding implementation or verification merely because a
+bot can suggest another improvement.
+
+Pause for user judgment when feedback reveals a severe security, data
+integrity, compatibility, or operational risk; requires a material product or
+architectural decision; or would substantially expand the agreed scope or
+cost. Otherwise, make the narrowest evidence-backed decision and continue the
+authorized workflow.
+
 Within authorized feedback handling, explain a demonstrably incorrect or
 already-handled claim with current-code or test evidence without asking again.
-Ask when a disagreement requires a product or architectural decision, evidence
-remains ambiguous, scope expands, or history rewriting or an external write is
-not already authorized. Human threads still require explicit direction to
-resolve. Read only the relevant reference:
+Ask when unresolved evidence prevents a safe decision, a disagreement requires
+a material product or architectural decision, feedback reveals a severe risk
+or substantial scope or cost expansion, or history rewriting or an external
+write is not already authorized. Human threads still require explicit
+direction to resolve. Read only the relevant reference:
 
 - `references/workflow.md`
 - `references/decision-tree.md`

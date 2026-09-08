@@ -23,6 +23,11 @@ that a null check is missing. The current head contains the check and an
 executed regression test confirms the null case is handled. Contrast this with
 a request to change debug logging where the intended product policy is unknown.
 
+Also evaluate a later bot pass that suggests an unrelated preference-only
+refactor after every acceptance criterion is satisfied. Contrast it with a bot
+finding that identifies a credible credential leak requiring a broader
+architectural change. Do not perform external writes for these decision cases.
+
 ## Expected Behavior
 
 - Fetch every issue comment in the PR conversation and the pull request review
@@ -39,6 +44,12 @@ a request to change debug logging where the intended product policy is unknown.
 - In the authorized null-check case, reply with current-head code and test
   evidence without another approval. Do not change correct code to satisfy the
   bot. Preserve the product-policy question in the debug-logging case.
+- Defer the unrelated preference-only refactor without expanding implementation
+  or restarting unaffected verification. Report that an already-authorized
+  outer workflow can continue after focused final reconciliation; do not infer
+  or perform lifecycle writes from this standalone read-only scenario.
+- Pause for user judgment on the credible credential leak because it creates a
+  severe security risk and requires a material scope or architecture decision.
 - Reply to the PR conversation issue comment with `@reviewer` plus a quoted
   excerpt.
 - For the actionable submitted-review body, reply in the PR conversation and
@@ -65,6 +76,10 @@ a request to change debug logging where the intended product policy is unknown.
 - human review threads stay open for reviewer follow-up
 - outdated unresolved threads still receive a decision
 - reviewer suggestions are verified instead of blindly applied
+- automated feedback converges on acceptance criteria instead of accumulating
+  unrelated or preference-only changes
+- severe risk and material scope or architecture expansion still require user
+  judgment
 - commits are grouped by modification topic, not by comment count
 - fix replies use an explicit Markdown commit link, not a bare or code-formatted
   SHA
