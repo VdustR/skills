@@ -24,35 +24,11 @@ Recording starts when the page is created, before the first paint, so the file
 opens on a blank frame. Note the time the page was created, then trim that lead-in
 during the ffmpeg pass. Playwright writes WebM; convert it in the same run.
 
-## Make the cursor a follower, not an animation
+## Add interaction overlays only when they carry the explanation
 
-Move the real Playwright mouse, and let an injected SVG pointer position itself
-from real `mousemove` events.
-
-Hover states, `:active`, and every handler fire exactly as they would for a
-person, and the drawn pointer cannot drift from where the click actually lands.
-Animating a decorative cursor separately from the click coordinates produces
-video where the arrow visibly misses the button it is pressing.
-
-Inject through `page.addInitScript` so the layer exists from the first paint:
-
-```css
-html, body, * { cursor: none !important; }
-#cursor { position: absolute; left: 0; top: 0; transform: translate(-4px, -3px);
-          filter: drop-shadow(0 3px 6px rgba(0,0,0,.55)); }
-#cursor.is-down { scale: .84; }
-```
-
-```js
-let x = innerWidth / 2, y = innerHeight / 2;
-const place = () => { cursor.style.translate = `${x}px ${y}px`; };
-addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; place(); }, true);
-addEventListener("mousedown", (e) => { cursor.classList.add("is-down"); ripple(e); }, true);
-addEventListener("mouseup", () => cursor.classList.remove("is-down"), true);
-```
-
-Use the classic macOS arrow shape rather than a dot. A circle reads as an
-automation artifact; an arrow reads as a person.
+For pointer emphasis and click feedback, read `cursor-and-clicks.md`. For shown
+shortcuts or typed input, read `keycast.md`. Both overlays must follow the real
+Playwright input events so the visual evidence cannot drift from the action.
 
 ## Move like a hand
 
@@ -106,27 +82,11 @@ message.
 - Scroll in increments rather than one jump: `page.mouse.wheel(0, dy / steps)`
   inside a short loop.
 
-## Subtitles in the DOM
+## Add explanatory subtitles separately
 
-Render captions as a styled element in the page and record them as part of the
-frame. The alternative, burning them in with ffmpeg, needs a build with
-libfreetype and libass, which the macOS Homebrew ffmpeg on this machine does not
-have. See `encoding.md`.
-
-Write the cue timings to a WebVTT sidecar in the same run so the captions can be
-restyled later without re-recording:
-
-```js
-async function say(text, holdMs = 2400) {
-  const start = Date.now() - videoStart;
-  await page.evaluate((t) => window.__demo.caption(t), text);
-  await sleep(holdMs);
-  cues.push({ start, end: Date.now() - videoStart, text });
-}
-```
-
-Around 20 px at 1280 wide is readable without covering the interface. Keep each
-caption to one line of plain speech.
+Read `subtitles.md` when the viewer needs narration, step labels, or an
+accessible text track. Subtitles explain intent; keycast reports input. Keep the
+two visually and semantically distinct.
 
 ## Frame it as a browser window
 

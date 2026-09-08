@@ -27,6 +27,22 @@ at a file on disk, which is what a destination such as vp-github takes as input.
 | Generated or mathematical motion, no interaction | Deterministic frame render. Read `references/generated-video.md`. | Yes |
 | A native app or anything outside a browser, on macOS | Window-scoped screen capture. Read `references/macos-window-capture.md`. | Capture yes, driving no |
 
+Add only the overlays that clarify the requested evidence:
+
+- Read `references/cursor-and-clicks.md` when pointer movement or click targets
+  are the focus.
+- Read `references/keycast.md` when shortcuts or typed input are the focus.
+- Read `references/subtitles.md` when the recording needs explanation, steps, or
+  an accessible text track.
+
+These are independent layers. A recording may use one, two, or all three. Do not
+add all of them by default: competing overlays obscure the interface and make a
+short demonstration harder to follow.
+
+Run `scripts/annotation-poc.cjs <output-directory>` to preview all three layers
+in a self-contained Konami Code walkthrough. It writes an H.264 MP4 and a WebVTT
+sidecar and uses the same Playwright and ffmpeg dependencies as the browser path.
+
 Read `references/encoding.md` before delivering a video: default output settings
 decide whether it plays inline or downloads as a blob. Its size-ceiling table
 applies to a still as well.

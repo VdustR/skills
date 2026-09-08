@@ -234,6 +234,12 @@ require_pattern "$recording_fixture" 'injected pointer follow' \
   "vp-recording fixture must cover the pointer following real mouse events"
 require_pattern "$recording_fixture" 'live geometry' \
   "vp-recording fixture must cover resolving targets from live geometry"
+require_pattern "$recording_fixture" 'three independent layers|independently routed layers' \
+  "vp-recording fixture must route cursor, keycast, and subtitles independently"
+require_pattern "$recording_fixture" 'keycast reports input while subtitles explain' \
+  "vp-recording fixture must distinguish keycast from subtitles"
+require_pattern "$recording_fixture" 'sensitive input is.*suppressed before' \
+  "vp-recording fixture must suppress sensitive input before overlay logging"
 require_pattern "$recording_fixture" 'verified by looking at frames|contact sheet' \
   "vp-recording fixture must cover verifying output before delivery"
 require_pattern "$recording_fixture" 'still image of a running UI has a producer' \
@@ -298,6 +304,14 @@ require_pattern "$recording_still_capture" 'the display has to remain available 
   "vp-recording still capture must keep the display available past the sign-in"
 require_pattern "$recording_still_capture" 'Closing first and planning to fall back does not work' \
   "vp-recording still capture must not offer a fallback to an already-closed context"
+for recording_overlay_reference in cursor-and-clicks keycast subtitles; do
+  require_pattern "$recording_skill" "references/$recording_overlay_reference.md" \
+    "vp-recording must route to the $recording_overlay_reference reference"
+done
+require_pattern "skills/vp-recording/references/keycast.md" 'Suppress the entire event before it' \
+  "vp-recording keycast guidance must suppress sensitive input before logging"
+require_pattern "skills/vp-recording/references/subtitles.md" 'keycast says what input occurred.*subtitle says' \
+  "vp-recording subtitle guidance must distinguish explanation from input"
 # AGENTS.md keeps required routing in the frontmatter or main workflow, so a
 # handoff that only appears under Related skills does not establish routing.
 if ! awk '/^## Related skills$/{exit} {print}' "$recording_skill" \
