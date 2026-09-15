@@ -78,7 +78,9 @@ the merged layer's branch:
 
 1. List every open PR whose base is the branch that will be deleted. Determine
    the intended new base for each PR from the stack, rather than assuming that
-   every child moves directly to the default branch.
+   every child moves directly to the default branch. Record the branch's exact
+   tip so a squash or rebase merge does not erase the old parent boundary needed
+   to repair child history.
 
    ```bash
    gh api --method GET --paginate repos/<owner>/<repo>/pulls \
@@ -99,6 +101,13 @@ the merged layer's branch:
 3. Stop if any affected PR is not open or its `baseRefName` does not match the
    intended new base. Merge the lower layer and delete its branch only after
    every affected PR passes this readback.
+4. After the lower layer merges, repair each retargeted child branch before
+   treating its PR as mergeable. Retargeting changes PR metadata; it does not
+   remove the lower layer's original commits from child history. For a squash or
+   rebase merge, use the recorded old parent tip with
+   `git rebase --onto <new-base> <old-parent-tip>` when ownership is clear, or
+   use the reconstruction workflow above. Follow the backup and force-with-lease
+   gates, then verify the child commit range, three-dot diff, tests, and PR base.
 
 This ordering applies whether branch deletion is explicit, part of
 `gh pr merge --delete-branch`, or enabled automatically in repository settings.

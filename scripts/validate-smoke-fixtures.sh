@@ -233,6 +233,14 @@ require_pattern "$stacked_rebase_fixture" 'REST query paginated to exhaustion' \
   "vp-stacked-pr fixture must exhaust pagination when discovering child PRs"
 require_pattern "$stacked_rebase_fixture" 'Stop the merge and branch deletion.*still names' \
   "vp-stacked-pr fixture must stop when retarget readback fails"
+require_pattern "$stacked_rebase_fixture" 'After the squash' \
+  "vp-stacked-pr fixture must cover post-squash child repair"
+require_pattern "$stacked_rebase_fixture" 'repair each retargeted child' \
+  "vp-stacked-pr fixture must repair child history after retargeting"
+require_pattern "$stacked_rebase_fixture" 'lower-layer commits.*commit range' \
+  "vp-stacked-pr fixture must verify parent commits leave the child commit range"
+require_pattern "$stacked_rebase_fixture" 'three-dot diff' \
+  "vp-stacked-pr fixture must verify the repaired child PR diff"
 require_pattern "$stacked_rebase_fixture" 'gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open' \
   "vp-stacked-pr fixture must recover the original PR through REST"
 require_pattern "$stacked_rebase_fixture" 'Delete the recreated branch only after both original PRs are open' \
@@ -249,6 +257,10 @@ require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh api --met
   "vp-stacked-pr manual guidance must paginate child PR discovery"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push origin <merged-layer-sha>:refs/heads/<deleted-base>' \
   "vp-stacked-pr manual guidance must recreate the missing base at the verified tip"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retargeting changes PR metadata; it does not' \
+  "vp-stacked-pr manual guidance must distinguish retargeting from history repair"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git rebase --onto <new-base> <old-parent-tip>' \
+  "vp-stacked-pr manual guidance must provide post-merge child repair"
 
 require_pattern "$recording_fixture" 'window id, never a screen rectangle|screencapture -l' \
   "vp-recording fixture must cover window-scoped capture over rectangle capture"
