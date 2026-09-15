@@ -76,11 +76,13 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
 - Before merging PR #201 or deleting `feature/layer-one`, recursively enumerate
   the complete descendant graph with REST queries paginated to exhaustion:
   direct children PR #202 and PR #203 plus deeper descendant PR #204. Carry each
-  head repository, branch, and tip through the traversal so the cross-fork path
-  is queried in the correct repository.
+  PR URL, head repository, branch, and tip through the traversal so the
+  cross-fork path is queried in the correct repository.
 - Retarget PR #202 and PR #203 to their intended new bases, then read back each
   PR's `state` and `baseRefName`. PR #204 remains based on PR #202's head. A
   default-limited listing or direct-child-only inventory is incomplete evidence.
+  Use each recorded PR URL for `gh pr edit` and `gh pr view`; a number alone can
+  select the wrong repository.
 - Stop the merge and branch deletion if either child is not open or still names
   `feature/layer-one` as its base. This gate also applies to automatic branch
   deletion and `gh pr merge --delete-branch`.
@@ -104,7 +106,8 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
   do not assume `origin` is that remote.
   Reopen each original child with
   `gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open`, retarget
-  it while open, and verify its state and base metadata.
+  it by its recorded PR URL while open, and verify its state and base metadata
+  through the same URL.
 - Delete the recreated branch only after every PR in the recorded affected set
   has been re-read by number as open on its expected base, and a repeated
   all-state query shows no unprocessed PR based on the recreated branch. Do not
@@ -135,6 +138,8 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
   discovery and base-branch deletion;
 - final graph traversal detects late deeper descendants and verifies repository,
   branch, and tip identity across forks;
+- PR mutations and readbacks use recorded URLs rather than repository-ambiguous
+  numbers;
 - retargeting preserves PR metadata but does not replace the post-merge history
   repair required after a squash or rebase merge;
 - recovery recreates the exact missing base through a verified target remote,

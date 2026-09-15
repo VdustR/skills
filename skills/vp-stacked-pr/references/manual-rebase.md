@@ -81,8 +81,8 @@ the merged layer's branch:
    repository and branch until no new descendants appear. A cross-fork
    descendant belongs to the head repository's PR collection, so carry the head
    repository through the traversal; a branch name alone is ambiguous. Record
-   every PR's repository, number, base, head repository, head branch, and exact
-   branch tip. Distinguish the direct children that must be
+   every PR's repository, URL, number, base, head repository, head branch, and
+   exact branch tip. Distinguish the direct children that must be
    retargeted before deletion from deeper descendants whose bases stay on the
    layer above them. This preserves every old parent boundary needed to repair
    history after a squash or rebase merge.
@@ -90,7 +90,7 @@ the merged layer's branch:
    ```bash
    gh api --method GET --paginate repos/<owner>/<repo>/pulls \
      -f state=open -f base=<branch-to-delete> -f per_page=100 \
-     --jq '.[] | {number, baseRefName: .base.ref, headRepository: .head.repo.full_name, headRefName: .head.ref, headSha: .head.sha}'
+     --jq '.[] | {number, url: .html_url, baseRefName: .base.ref, headRepository: .head.repo.full_name, headRefName: .head.ref, headSha: .head.sha}'
    ```
 
    Exhaust every page. A default-limited listing cannot establish that every
@@ -101,8 +101,8 @@ the merged layer's branch:
    the default branch:
 
    ```bash
-   gh pr edit <child-pr> --base <new-base>
-   gh pr view <child-pr> --json state,baseRefName,headRefName
+   gh pr edit <child-pr-url> --base <new-base>
+   gh pr view <child-pr-url> --json state,baseRefName,headRefName
    ```
 
 3. Stop if any affected PR is not open or its `baseRefName` does not match the
@@ -161,8 +161,8 @@ and review history with this recovery sequence:
 
    ```bash
    gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open
-   gh pr edit <child-pr> --base <new-base>
-   gh pr view <child-pr> --json state,baseRefName,headRefName
+   gh pr edit <child-pr-url> --base <new-base>
+   gh pr view <child-pr-url> --json state,baseRefName,headRefName
    ```
 
    `gh pr reopen` and GraphQL base edits can obscure the missing-base cause. If

@@ -237,6 +237,8 @@ require_pattern "$stacked_rebase_fixture" 'PR #204 remains based on PR #202' \
   "vp-stacked-pr fixture must distinguish direct children from deeper descendants"
 require_pattern "$stacked_rebase_fixture" 'head repository, branch, and tip' \
   "vp-stacked-pr fixture must preserve cross-fork descendant identity"
+require_pattern "$stacked_rebase_fixture" 'recorded PR URL' \
+  "vp-stacked-pr fixture must address PRs in their recorded repositories"
 require_pattern "$stacked_rebase_fixture" 'Stop the merge and branch deletion.*still names' \
   "vp-stacked-pr fixture must stop when retarget readback fails"
 require_pattern "$stacked_rebase_fixture" 'Immediately before merge or deletion' \
@@ -285,6 +287,10 @@ require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'complete ope
   "vp-stacked-pr manual guidance must recursively inventory descendants"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'headRepository: .head.repo.full_name' \
   "vp-stacked-pr manual guidance must carry repository identity across forks"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh pr edit <child-pr-url>' \
+  "vp-stacked-pr manual guidance must mutate the recorded PR repository"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh pr view <child-pr-url>' \
+  "vp-stacked-pr manual guidance must read back the recorded PR repository"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'repeat the complete graph traversal and tip comparison' \
   "vp-stacked-pr manual guidance must rewalk descendants before rewriting"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push <target-remote> <merged-layer-sha>:refs/heads/<deleted-base>' \
