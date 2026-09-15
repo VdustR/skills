@@ -225,6 +225,24 @@ require_pattern "$stacked_rebase_fixture" 'stack merge API' \
   "vp-stacked-pr fixture must cover stacked members requiring the stack merge API"
 require_pattern "$stacked_rebase_fixture" 'native.*not.*(reconstruction|manual)|not manual reconstruction' \
   "vp-stacked-pr fixture must cover routing GitHub stacks to the native workflow"
+require_pattern "$stacked_rebase_fixture" 'retarget.*PR #202.*PR #203|retarget PR #202 and PR #203' \
+  "vp-stacked-pr fixture must retarget every affected child before base-branch deletion"
+require_pattern "$stacked_rebase_fixture" 'Stop the merge and branch deletion.*still names' \
+  "vp-stacked-pr fixture must stop when retarget readback fails"
+require_pattern "$stacked_rebase_fixture" 'gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open' \
+  "vp-stacked-pr fixture must recover the original PR through REST"
+require_pattern "$stacked_rebase_fixture" 'Delete the recreated branch only after both original PRs are open' \
+  "vp-stacked-pr fixture must delay recovered base deletion until PRs are open"
+require_pattern "$stacked_rebase_fixture" 'both bases' \
+  "vp-stacked-pr fixture must verify recovered base metadata before deletion"
+require_pattern "$stacked_rebase_fixture" 'no other open PR uses the branch' \
+  "vp-stacked-pr fixture must check for other dependent PRs before deletion"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retarget Before Deleting A GitHub Base Branch' \
+  "vp-stacked-pr manual guidance must prevent deletion before retargeting"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Stop if any affected PR is not open or its `baseRefName` does not match' \
+  "vp-stacked-pr manual guidance must block deletion on failed retarget readback"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push origin <merged-layer-sha>:refs/heads/<deleted-base>' \
+  "vp-stacked-pr manual guidance must recreate the missing base at the verified tip"
 
 require_pattern "$recording_fixture" 'window id, never a screen rectangle|screencapture -l' \
   "vp-recording fixture must cover window-scoped capture over rectangle capture"

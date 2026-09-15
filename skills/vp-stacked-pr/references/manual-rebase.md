@@ -69,6 +69,69 @@ rebase merges leave different evidence.
 - Resolve conflicts semantically. When multiple behaviorally valid resolutions
   exist, ask the user before choosing; never choose a side globally.
 
+## Retarget Before Deleting A GitHub Base Branch
+
+For an ad-hoc GitHub stack, do not rely on branch deletion to retarget the PRs
+above a merged layer. GitHub documents automatic retargeting for open PRs in the
+same repository, but verify and update the actual PR metadata before deleting
+the merged layer's branch:
+
+1. List every open PR whose base is the branch that will be deleted. Determine
+   the intended new base for each PR from the stack, rather than assuming that
+   every child moves directly to the default branch.
+
+   ```bash
+   gh pr list --state open --base <branch-to-delete> \
+     --json number,baseRefName,headRefName
+   ```
+
+2. Retarget each affected PR while it is still open:
+
+   ```bash
+   gh pr edit <child-pr> --base <new-base>
+   gh pr view <child-pr> --json state,baseRefName,headRefName
+   ```
+
+3. Stop if any affected PR is not open or its `baseRefName` does not match the
+   intended new base. Merge the lower layer and delete its branch only after
+   every affected PR passes this readback.
+
+This ordering applies whether branch deletion is explicit, part of
+`gh pr merge --delete-branch`, or enabled automatically in repository settings.
+
+If deleting the base branch has already closed a child PR, preserve its number
+and review history with this recovery sequence:
+
+1. Identify and verify the deleted base branch's exact pre-deletion tip. For a
+   merged layer, use the commit that the branch pointed to when it was merged;
+   do not substitute the squash or merge commit unless it is the same object.
+2. Recreate the missing base branch at that commit:
+
+   ```bash
+   git push origin <merged-layer-sha>:refs/heads/<deleted-base>
+   ```
+
+3. Reopen the PR through the REST API, then retarget it while it is open:
+
+   ```bash
+   gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open
+   gh pr edit <child-pr> --base <new-base>
+   gh pr view <child-pr> --json state,baseRefName,headRefName
+   ```
+
+   `gh pr reopen` and GraphQL base edits can obscure the missing-base cause. If
+   recovery fails, inspect the REST response instead of replacing the PR.
+4. Delete the recreated base branch only after the child PR is open, its new
+   base is confirmed, and no other open PR still uses the recreated branch:
+
+   ```bash
+   gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<deleted-base>
+   ```
+
+Branch recreation and deletion are remote writes. Require the authorization
+that the surrounding delivery or recovery workflow needs before performing
+them.
+
 Verify the backup ref still resolves to its recorded pre-rebase object ID, then
 verify the commit range, diff against the intended base, tests, and PR/MR
 metadata. History rewriting and force pushing require separate explicit

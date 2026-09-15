@@ -29,6 +29,14 @@ available metadata does not establish its ownership.
 
 Assume each working tree is clean and authenticated host metadata is available.
 
+**Situation 3 — ad-hoc GitHub stack.** PR #201 targets `main`, PR #202 targets
+the `feature/layer-one` branch from PR #201, and PR #203 also targets
+`feature/layer-one`. PR #201 is ready to squash-merge with branch deletion. The
+stack is not registered with `gh stack`. First describe the safe merge order.
+Then assume `feature/layer-one` was deleted before retargeting, both child PRs
+closed, and the branch's verified pre-deletion tip was `abc1234`; recover the
+original PRs without replacing them.
+
 ## Expected Behavior
 
 Situation 1 (GitHub native stack) routes to `references/github-native.md`:
@@ -61,6 +69,22 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - Confirm the backup ref did not move after the rebase. Never use an unguarded
   force push or delete the backup ref automatically.
 
+Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
+
+- Before merging PR #201 or deleting `feature/layer-one`, enumerate every open
+  PR based on that branch, retarget PR #202 and PR #203 to their intended new
+  bases, and read back each PR's `state` and `baseRefName`.
+- Stop the merge and branch deletion if either child is not open or still names
+  `feature/layer-one` as its base. This gate also applies to automatic branch
+  deletion and `gh pr merge --delete-branch`.
+- For recovery, push `abc1234` back to
+  `refs/heads/feature/layer-one`, reopen each original child with
+  `gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open`, retarget
+  it while open, and verify its state and base metadata.
+- Delete the recreated branch only after both original PRs are open, both bases
+  are verified, and no other open PR uses the branch. Do not open replacement
+  PRs or discard their review history.
+
 ## Regression Coverage
 
 - GitHub same-repo stacks route to the native `gh stack` workflow, not manual
@@ -75,3 +99,9 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - repeated backup creation cannot overwrite a retained recovery point;
 - force-with-lease requires explicit confirmation;
 - backup ref cleanup remains a separate manual action.
+- GitHub ad-hoc stacks retarget every affected child PR before a merged base
+  branch is deleted;
+- failed retarget readback blocks merge and branch deletion;
+- recovery recreates the exact missing base, uses REST to reopen the original
+  PR, retargets it while open, and deletes the recreated branch only after
+  complete metadata verification.
