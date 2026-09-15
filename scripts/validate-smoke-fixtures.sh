@@ -229,8 +229,12 @@ require_pattern "$stacked_rebase_fixture" 'three stacked-change situations' \
   "vp-stacked-pr fixture must declare all three situations"
 require_pattern "$stacked_rebase_fixture" 'retarget.*PR #202.*PR #203|retarget PR #202 and PR #203' \
   "vp-stacked-pr fixture must retarget every affected child before base-branch deletion"
-require_pattern "$stacked_rebase_fixture" 'REST query paginated to exhaustion' \
+require_pattern "$stacked_rebase_fixture" 'REST queries paginated to exhaustion' \
   "vp-stacked-pr fixture must exhaust pagination when discovering child PRs"
+require_pattern "$stacked_rebase_fixture" 'complete descendant graph' \
+  "vp-stacked-pr fixture must inventory deeper descendants"
+require_pattern "$stacked_rebase_fixture" 'PR #204 remains based on PR #202' \
+  "vp-stacked-pr fixture must distinguish direct children from deeper descendants"
 require_pattern "$stacked_rebase_fixture" 'Stop the merge and branch deletion.*still names' \
   "vp-stacked-pr fixture must stop when retarget readback fails"
 require_pattern "$stacked_rebase_fixture" 'Immediately before merge or deletion' \
@@ -239,11 +243,11 @@ require_pattern "$stacked_rebase_fixture" 'Proceed only if it returns no PRs' \
   "vp-stacked-pr fixture must require a zero-result final child query"
 require_pattern "$stacked_rebase_fixture" 'After the squash' \
   "vp-stacked-pr fixture must cover post-squash child repair"
-require_pattern "$stacked_rebase_fixture" 'repair each retargeted child' \
-  "vp-stacked-pr fixture must repair child history after retargeting"
-require_pattern "$stacked_rebase_fixture" 'lower-layer commits.*commit range' \
-  "vp-stacked-pr fixture must verify parent commits leave the child commit range"
-require_pattern "$stacked_rebase_fixture" 'three-dot diff' \
+require_pattern "$stacked_rebase_fixture" 'repair every branch in the descendant graph' \
+  "vp-stacked-pr fixture must repair all descendant history after retargeting"
+require_pattern "$stacked_rebase_fixture" 'PR #202, PR #203, or PR #204' \
+  "vp-stacked-pr fixture must verify parent commits leave every descendant"
+require_pattern "$stacked_rebase_fixture" 'three-dot diffs' \
   "vp-stacked-pr fixture must verify the repaired child PR diff"
 require_pattern "$stacked_rebase_fixture" 'gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open' \
   "vp-stacked-pr fixture must recover the original PR through REST"
@@ -253,10 +257,12 @@ require_pattern "$stacked_rebase_fixture" 'Delete the recreated branch only afte
   "vp-stacked-pr fixture must delay recovered base deletion until every affected PR is open"
 require_pattern "$stacked_rebase_fixture" 'recorded affected set' \
   "vp-stacked-pr fixture must retain the complete recovery inventory"
-require_pattern "$stacked_rebase_fixture" 'every base is verified' \
+require_pattern "$stacked_rebase_fixture" 'open on its expected base' \
   "vp-stacked-pr fixture must verify recovered base metadata before deletion"
-require_pattern "$stacked_rebase_fixture" 'repeated all-state query' \
+require_pattern "$stacked_rebase_fixture" 'all-state query' \
   "vp-stacked-pr fixture must recheck all affected PRs before deletion"
+require_pattern "$stacked_rebase_fixture" 're-read by number as open on its expected base' \
+  "vp-stacked-pr fixture must re-read each recovered PR before deletion"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retarget Before Deleting A GitHub Base Branch' \
   "vp-stacked-pr manual guidance must prevent deletion before retargeting"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Stop if any affected PR is not open or its `baseRefName` does not match' \
@@ -267,13 +273,17 @@ require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'returns no P
   "vp-stacked-pr manual guidance must block deletion while any child still targets the branch"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh api --method GET --paginate repos/<owner>/<repo>/pulls' \
   "vp-stacked-pr manual guidance must paginate child PR discovery"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'complete open descendant graph' \
+  "vp-stacked-pr manual guidance must recursively inventory descendants"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push origin <merged-layer-sha>:refs/heads/<deleted-base>' \
   "vp-stacked-pr manual guidance must recreate the missing base at the verified tip"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'state=all -f base=<deleted-base> -f per_page=100' \
   "vp-stacked-pr manual guidance must inventory affected PRs across all states"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'every PR in the recorded affected set' \
   "vp-stacked-pr manual guidance must recover the complete affected set"
-require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retargeting changes PR metadata; it does not' \
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 're-read every PR in the recorded affected set' \
+  "vp-stacked-pr manual guidance must verify recovered PRs by number"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retargeting changes PR metadata' \
   "vp-stacked-pr manual guidance must distinguish retargeting from history repair"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git rebase --onto <new-base> <old-parent-tip>' \
   "vp-stacked-pr manual guidance must provide post-merge child repair"

@@ -76,11 +76,13 @@ above a merged layer. GitHub documents automatic retargeting for open PRs in the
 same repository, but verify and update the actual PR metadata before deleting
 the merged layer's branch:
 
-1. List every open PR whose base is the branch that will be deleted. Determine
-   the intended new base for each PR from the stack, rather than assuming that
-   every child moves directly to the default branch. Record the branch's exact
-   tip so a squash or rebase merge does not erase the old parent boundary needed
-   to repair child history.
+1. Inventory the complete open descendant graph. Start with the branch that will
+   be deleted, list every PR based on it, then repeat the query for each returned
+   head branch until no new descendants appear. Record every PR's number, base,
+   head, and exact branch tip. Distinguish the direct children that must be
+   retargeted before deletion from deeper descendants whose bases stay on the
+   layer above them. This preserves every old parent boundary needed to repair
+   history after a squash or rebase merge.
 
    ```bash
    gh api --method GET --paginate repos/<owner>/<repo>/pulls \
@@ -91,7 +93,9 @@ the merged layer's branch:
    Exhaust every page. A default-limited listing cannot establish that every
    affected PR is safe.
 
-2. Retarget each affected PR while it is still open:
+2. Retarget each direct child while it is still open. Determine its intended new
+   base from the graph rather than assuming that every child moves directly to
+   the default branch:
 
    ```bash
    gh pr edit <child-pr> --base <new-base>
@@ -104,13 +108,16 @@ the merged layer's branch:
    returns no PRs; a new child requires retargeting and another complete
    readback. Merge the lower layer and delete its branch only after every
    affected PR passes these gates.
-4. After the lower layer merges, repair each retargeted child branch before
-   treating its PR as mergeable. Retargeting changes PR metadata; it does not
-   remove the lower layer's original commits from child history. For a squash or
-   rebase merge, use the recorded old parent tip with
-   `git rebase --onto <new-base> <old-parent-tip>` when ownership is clear, or
-   use the reconstruction workflow above. Follow the backup and force-with-lease
-   gates, then verify the child commit range, three-dot diff, tests, and PR base.
+4. After the lower layer merges, repair the complete descendant graph before
+   treating any PR in it as mergeable. Retargeting changes PR metadata; it does
+   not remove obsolete lower-layer commits from descendant history. Rebase from
+   each top branch with `--update-refs` when that covers every intermediate ref,
+   or explicitly repair every descendant. For a direct child whose old parent
+   boundary is clear, `git rebase --onto <new-base> <old-parent-tip>` is also
+   available; otherwise use the reconstruction workflow above. Follow the
+   backup and force-with-lease gates for every rewritten branch, then verify
+   every descendant's commit range, three-dot diff, tests, branch tip, and PR
+   base.
 
 This ordering applies whether branch deletion is explicit, part of
 `gh pr merge --delete-branch`, or enabled automatically in repository settings.
@@ -149,10 +156,12 @@ and review history with this recovery sequence:
 
    `gh pr reopen` and GraphQL base edits can obscure the missing-base cause. If
    recovery fails, inspect the REST response instead of replacing the PR.
-5. Delete the recreated base branch only after every PR in the recorded affected
-   set is open and its new base is confirmed. Repeat the fully paginated
-   all-state inventory and stop if any affected PR remains closed, unverified,
-   or based on the recreated branch:
+5. Immediately before deletion, re-read every PR in the recorded affected set
+   by number and confirm that it is open on its expected new base. Then repeat
+   the fully paginated all-state inventory of the recreated base to detect newly
+   discovered targets. Stop if a recorded PR is closed or has the wrong base, or
+   if any unprocessed PR still uses the recreated branch. Delete the recreated
+   base only after both readbacks pass:
 
    ```bash
    gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<deleted-base>
