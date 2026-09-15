@@ -99,8 +99,11 @@ the merged layer's branch:
    ```
 
 3. Stop if any affected PR is not open or its `baseRefName` does not match the
-   intended new base. Merge the lower layer and delete its branch only after
-   every affected PR passes this readback.
+   intended new base. Immediately before merging or deleting, repeat the fully
+   paginated open-PR query for the branch being removed. Proceed only when it
+   returns no PRs; a new child requires retargeting and another complete
+   readback. Merge the lower layer and delete its branch only after every
+   affected PR passes these gates.
 4. After the lower layer merges, repair each retargeted child branch before
    treating its PR as mergeable. Retargeting changes PR metadata; it does not
    remove the lower layer's original commits from child history. For a squash or

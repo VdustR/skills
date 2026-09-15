@@ -79,6 +79,9 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
 - Stop the merge and branch deletion if either child is not open or still names
   `feature/layer-one` as its base. This gate also applies to automatic branch
   deletion and `gh pr merge --delete-branch`.
+- Immediately before merge or deletion, repeat the paginated open-PR query for
+  `feature/layer-one`. Proceed only if it returns no PRs; retarget and verify
+  any child added since the initial inventory before checking again.
 - Record the exact `feature/layer-one` tip before merging. After the squash
   merge, repair each retargeted child with the manual rebase or reconstruction
   workflow so the original lower-layer commits no longer appear in its commit range
@@ -115,6 +118,8 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
 - dependent PR discovery is paginated to exhaustion rather than capped by a
   command default;
 - failed retarget readback blocks merge and branch deletion;
+- a final paginated zero-result query closes the race between initial child
+  discovery and base-branch deletion;
 - retargeting preserves PR metadata but does not replace the post-merge history
   repair required after a squash or rebase merge;
 - recovery recreates the exact missing base, uses REST to reopen the original
