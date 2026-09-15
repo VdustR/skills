@@ -225,8 +225,12 @@ require_pattern "$stacked_rebase_fixture" 'stack merge API' \
   "vp-stacked-pr fixture must cover stacked members requiring the stack merge API"
 require_pattern "$stacked_rebase_fixture" 'native.*not.*(reconstruction|manual)|not manual reconstruction' \
   "vp-stacked-pr fixture must cover routing GitHub stacks to the native workflow"
+require_pattern "$stacked_rebase_fixture" 'three stacked-change situations' \
+  "vp-stacked-pr fixture must declare all three situations"
 require_pattern "$stacked_rebase_fixture" 'retarget.*PR #202.*PR #203|retarget PR #202 and PR #203' \
   "vp-stacked-pr fixture must retarget every affected child before base-branch deletion"
+require_pattern "$stacked_rebase_fixture" 'REST query paginated to exhaustion' \
+  "vp-stacked-pr fixture must exhaust pagination when discovering child PRs"
 require_pattern "$stacked_rebase_fixture" 'Stop the merge and branch deletion.*still names' \
   "vp-stacked-pr fixture must stop when retarget readback fails"
 require_pattern "$stacked_rebase_fixture" 'gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open' \
@@ -241,6 +245,8 @@ require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retarget Bef
   "vp-stacked-pr manual guidance must prevent deletion before retargeting"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Stop if any affected PR is not open or its `baseRefName` does not match' \
   "vp-stacked-pr manual guidance must block deletion on failed retarget readback"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh api --method GET --paginate repos/<owner>/<repo>/pulls' \
+  "vp-stacked-pr manual guidance must paginate child PR discovery"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push origin <merged-layer-sha>:refs/heads/<deleted-base>' \
   "vp-stacked-pr manual guidance must recreate the missing base at the verified tip"
 

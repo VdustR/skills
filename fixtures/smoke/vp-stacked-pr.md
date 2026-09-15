@@ -2,7 +2,7 @@
 
 ## Prompt
 
-Use `$vp-stacked-pr` for two stacked-change situations and route each to the correct
+Use `$vp-stacked-pr` for three stacked-change situations and route each to the correct
 reference before acting:
 
 **Situation 1 — GitHub, same repository.** Build and land a three-layer stack of
@@ -72,8 +72,10 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
 
 - Before merging PR #201 or deleting `feature/layer-one`, enumerate every open
-  PR based on that branch, retarget PR #202 and PR #203 to their intended new
-  bases, and read back each PR's `state` and `baseRefName`.
+  PR based on that branch with a REST query paginated to exhaustion.
+- Retarget PR #202 and PR #203 to their intended new bases, then read back each
+  PR's `state` and `baseRefName`. A default-limited listing is incomplete
+  evidence.
 - Stop the merge and branch deletion if either child is not open or still names
   `feature/layer-one` as its base. This gate also applies to automatic branch
   deletion and `gh pr merge --delete-branch`.
@@ -101,6 +103,8 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
 - backup ref cleanup remains a separate manual action.
 - GitHub ad-hoc stacks retarget every affected child PR before a merged base
   branch is deleted;
+- dependent PR discovery is paginated to exhaustion rather than capped by a
+  command default;
 - failed retarget readback blocks merge and branch deletion;
 - recovery recreates the exact missing base, uses REST to reopen the original
   PR, retargets it while open, and deletes the recreated branch only after

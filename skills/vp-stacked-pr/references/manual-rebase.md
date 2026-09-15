@@ -81,9 +81,13 @@ the merged layer's branch:
    every child moves directly to the default branch.
 
    ```bash
-   gh pr list --state open --base <branch-to-delete> \
-     --json number,baseRefName,headRefName
+   gh api --method GET --paginate repos/<owner>/<repo>/pulls \
+     -f state=open -f base=<branch-to-delete> -f per_page=100 \
+     --jq '.[] | {number, baseRefName: .base.ref, headRefName: .head.ref}'
    ```
+
+   Exhaust every page. A default-limited listing cannot establish that every
+   affected PR is safe.
 
 2. Retarget each affected PR while it is still open:
 
