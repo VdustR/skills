@@ -235,12 +235,18 @@ require_pattern "$stacked_rebase_fixture" 'complete descendant graph' \
   "vp-stacked-pr fixture must inventory deeper descendants"
 require_pattern "$stacked_rebase_fixture" 'PR #204 remains based on PR #202' \
   "vp-stacked-pr fixture must distinguish direct children from deeper descendants"
+require_pattern "$stacked_rebase_fixture" 'head repository, branch, and tip' \
+  "vp-stacked-pr fixture must preserve cross-fork descendant identity"
 require_pattern "$stacked_rebase_fixture" 'Stop the merge and branch deletion.*still names' \
   "vp-stacked-pr fixture must stop when retarget readback fails"
 require_pattern "$stacked_rebase_fixture" 'Immediately before merge or deletion' \
   "vp-stacked-pr fixture must close the child-discovery race before deletion"
-require_pattern "$stacked_rebase_fixture" 'Proceed only if it returns no PRs' \
+require_pattern "$stacked_rebase_fixture" 'no PR targets `feature/layer-one`' \
   "vp-stacked-pr fixture must require a zero-result final child query"
+require_pattern "$stacked_rebase_fixture" 'Discover late PR #205' \
+  "vp-stacked-pr fixture must detect a late deeper descendant"
+require_pattern "$stacked_rebase_fixture" 'every recorded identity, base, head' \
+  "vp-stacked-pr fixture must compare the final descendant graph"
 require_pattern "$stacked_rebase_fixture" 'After the squash' \
   "vp-stacked-pr fixture must cover post-squash child repair"
 require_pattern "$stacked_rebase_fixture" 'repair every branch in the descendant graph' \
@@ -263,20 +269,28 @@ require_pattern "$stacked_rebase_fixture" 'all-state query' \
   "vp-stacked-pr fixture must recheck all affected PRs before deletion"
 require_pattern "$stacked_rebase_fixture" 're-read by number as open on its expected base' \
   "vp-stacked-pr fixture must re-read each recovered PR before deletion"
+require_pattern "$stacked_rebase_fixture" 'do not assume `origin`' \
+  "vp-stacked-pr fixture must verify the recovery remote"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retarget Before Deleting A GitHub Base Branch' \
   "vp-stacked-pr manual guidance must prevent deletion before retargeting"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Stop if any affected PR is not open or its `baseRefName` does not match' \
   "vp-stacked-pr manual guidance must block deletion on failed retarget readback"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Immediately before merging or deleting, repeat the fully' \
   "vp-stacked-pr manual guidance must repeat child discovery at the deletion gate"
-require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'returns no PRs' \
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'no PR still targets the branch' \
   "vp-stacked-pr manual guidance must block deletion while any child still targets the branch"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh api --method GET --paginate repos/<owner>/<repo>/pulls' \
   "vp-stacked-pr manual guidance must paginate child PR discovery"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'complete open descendant graph' \
   "vp-stacked-pr manual guidance must recursively inventory descendants"
-require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push origin <merged-layer-sha>:refs/heads/<deleted-base>' \
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'headRepository: .head.repo.full_name' \
+  "vp-stacked-pr manual guidance must carry repository identity across forks"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'repeat the complete graph traversal and tip comparison' \
+  "vp-stacked-pr manual guidance must rewalk descendants before rewriting"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push <target-remote> <merged-layer-sha>:refs/heads/<deleted-base>' \
   "vp-stacked-pr manual guidance must recreate the missing base at the verified tip"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Do not assume `origin`' \
+  "vp-stacked-pr manual guidance must verify the recovery remote"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'state=all -f base=<deleted-base> -f per_page=100' \
   "vp-stacked-pr manual guidance must inventory affected PRs across all states"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'every PR in the recorded affected set' \

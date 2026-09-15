@@ -76,10 +76,13 @@ above a merged layer. GitHub documents automatic retargeting for open PRs in the
 same repository, but verify and update the actual PR metadata before deleting
 the merged layer's branch:
 
-1. Inventory the complete open descendant graph. Start with the branch that will
-   be deleted, list every PR based on it, then repeat the query for each returned
-   head branch until no new descendants appear. Record every PR's number, base,
-   head, and exact branch tip. Distinguish the direct children that must be
+1. Inventory the complete open descendant graph. Start with the repository and
+   branch that will be changed, then repeat the query for each returned head
+   repository and branch until no new descendants appear. A cross-fork
+   descendant belongs to the head repository's PR collection, so carry the head
+   repository through the traversal; a branch name alone is ambiguous. Record
+   every PR's repository, number, base, head repository, head branch, and exact
+   branch tip. Distinguish the direct children that must be
    retargeted before deletion from deeper descendants whose bases stay on the
    layer above them. This preserves every old parent boundary needed to repair
    history after a squash or rebase merge.
@@ -87,7 +90,7 @@ the merged layer's branch:
    ```bash
    gh api --method GET --paginate repos/<owner>/<repo>/pulls \
      -f state=open -f base=<branch-to-delete> -f per_page=100 \
-     --jq '.[] | {number, baseRefName: .base.ref, headRefName: .head.ref}'
+     --jq '.[] | {number, baseRefName: .base.ref, headRepository: .head.repo.full_name, headRefName: .head.ref, headSha: .head.sha}'
    ```
 
    Exhaust every page. A default-limited listing cannot establish that every
@@ -104,10 +107,12 @@ the merged layer's branch:
 
 3. Stop if any affected PR is not open or its `baseRefName` does not match the
    intended new base. Immediately before merging or deleting, repeat the fully
-   paginated open-PR query for the branch being removed. Proceed only when it
-   returns no PRs; a new child requires retargeting and another complete
-   readback. Merge the lower layer and delete its branch only after every
-   affected PR passes these gates.
+   paginated query for the branch being removed and for every recorded
+   descendant head, recursively expanding any new nodes. Compare every PR
+   identity, repository, base, head, and tip with the recorded graph. A new or
+   changed descendant restarts classification, retargeting where applicable,
+   and complete readback. Proceed only when no PR still targets the branch being
+   removed and the complete graph is stable.
 4. After the lower layer merges, repair the complete descendant graph before
    treating any PR in it as mergeable. Retargeting changes PR metadata; it does
    not remove obsolete lower-layer commits from descendant history. Rebase from
@@ -117,7 +122,9 @@ the merged layer's branch:
    available; otherwise use the reconstruction workflow above. Follow the
    backup and force-with-lease gates for every rewritten branch, then verify
    every descendant's commit range, three-dot diff, tests, branch tip, and PR
-   base.
+   base. Repeat the complete graph traversal and tip comparison immediately
+   before rewriting any descendant; a new or moved node restarts the repair
+   plan.
 
 This ordering applies whether branch deletion is explicit, part of
 `gh pr merge --delete-branch`, or enabled automatically in repository settings.
@@ -139,10 +146,14 @@ and review history with this recovery sequence:
 2. Identify and verify the deleted base branch's exact pre-deletion tip. For a
    merged layer, use the commit that the branch pointed to when it was merged;
    do not substitute the squash or merge commit unless it is the same object.
-3. Recreate the missing base branch at that commit:
+3. Resolve a Git remote that maps to `<owner>/<repo>` and verify its fetch and
+   push URLs. Do not assume `origin` points to the repository that owns the
+   closed PRs. Recreate the missing base branch at the verified commit through
+   that remote:
 
    ```bash
-   git push origin <merged-layer-sha>:refs/heads/<deleted-base>
+   git remote -v
+   git push <target-remote> <merged-layer-sha>:refs/heads/<deleted-base>
    ```
 
 4. Reopen and retarget every PR in the recorded affected set. Use the REST API
