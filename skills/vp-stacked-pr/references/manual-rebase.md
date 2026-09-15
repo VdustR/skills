@@ -69,6 +69,119 @@ rebase merges leave different evidence.
 - Resolve conflicts semantically. When multiple behaviorally valid resolutions
   exist, ask the user before choosing; never choose a side globally.
 
+## Retarget Before Deleting A GitHub Base Branch
+
+For an ad-hoc GitHub stack, do not rely on branch deletion to retarget the PRs
+above a merged layer. GitHub documents automatic retargeting for open PRs in the
+same repository, but verify and update the actual PR metadata before deleting
+the merged layer's branch:
+
+1. Inventory the complete open descendant graph. Start with the repository and
+   branch that will be changed, then repeat the query for each returned head
+   repository and branch until no new descendants appear. A cross-fork
+   descendant belongs to the head repository's PR collection, so carry the head
+   repository through the traversal; a branch name alone is ambiguous. Record
+   every PR's repository, URL, number, base, head repository, head branch, and
+   exact branch tip. Distinguish the direct children that must be
+   retargeted before deletion from deeper descendants whose bases stay on the
+   layer above them. This preserves every old parent boundary needed to repair
+   history after a squash or rebase merge.
+
+   ```bash
+   gh api --method GET --paginate repos/<owner>/<repo>/pulls \
+     -f state=open -f base=<branch-to-delete> -f per_page=100 \
+     --jq '.[] | {number, url: .html_url, baseRefName: .base.ref, headRepository: .head.repo.full_name, headRefName: .head.ref, headSha: .head.sha}'
+   ```
+
+   Exhaust every page. A default-limited listing cannot establish that every
+   affected PR is safe.
+
+2. Retarget each direct child while it is still open. Determine its intended new
+   base from the graph rather than assuming that every child moves directly to
+   the default branch:
+
+   ```bash
+   gh pr edit <child-pr-url> --base <new-base>
+   gh pr view <child-pr-url> --json state,baseRefName,headRefName
+   ```
+
+3. Stop if any affected PR is not open or its `baseRefName` does not match the
+   intended new base. Immediately before merging or deleting, repeat the fully
+   paginated query for the branch being removed and for every recorded
+   descendant head, recursively expanding any new nodes. Compare every PR
+   identity, repository, base, head, and tip with the recorded graph. A new or
+   changed descendant restarts classification, retargeting where applicable,
+   and complete readback. Proceed only when no PR still targets the branch being
+   removed and the complete graph is stable.
+4. After the lower layer merges, repair the complete descendant graph before
+   treating any PR in it as mergeable. Retargeting changes PR metadata; it does
+   not remove obsolete lower-layer commits from descendant history. Rebase from
+   each top branch with `--update-refs` when that covers every intermediate ref,
+   or explicitly repair every descendant. For a direct child whose old parent
+   boundary is clear, `git rebase --onto <new-base> <old-parent-tip>` is also
+   available; otherwise use the reconstruction workflow above. Follow the
+   backup and force-with-lease gates for every rewritten branch, then verify
+   every descendant's commit range, three-dot diff, tests, branch tip, and PR
+   base. Repeat the complete graph traversal and tip comparison immediately
+   before rewriting any descendant; a new or moved node restarts the repair
+   plan.
+
+This ordering applies whether branch deletion is explicit, part of
+`gh pr merge --delete-branch`, or enabled automatically in repository settings.
+
+If deleting the base branch has already closed a child PR, preserve its number
+and review history with this recovery sequence:
+
+1. Before reopening anything, inventory every PR whose base is the deleted
+   branch across all states with complete pagination. Use stack metadata and PR
+   history to distinguish children closed by the deletion from merged or
+   intentionally closed PRs, and record the complete affected set:
+
+   ```bash
+   gh api --method GET --paginate repos/<owner>/<repo>/pulls \
+     -f state=all -f base=<deleted-base> -f per_page=100 \
+     --jq '.[] | {number, state, baseRefName: .base.ref, headRefName: .head.ref}'
+   ```
+
+2. Identify and verify the deleted base branch's exact pre-deletion tip. For a
+   merged layer, use the commit that the branch pointed to when it was merged;
+   do not substitute the squash or merge commit unless it is the same object.
+3. Resolve a Git remote that maps to `<owner>/<repo>` and verify its fetch and
+   push URLs. Do not assume `origin` points to the repository that owns the
+   closed PRs. Recreate the missing base branch at the verified commit through
+   that remote:
+
+   ```bash
+   git remote -v
+   git push <target-remote> <merged-layer-sha>:refs/heads/<deleted-base>
+   ```
+
+4. Reopen and retarget every PR in the recorded affected set. Use the REST API
+   to reopen each PR, then retarget it while it is open:
+
+   ```bash
+   gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open
+   gh pr edit <child-pr-url> --base <new-base>
+   gh pr view <child-pr-url> --json state,baseRefName,headRefName
+   ```
+
+   `gh pr reopen` and GraphQL base edits can obscure the missing-base cause. If
+   recovery fails, inspect the REST response instead of replacing the PR.
+5. Immediately before deletion, re-read every PR in the recorded affected set
+   by number and confirm that it is open on its expected new base. Then repeat
+   the fully paginated all-state inventory of the recreated base to detect newly
+   discovered targets. Stop if a recorded PR is closed or has the wrong base, or
+   if any unprocessed PR still uses the recreated branch. Delete the recreated
+   base only after both readbacks pass:
+
+   ```bash
+   gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<deleted-base>
+   ```
+
+Branch recreation and deletion are remote writes. Require the authorization
+that the surrounding delivery or recovery workflow needs before performing
+them.
+
 Verify the backup ref still resolves to its recorded pre-rebase object ID, then
 verify the commit range, diff against the intended base, tests, and PR/MR
 metadata. History rewriting and force pushing require separate explicit

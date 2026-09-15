@@ -2,7 +2,7 @@
 
 ## Prompt
 
-Use `$vp-stacked-pr` for two stacked-change situations and route each to the correct
+Use `$vp-stacked-pr` for three stacked-change situations and route each to the correct
 reference before acting:
 
 **Situation 1 — GitHub, same repository.** Build and land a three-layer stack of
@@ -28,6 +28,16 @@ current `main`. Commit `fff6666` overlaps both parent and child changes, and the
 available metadata does not establish its ownership.
 
 Assume each working tree is clean and authenticated host metadata is available.
+
+**Situation 3 — ad-hoc GitHub stack.** PR #201 targets `main`; PR #202 and PR
+#203 target the `feature/layer-one` branch from PR #201; and PR #204 targets
+the `feature/layer-two` head branch from PR #202. PR #201 is ready to
+squash-merge with branch deletion. The stack is not registered with `gh stack`.
+First describe the safe merge order. Then assume `feature/layer-one` was deleted
+before retargeting, both direct children closed, and the branch's verified
+pre-deletion tip was `abc1234`; recover the original PRs without replacing them.
+Assume PR #202's head belongs to a fork repository and, after the initial graph
+walk, PR #205 is opened in that fork against PR #204's head branch.
 
 ## Expected Behavior
 
@@ -61,6 +71,48 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - Confirm the backup ref did not move after the rebase. Never use an unguarded
   force push or delete the backup ref automatically.
 
+Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
+
+- Before merging PR #201 or deleting `feature/layer-one`, recursively enumerate
+  the complete descendant graph with REST queries paginated to exhaustion:
+  direct children PR #202 and PR #203 plus deeper descendant PR #204. Carry each
+  PR URL, head repository, branch, and tip through the traversal so the
+  cross-fork path is queried in the correct repository.
+- Retarget PR #202 and PR #203 to their intended new bases, then read back each
+  PR's `state` and `baseRefName`. PR #204 remains based on PR #202's head. A
+  default-limited listing or direct-child-only inventory is incomplete evidence.
+  Use each recorded PR URL for `gh pr edit` and `gh pr view`; a number alone can
+  select the wrong repository.
+- Stop the merge and branch deletion if either child is not open or still names
+  `feature/layer-one` as its base. This gate also applies to automatic branch
+  deletion and `gh pr merge --delete-branch`.
+- Immediately before merge or deletion, repeat the full traversal from
+  `feature/layer-one` and every recorded descendant head. Discover late PR #205
+  in the fork, add it to the graph, and restart the readback. Proceed only when
+  no PR targets `feature/layer-one` and every recorded identity, base, head
+  repository, branch, and tip is stable.
+- Record the exact `feature/layer-one` tip before merging. After the squash
+  merge, repair every branch in the descendant graph with top-branch
+  `--update-refs` rebases or explicit per-descendant repair. The original
+  lower-layer commits must no longer appear in PR #202, PR #203, or PR #204's
+  commit ranges or three-dot diffs, and late PR #205 must also be repaired.
+  Rewalk the graph and compare tips immediately before rewriting. Apply the
+  backup and force-with-lease gates, then verify each descendant's history,
+  diff, tests, branch tip, and PR base.
+- For recovery, push `abc1234` back to
+  `refs/heads/feature/layer-one`. Before reopening anything, use an all-state
+  query paginated to exhaustion to record every child that the deletion closed.
+  Resolve and verify the Git remote for the repository that owns the closed PRs;
+  do not assume `origin` is that remote.
+  Reopen each original child with
+  `gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open`, retarget
+  it by its recorded PR URL while open, and verify its state and base metadata
+  through the same URL.
+- Delete the recreated branch only after every PR in the recorded affected set
+  has been re-read by number as open on its expected base, and a repeated
+  all-state query shows no unprocessed PR based on the recreated branch. Do not
+  open replacement PRs or discard their review history.
+
 ## Regression Coverage
 
 - GitHub same-repo stacks route to the native `gh stack` workflow, not manual
@@ -75,3 +127,22 @@ Situation 2 (non-GitHub manual repair) routes to `references/manual-rebase.md`:
 - repeated backup creation cannot overwrite a retained recovery point;
 - force-with-lease requires explicit confirmation;
 - backup ref cleanup remains a separate manual action.
+- GitHub ad-hoc stacks retarget every affected child PR before a merged base
+  branch is deleted;
+- dependent PR discovery is paginated to exhaustion rather than capped by a
+  command default;
+- descendant discovery is recursive, and history repair covers direct and
+  deeper descendants;
+- failed retarget readback blocks merge and branch deletion;
+- a final paginated zero-result query closes the race between initial child
+  discovery and base-branch deletion;
+- final graph traversal detects late deeper descendants and verifies repository,
+  branch, and tip identity across forks;
+- PR mutations and readbacks use recorded URLs rather than repository-ambiguous
+  numbers;
+- retargeting preserves PR metadata but does not replace the post-merge history
+  repair required after a squash or rebase merge;
+- recovery recreates the exact missing base through a verified target remote,
+  uses REST to reopen the original PR, retargets it while open, and deletes the
+  recreated branch only after per-number metadata verification plus a repeated
+  all-state base query.
