@@ -115,16 +115,28 @@ This ordering applies whether branch deletion is explicit, part of
 If deleting the base branch has already closed a child PR, preserve its number
 and review history with this recovery sequence:
 
-1. Identify and verify the deleted base branch's exact pre-deletion tip. For a
+1. Before reopening anything, inventory every PR whose base is the deleted
+   branch across all states with complete pagination. Use stack metadata and PR
+   history to distinguish children closed by the deletion from merged or
+   intentionally closed PRs, and record the complete affected set:
+
+   ```bash
+   gh api --method GET --paginate repos/<owner>/<repo>/pulls \
+     -f state=all -f base=<deleted-base> -f per_page=100 \
+     --jq '.[] | {number, state, baseRefName: .base.ref, headRefName: .head.ref}'
+   ```
+
+2. Identify and verify the deleted base branch's exact pre-deletion tip. For a
    merged layer, use the commit that the branch pointed to when it was merged;
    do not substitute the squash or merge commit unless it is the same object.
-2. Recreate the missing base branch at that commit:
+3. Recreate the missing base branch at that commit:
 
    ```bash
    git push origin <merged-layer-sha>:refs/heads/<deleted-base>
    ```
 
-3. Reopen the PR through the REST API, then retarget it while it is open:
+4. Reopen and retarget every PR in the recorded affected set. Use the REST API
+   to reopen each PR, then retarget it while it is open:
 
    ```bash
    gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open
@@ -134,8 +146,10 @@ and review history with this recovery sequence:
 
    `gh pr reopen` and GraphQL base edits can obscure the missing-base cause. If
    recovery fails, inspect the REST response instead of replacing the PR.
-4. Delete the recreated base branch only after the child PR is open, its new
-   base is confirmed, and no other open PR still uses the recreated branch:
+5. Delete the recreated base branch only after every PR in the recorded affected
+   set is open and its new base is confirmed. Repeat the fully paginated
+   all-state inventory and stop if any affected PR remains closed, unverified,
+   or based on the recreated branch:
 
    ```bash
    gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<deleted-base>

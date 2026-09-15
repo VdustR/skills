@@ -86,12 +86,15 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
   verify history, diff, tests, and PR base before treating either child as
   mergeable.
 - For recovery, push `abc1234` back to
-  `refs/heads/feature/layer-one`, reopen each original child with
+  `refs/heads/feature/layer-one`. Before reopening anything, use an all-state
+  query paginated to exhaustion to record every child that the deletion closed.
+  Reopen each original child with
   `gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open`, retarget
   it while open, and verify its state and base metadata.
-- Delete the recreated branch only after both original PRs are open, both bases
-  are verified, and no other open PR uses the branch. Do not open replacement
-  PRs or discard their review history.
+- Delete the recreated branch only after every PR in the recorded affected set
+  is open, every base is verified, and a repeated all-state query shows no
+  affected PR remains closed or based on the recreated branch. Do not open
+  replacement PRs or discard their review history.
 
 ## Regression Coverage
 
@@ -116,4 +119,4 @@ Situation 3 (GitHub ad-hoc stack) routes to `references/manual-rebase.md`:
   repair required after a squash or rebase merge;
 - recovery recreates the exact missing base, uses REST to reopen the original
   PR, retargets it while open, and deletes the recreated branch only after
-  complete metadata verification.
+  complete metadata verification across the recorded all-state affected set.

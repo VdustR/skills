@@ -243,12 +243,16 @@ require_pattern "$stacked_rebase_fixture" 'three-dot diff' \
   "vp-stacked-pr fixture must verify the repaired child PR diff"
 require_pattern "$stacked_rebase_fixture" 'gh api -X PATCH repos/<owner>/<repo>/pulls/<child-pr> -f state=open' \
   "vp-stacked-pr fixture must recover the original PR through REST"
-require_pattern "$stacked_rebase_fixture" 'Delete the recreated branch only after both original PRs are open' \
-  "vp-stacked-pr fixture must delay recovered base deletion until PRs are open"
-require_pattern "$stacked_rebase_fixture" 'both bases' \
+require_pattern "$stacked_rebase_fixture" 'query paginated to exhaustion' \
+  "vp-stacked-pr fixture must inventory closed children before recovery"
+require_pattern "$stacked_rebase_fixture" 'Delete the recreated branch only after every PR' \
+  "vp-stacked-pr fixture must delay recovered base deletion until every affected PR is open"
+require_pattern "$stacked_rebase_fixture" 'recorded affected set' \
+  "vp-stacked-pr fixture must retain the complete recovery inventory"
+require_pattern "$stacked_rebase_fixture" 'every base is verified' \
   "vp-stacked-pr fixture must verify recovered base metadata before deletion"
-require_pattern "$stacked_rebase_fixture" 'no other open PR uses the branch' \
-  "vp-stacked-pr fixture must check for other dependent PRs before deletion"
+require_pattern "$stacked_rebase_fixture" 'repeated all-state query' \
+  "vp-stacked-pr fixture must recheck all affected PRs before deletion"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retarget Before Deleting A GitHub Base Branch' \
   "vp-stacked-pr manual guidance must prevent deletion before retargeting"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Stop if any affected PR is not open or its `baseRefName` does not match' \
@@ -257,6 +261,10 @@ require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'gh api --met
   "vp-stacked-pr manual guidance must paginate child PR discovery"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git push origin <merged-layer-sha>:refs/heads/<deleted-base>' \
   "vp-stacked-pr manual guidance must recreate the missing base at the verified tip"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'state=all -f base=<deleted-base> -f per_page=100' \
+  "vp-stacked-pr manual guidance must inventory affected PRs across all states"
+require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'every PR in the recorded affected set' \
+  "vp-stacked-pr manual guidance must recover the complete affected set"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'Retargeting changes PR metadata; it does not' \
   "vp-stacked-pr manual guidance must distinguish retargeting from history repair"
 require_pattern "skills/vp-stacked-pr/references/manual-rebase.md" 'git rebase --onto <new-base> <old-parent-tip>' \
