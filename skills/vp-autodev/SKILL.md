@@ -65,31 +65,33 @@ Keep evidence for each decision from issue validation through delivery:
    a complete, independently paginated snapshot of PR conversation issue
    comments and review threads with all inline comments and replies; a partial
    read cannot establish that feedback is handled. Then repeat verification and
-   monitoring. When all pre-Ready gates pass, advance to Ready. Do not require a
-   terminal signal from a reviewer that is configured to start only after Ready;
-   step 9 observes that reviewer after its trigger exists.
-9. After Ready, start the final reviewer observation gate described in
-   `references/reviewer-terminal-signals.md`. Bind reviewers triggered by Ready
-   to the Ready trigger time and current head. Retain valid current-head evidence
-   from pre-Ready-only reviewers instead of requiring a signal they will never
-   re-emit. Wait a documented, bounded interval for every pending configured
-   reviewer to reach a terminal signal; silence is not completion.
-   For Codex, accept an authored review or thread, or the repository-documented
-   no-finding reaction. Include PR-level, review-level, and inline-comment
-   reactions plus delayed bot replies. Independently paginate PR conversation
-   issue comments, submitted reviews, and review threads with every nested
-   inline comment and reply. Route actionable items through
-   `vp-pr-comment-resolver`, and block merge while any reviewer is pending or
-   its terminal state is ambiguous.
+   monitoring. When all pre-Ready gates pass, advance to Ready.
+9. After Ready, perform the passive automated-review observation described in
+   `references/automated-review-observation.md`. Invoking Codex or another
+   automated reviewer is not a default step in this workflow. Invoke one when
+   the user or a repository procedure explicitly asks for that action; an
+   installed integration, historical bot activity, or a documented trigger
+   command does not make invocation automatic. Do not wait for an automated
+   reviewer that has not started, and do not make a missing terminal signal a
+   standalone merge blocker. For a repository-defined optional review that was
+   requested or started, make a reasonable repository-supported retrigger
+   attempt before temporarily proceeding without it. Repeated failures,
+   exhausted quota, or excessive delay may justify proceeding when required
+   evidence is otherwise complete. Use about one hour as a default reference
+   for unattended work, not a fixed deadline; adapt the retry and observation
+   window to repository conventions, progress, risk, and cost. Record the
+   evidence and rationale. Route every actionable item that actually appears
+   through `vp-pr-comment-resolver`. A repository-required review cannot be
+   degraded for failure, quota, or delay; keep it blocked until recovery and
+   completion, or until the user explicitly directs the next action.
 10. After the last mutation, including Ready, a reply, fix, push, or thread
     resolution, reconcile again. Record the current head; re-read current-head
     CI and checks; completely re-fetch PR conversation issue comments,
-    submitted reviews, review threads and their nested replies, and all
-    configured reaction surfaces; and confirm every reviewer terminal signal
-    still applies. A mutation invalidates the prior final
-    snapshot. If a bounded wait expires without an attributable terminal
-    signal, stop with the reviewer, head, trigger time, surfaces checked, wait
-    policy, and exact missing evidence.
+    submitted reviews, review threads and their nested replies, and reaction
+    surfaces used by feedback that exists. A mutation invalidates the prior
+    final snapshot. Report an automated reviewer that did not run as unobserved.
+    Do not convert an optional reviewer into an indefinite wait loop; apply the
+    documented retry and degradation judgment when that review was requested.
 11. For a user-specified repository the user owns, merge when repository policy
    permits it, required evidence is green, feedback is handled, the change is
    fully verified, and the remaining risk is low. Treat the request to auto
@@ -109,8 +111,9 @@ documented low-risk conditions permit further progress. When a safety gate
 prevents progress, report the bounded terminal state and the exact missing
 decision or evidence.
 
-Do not treat CI success as proof that the issue is fixed, or silence from one
-bot surface as proof that every review signal has completed.
+Do not treat CI success as proof that the issue is fixed. Do not treat silence
+from a bot as a completed review, but do not wait for or summon the bot solely
+to turn that silence into a signal.
 
 ## Verification and convergence
 
@@ -122,8 +125,8 @@ manual walkthroughs, executed tests, and independent agent trials in the report.
 
 Batch verified findings into a focused correction pass. Repeat affected checks
 when behavior changes or new evidence appears, and always perform the required
-final reconciliation. Do not request another review on an unchanged head that
-already has valid terminal evidence unless repository policy requires it.
+final reconciliation. A new automated review request is outside the default
+delivery loop; make one when the user or repository procedure explicitly asks.
 When `vp-pr-comment-resolver` handles automated feedback, keep each decision
 tied to the requested change and its acceptance criteria. A new suggestion
 reopens only the affected decision and verification unless it exposes a broader
@@ -138,7 +141,7 @@ correction passes for the same unresolved finding, reassess the cause and
 evidence before editing again. Continue with a concrete new hypothesis and a discriminating
 check; do not repeat a failed approach or add unrelated improvements. If no safe
 next step exists, report the blocker. A pass count never makes unresolved
-findings, pending reviewers, or incomplete verification safe to merge.
+findings or incomplete verification safe to merge.
 
 ## Problems discovered during the work
 
