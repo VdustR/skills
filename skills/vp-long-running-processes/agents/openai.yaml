@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Long-Running Processes"
-  short_description: "Reuse or safely stop long-running processes"
-  default_prompt: "Use $vp-long-running-processes before starting, stopping, or restarting dev servers, watchers, browser sessions, or background jobs."
+  short_description: "Manage persistent processes and named local URLs"
+  default_prompt: "Use $vp-long-running-processes to safely reuse, start, inspect, stop, or restart persistent processes and to consider Portless for stable named URLs when a local daemon opens an HTTP port."
