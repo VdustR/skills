@@ -88,7 +88,7 @@ vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 autodev_fixture="fixtures/smoke/vp-autodev.md"
 autodev_skill="skills/vp-autodev/SKILL.md"
-autodev_reviewer_signals="skills/vp-autodev/references/reviewer-terminal-signals.md"
+autodev_review_observation="skills/vp-autodev/references/automated-review-observation.md"
 
 require_pattern "$autodev_fixture" 'branch creation.*commit.*push.*Draft PR' \
   "vp-autodev fixture must cover authorization through Draft PR creation"
@@ -111,46 +111,44 @@ require_pattern "$autodev_skill" 'changes, a Draft PR, or a Ready PR' \
 if grep -Fq 'Stop when all required signals pass' "$autodev_skill"; then
   fail "vp-autodev review success must advance to merge evaluation"
 fi
-require_pattern "$autodev_fixture" 'Ready.*(new review trigger|final observation)' \
-  "vp-autodev fixture must start a final observation gate after Ready"
-require_pattern "$autodev_fixture" 'Ready-only reviewer.*circular pre-Ready prerequisite' \
-  "vp-autodev fixture must not require Ready-triggered evidence before Ready"
-require_pattern "$autodev_fixture" 'delayed inline Codex review.*block' \
-  "vp-autodev fixture must block on a delayed Ready-triggered Codex review"
-require_pattern "$autodev_fixture" 'reaction-only no-finding signal' \
-  "vp-autodev fixture must cover the Codex no-finding reaction"
-require_pattern "$autodev_fixture" 'delayed bot replies' \
-  "vp-autodev fixture must include delayed bot replies"
-require_pattern "$autodev_fixture" 'terminal review signal.*settle/readback.*does not permit immediate merge' \
-  "vp-autodev fixture must not merge immediately on the first terminal signal"
-require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment.*reactions' \
-  "vp-autodev fixture must include every required reaction surface"
+require_pattern "$autodev_fixture" 'Do not automatically post `@codex review`' \
+  "vp-autodev fixture must keep Codex review invocation out of the default flow"
+require_pattern "$autodev_fixture" 'historical reviews.*summary comment' \
+  "vp-autodev fixture must not infer invocation authority from historical bot state"
+require_pattern "$autodev_fixture" 'Do not wait for Codex when it has not started' \
+  "vp-autodev fixture must not wait for a reviewer that did not start"
+require_pattern "$autodev_fixture" 'repository-supported retrigger' \
+  "vp-autodev fixture must retry an optional reviewer before degrading it"
+require_pattern "$autodev_fixture" 'Allow repeated failures, exhausted quota, or excessive delay' \
+  "vp-autodev fixture must allow evidence-based optional-review degradation"
+require_pattern "$autodev_fixture" 'fixed deadline' \
+  "vp-autodev fixture must keep the unattended wait reference adaptable"
+require_pattern "$autodev_fixture" 'Never degrade a repository-required review' \
+  "vp-autodev fixture must preserve required reviews through failure and quota exhaustion"
+require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment' \
+  "vp-autodev fixture must include every applicable reaction surface"
 require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \
   "vp-autodev fixture must reconcile CI and feedback after the last mutation"
 require_pattern "$autodev_fixture" 'Independently paginate submitted reviews' \
   "vp-autodev fixture must cover body-only submitted reviews"
-require_pattern "$autodev_fixture" 'pre-Ready-only reviewer survives Ready' \
-  "vp-autodev fixture must preserve valid pre-Ready-only reviewer evidence"
-require_pattern "$autodev_fixture" 'bounded wait.*safe blocker' \
-  "vp-autodev fixture must safely block when terminal evidence never arrives"
-require_pattern "$autodev_reviewer_signals" 'silence.*(not completion|pending)' \
-  "vp-autodev reviewer gate must reject silence as a terminal signal"
-require_pattern "$autodev_reviewer_signals" 'independently complete pagination' \
-  "vp-autodev reviewer gate must require complete nested pagination"
-require_pattern "$autodev_reviewer_signals" 'PR-level reactions.*review-level reactions.*inline-comment reactions' \
-  "vp-autodev reviewer gate must enumerate reaction surfaces"
-require_pattern "$autodev_reviewer_signals" 'mutation restarts this final snapshot' \
-  "vp-autodev reviewer gate must reconcile after the final mutation"
-require_pattern "$autodev_reviewer_signals" 'terminal signal starts? the final settle and readback phase' \
-  "vp-autodev reviewer gate must observe delayed replies after a terminal signal"
-require_pattern "$autodev_reviewer_signals" 'Queued.*reviewing.*nonterminal bot replies remain.*pending' \
-  "vp-autodev reviewer gate must not treat status replies as terminal findings"
-require_pattern "$autodev_reviewer_signals" 'Authorship alone does not prove reviewer completion' \
-  "vp-autodev reviewer gate must require terminal semantics beyond bot authorship"
-require_pattern "$autodev_reviewer_signals" 'Fetch every submitted review with independent complete pagination' \
-  "vp-autodev reviewer gate must independently paginate submitted reviews"
-require_pattern "$autodev_reviewer_signals" 'Independently.*paginate every reaction collection.*record.*pagination completion' \
-  "vp-autodev reviewer gate must fully paginate every reaction target"
+require_pattern "$autodev_review_observation" 'Invoke a reviewer with a command such as `@codex review`' \
+  "vp-autodev observation must require an explicit trigger for a new review"
+require_pattern "$autodev_review_observation" 'Do not wait for a reviewer that has not started' \
+  "vp-autodev observation must not wait for absent reviewer activity"
+require_pattern "$autodev_review_observation" 'reasonable attempt to retrigger' \
+  "vp-autodev observation must retry an optional reviewer before degrading it"
+require_pattern "$autodev_review_observation" 'not a mandatory deadline' \
+  "vp-autodev observation must keep the unattended wait reference adaptable"
+require_pattern "$autodev_review_observation" 'applies only to optional reviews' \
+  "vp-autodev observation must preserve repository-required review gates"
+require_pattern "$autodev_review_observation" 'until the reviewer recovers and completes, or until the' \
+  "vp-autodev observation must wait for required-review recovery or user direction"
+require_pattern "$autodev_review_observation" 'Fetch every submitted review with independent complete pagination' \
+  "vp-autodev observation must independently paginate submitted reviews"
+require_pattern "$autodev_review_observation" 'Independently paginate each' \
+  "vp-autodev observation must fully paginate applicable reaction targets"
+require_pattern "$autodev_review_observation" 'thread resolution restarts the final snapshot' \
+  "vp-autodev observation must reconcile after the final mutation"
 
 require_pattern "$vp_skills_fixture" "agent '\\*'|--agent '\\*'" \
   "vp-skills fixture must cover quoted all-agent defaults"
