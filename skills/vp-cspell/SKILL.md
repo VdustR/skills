@@ -18,6 +18,13 @@ intentional and the repository owns an appropriate configuration surface.
 4. Use a local directive for intentional one-off text.
 5. Ignore patterns only for generated, encoded, or structurally noisy content.
 
+Before choosing between steps 3 and 4, search the repository for the word,
+including its dictionaries and existing local directives. Skip the directive
+when a dictionary already lists the word. A word that appears in more than one
+file, or names a common tool, product, or language, is reusable: add it to the
+dictionary and remove the local directives it makes redundant. Repeating the
+same directive across files is the signal to promote it.
+
 Do not add a word globally merely to silence one occurrence, and do not invent
 configuration for an IDE-only warning when the repository has no cspell setup.
 Run the repository's configured check after changes.
