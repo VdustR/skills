@@ -61,8 +61,8 @@ Situation 2 routes to `references/web-demo.md`:
 Situation 3 routes to `references/still-capture.md`:
 
 - Produce a file. Do not treat the in-app browser's inline screenshot as the
-  deliverable, because vp-github's attachment path starts at a file path and an
-  inline image is never written to disk.
+  deliverable, because vp-github's attachment path starts at a file path and this
+  session has no original file export.
 - Do not move a cookie, session token, or credential out of the viewing browser
   into a scriptable one. Log in once interactively against an isolated persistent
   profile the run creates, screenshot from that context, then delete the profile.
@@ -133,3 +133,33 @@ All situations:
 - click targets come from live geometry, not remembered coordinates;
 - output is verified by looking at frames before delivery;
 - ffmpeg filter availability is checked rather than assumed.
+
+## Still artifact and export decision scenarios
+
+Use a synthetic local page with generated illustrations and small text only.
+These are additional decision scenarios for the still workflow, not additional
+capture requests in the four-situation prompt above.
+
+| Scenario | Expected decision |
+|---|---|
+| The authorized session has a documented lossless original file export | Request PNG and export in that session; validate saved bytes and dimensions without another login or credential extraction. |
+| The session displays only an inline preview and has no supported original export | Use the existing authorized isolated Playwright capture, with interactive login only when needed, or the window-id producer for a native target. Preserve user-specified tools. |
+| The host blocks export for security or permission reasons | Stop and report the blocked export; do not bypass it with another tool or move session credentials. A fallback needs separately established authority that respects the restriction. |
+| A JPEG preview has been saved unchanged as `example.png` | Reject it by file signature/type, despite successful Markdown rendering; recapture lossless PNG rather than relabeling or converting the compressed preview. |
+| A genuine PNG has fewer source pixels than the intended 2x display needs | Detect insufficient decoded dimensions on either axis and recapture or choose a still-readable smaller display. Do not upscale the preview. |
+| An original export has adequate dimensions but unknown capture scale | Record the scale as unknown; establish a fresh 2x capture when source scale cannot be verified. Do not infer provenance from dimensions. |
+| The page has loaded but claimed state, fonts, relevant images, or transitions are unsettled | Wait for the claim and material resources, capture, then pair the same-state text assertion. |
+| A cropped PNG passes type and pixel checks | Inspect the original and intended rendered size, preserving contextual labels. Passing machine checks alone cannot establish readability. |
+
+Run `scripts/still-capture-poc.cjs <output-directory>` from the skill directory
+with the existing Playwright setup for an executable synthetic artifact test.
+It rejects a JPEG named `.png` and an insufficient genuine PNG and checks a 2x
+PNG's signature and decoded dimensions. Inspect `capture-2x.png` and
+`intended-size.png` visually for small text, controls, generated illustration,
+and the paired `Settings ready` assertion.
+
+Report evidence separately: repository fixture matching is a static check;
+the synthetic capture is an executable test; viewing the files is visual
+inspection; applying the table is a manual decision walkthrough unless an
+independent agent actually performed a trial. None of these implies that a real
+authenticated export, permission denial, or publication path was exercised.

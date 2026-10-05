@@ -5,21 +5,33 @@ is where vp-github's attachment path begins.
 
 | Subject | Producer |
 |---|---|
-| A web app, any platform | Playwright `page.screenshot({ path })` |
-| A web app behind a login | The same, against an isolated persistent profile |
+| Already authorized session with supported original export | Lossless original file export, then the artifact validation gate |
+| A web app, any platform, export unavailable | Playwright `page.screenshot({ path })` |
+| A web app behind a login, export unavailable | The same, against an isolated persistent profile |
 | A native window, macOS | `screencapture -x -o -l<id>`, or a desktop tool given a window id |
 
-## An inline screenshot is not a file
+## Choose an authorized file producer
 
-An agent's own browser or computer-use tool usually returns pixels to the model
-and writes nothing to disk. There is no path to upload and no second look at the
-image later. When the destination is an attachment, run one of the producers
-above instead of reusing what a viewing tool already showed you.
+Prefer a supported original image export from the already authorized browser or
+computer-use session when its documented capability writes or returns the
+original bytes as a file. Request lossless PNG explicitly. Inspect the current
+tool documentation and result; an inline preview alone does not establish that
+original export exists or that the preview is lossless. Preserve any tool the
+user explicitly requires.
 
-Do not solve this by moving a session token or cookie jar out of the viewing
-browser into a scriptable one. A permission classifier that blocks the transfer
-is correct: the credential leaves the process that was granted it. Log in once in
-a throwaway profile instead, as below.
+| Session capability | Action |
+|---|---|
+| Supported original export, permitted by the host | Export in that session, then validate the saved artifact below. No additional login is needed. |
+| Inline preview only, or no supported original export | Use the existing Playwright or window-id producer below, if authorized and compatible with the user's tool constraint. |
+| Export denied by security policy or permission | Stop and report the blocked export. Do not switch tools to bypass the denial. |
+
+Do not move a session token, cookie jar, or profile out of the authorized browser
+into another producer. An unavailable export capability permits a safe fallback;
+a security-blocked export does not. If a separately authorized capture can proceed
+without bypassing that restriction, establish that scope first. Otherwise request
+the missing permission or a user-provided file. For a fallback that needs login,
+use the isolated-profile sequence below or the managed-profile handoff; never
+extract credentials to avoid signing in.
 
 ## Web app: Playwright writes the file
 
@@ -36,7 +48,12 @@ try {
   await page.goto(url, { waitUntil: "load" });
   // Wait for the thing the screenshot is evidence for, not just for load.
   await page.getByRole("tab", { name: "Overview" }).waitFor({ state: "visible" });
-  await page.screenshot({ path: "out/before.png" });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(Array.from(document.images, image => image.decode()));
+  });
+  // Also wait for app-specific data and material transitions to settle.
+  await page.screenshot({ path: "out/before.png", type: "png", scale: "device" });
 } finally {
   await browser.close();
 }
@@ -45,7 +62,8 @@ try {
 Close the browser in a `finally`. A navigation or screenshot that throws
 otherwise leaves Chromium running and the script alive with it.
 
-Set `deviceScaleFactor: 2`. Measured: a 900x300 viewport wrote 1800x600 at
+Set `deviceScaleFactor: 2` and request PNG with device-scale pixels. Measured:
+a 900x300 viewport wrote 1800x600 at
 `deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
 interface is too small for a reviewer to read the text that proves the claim.
 
@@ -69,8 +87,12 @@ locator resolves immediately rather than waiting for matches. A single-element
 locator auto-waits; a list does not. So the caption and the image can disagree,
 or the caption can come back empty, and neither failure announces itself.
 
-Wait on the specific element that carries the claim, then screenshot, then read
-the assertion from that settled state.
+Wait on the specific element that carries the claim, loaded fonts and relevant
+images, and any material animation or transition. Use an application readiness
+signal or a settled-state assertion rather than a fixed delay. Image decoding
+errors must be resolved or explicitly excluded from the claim before capture.
+Then screenshot and read the assertion from that same settled state; if the state
+changes between those operations, repeat the pair.
 
 ## A UI behind a login
 
@@ -216,7 +238,7 @@ the title from the rows.
 # Owner unknown? List every on-screen window and match on the title.
 ./scripts/window-id.swift | awk -F'\t' '$3 == "Inventory Editor" { print $1, $2, $4 }'
 
-screencapture -x -o -l37528 out/before.png
+screencapture -x -o -t png -l37528 out/before.png
 ```
 
 Print the owner and size alongside the id and check them before capturing. Two
@@ -261,18 +283,60 @@ The choice is recoverable when the tool reports it. The same run printed
 title. Ask for the machine-readable result and compare the reported id against the
 id you intended.
 
-## Confirm the file before it leaves the machine
+## Validate the saved artifact
 
-Open the image and check three things: it is the window you meant, it shows the
-state you are claiming, and nothing else is in the frame.
+Apply this gate to every producer, including original exports and crops. Keep
+machine-checkable properties separate from visual readability.
 
-This is mandatory when the image is bound for a GitHub attachment, because the
-upload has no documented deletion path. vp-github records that access depends on
-repository visibility and whether posted content references the asset, and a
-later reference or visibility change can expand that access. Discarding the draft
-does not reliably recall the image. There is no later step that safely substitutes
-for checking the file before upload.
+1. Verify the actual file signature/type with `file --mime-type` or an available
+   image decoder, and successfully decode the image with an image tool. PNG starts
+   with the bytes `89 50 4e 47 0d 0a 1a 0a`; a `.png` extension is insufficient.
+   Reject a JPEG named `.png` and recapture as lossless PNG. Renaming or converting
+   that JPEG to PNG cannot restore detail lost to compression.
+2. Read decoded pixel width and height. Record the capture scale, captured region
+   in CSS pixels or window points, and intended rendered width and height in CSS
+   pixels or points. At the baseline 2x scale, require source width and height to
+   be at least twice the intended display width and height. Verify both axes after
+   cropping. For an export with unknown scale, record it as unknown and establish
+   a fresh 2x capture if its source scale cannot be verified; dimensions alone do
+   not establish capture scale.
+3. If source pixels are inadequate, capture again at sufficient native/device
+   resolution, or reduce the intended display size only if that still communicates
+   the claim. Do not upscale an existing low-resolution preview to pass the gate.
+4. Inspect the original file at native resolution and inspect it rendered at the
+   intended display size. Verify small text, controls, and the claimed state are
+   readable. Passing type and dimension checks does not establish readability.
+   Crop to the relevant region while preserving labels and context needed to
+   understand the claim. Repeat the checks on the final crop.
+5. Confirm the target, claimed state, paired text assertion, and absence of
+   unrelated or sensitive content before delivery. Record the validated type,
+   decoded dimensions, scale, intended display size, and visual inspection result.
+   Keep this evidence generalized when publication requires de-identification.
 
-PNG is the format to write. It is one of the eight media types supported by the
-GitHub CLI attachment path and legacy endpoint. See vp-github for the whitelist,
-filename rules, and size ceilings.
+For example, a synthetic region intended to render at 480 by 240 CSS pixels needs
+at least 960 by 480 source pixels at 2x. A genuine 480 by 240 PNG fails that size
+check even though its format is correct. A larger upscaled copy still fails the
+capture-provenance requirement.
+
+This gate is mandatory before a GitHub attachment. An upload has
+no documented deletion path; access depends on repository visibility and whether posted content
+references the asset, and later changes can expand access. Discarding a draft
+does not reliably recall an image. See vp-github for filename rules and size
+ceilings. Successful Markdown rendering does not establish image clarity.
+
+## Synthetic regression exercise
+
+With this skill's existing Node and Playwright dependencies, run
+`scripts/still-capture-poc.cjs <output-directory>`. It uses a synthetic local page,
+small text, controls, and generated illustrations only. It writes a 1x JPEG named
+`.png`, a genuine insufficient 1x PNG, a 2x PNG, and a local intended-size preview.
+It checks signatures and decoded dimensions, rejects the first two artifacts,
+and accepts the 2x artifact's machine-checkable properties. It waits for the
+claimed interface state, fonts, and images before capture and pairs a text
+assertion with that state.
+
+Inspect the original 2x PNG and the intended-size preview separately. The
+executable test cannot establish visual readability or agent routing. Exercise
+the original-export, unavailable-export fallback, and security-blocked stop
+scenarios in `fixtures/smoke/vp-recording.md` at the repository root as manual
+walkthroughs or independent trials, and label the evidence type accurately.
