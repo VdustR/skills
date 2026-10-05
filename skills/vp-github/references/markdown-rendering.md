@@ -52,3 +52,7 @@ gh api "repos/<owner>/<repo>/readme?ref=<branch>" -H "Accept: application/vnd.gi
 
 Grep the result for `<video`, `<img`, and `<a ` to see which of the three you got.
 A stripped tag leaves no trace in the output, so absence is the signal.
+
+Successful Markdown rendering establishes that an image is embedded, not that its
+text is readable. Before publishing a still, use vp-recording's artifact checks
+and inspect the image at the intended display size.

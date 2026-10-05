@@ -9,8 +9,8 @@ description: >-
   image or a video, and any request to record, film, screenshot, or show what an
   interface is doing, including a UI behind a login. Every path ends at a file on
   disk. The browser paths, still and video, and the render path are
-  cross-platform, though a still behind a login needs a display; capturing a
-  native window, still or video, is macOS only.
+  cross-platform, though a still behind a login needs a display when the isolated
+  capture path requires interactive sign-in; capturing a native window, still or video, is macOS only.
   Boundary: use vp-minimal-repro for a re-runnable reproduction that needs no
   image, and vp-github to attach the result to an issue or pull request.
 ---
@@ -55,20 +55,24 @@ ask about anything missing before starting.
 
 | Path | Depends on |
 |---|---|
-| Still of a web UI | Node and Playwright with a browser binary. No ffmpeg. A display too, but only when the capture needs an interactive login |
+| Still of a web UI | Supported lossless original export in the authorized session, or Node and Playwright with a browser binary. No ffmpeg. A display too, but only when the capture needs an interactive login |
 | Still of a macOS window | Screen Recording permission for the calling process, and Swift for the bundled window-id script or a desktop automation tool that lists window ids. An accessibility-capable automation tool as well, if the paired text assertion is read from the window rather than written by hand |
 | Browser walkthrough | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | Generated render | Node, Playwright with a browser binary, ffmpeg with H.264 |
 | macOS window capture | Screen Recording permission for the calling process, and ffmpeg for verifying and converting the `.mov`. Window-id lookup needs either Swift for the bundled script or a desktop automation tool. An input tool as well, but only if the app has to do something on camera |
 
 The browser paths, still and video, run on any platform and inside a container,
-with one exception: a still that needs an interactive login needs a display for
-the whole capture, so it does not run on a displayless runner. That exception is
+with one exception: an isolated still capture that needs an interactive login
+needs a display for the whole capture, so it does not run on a displayless runner. That exception is
 stated once, under Prefer the browser path, and every platform claim here defers
 to it. The macOS window paths depend on macOS system tools and have no equivalent
 here for Linux or Windows.
 
 ## Prefer the browser path
+
+For a still, first check the authorized session for a supported original file
+export using `references/still-capture.md`. Preserve tool constraints and stop at
+security denials. If export is unavailable, use the capture paths below.
 
 If the subject runs in a browser, use the browser path for a still or a video,
 even when a desktop recorder is already open. Without a login it is fully
@@ -82,7 +86,7 @@ service workers, or SSO. It owns managed profile identity, permissions, and
 deletion. The throwaway-profile sequence in `references/still-capture.md` is for a
 login that begins and ends inside one capture.
 
-A still behind a login is the exception, and it stays the exception through the
+An isolated still capture behind a login is the exception, and it stays the exception through the
 whole sequence. The interactive sign-in needs a visible window and a display, and
 Playwright cannot switch that running context to headless afterwards, so the
 capture happens in the same visible window. Plan for a display for the entire
@@ -118,9 +122,11 @@ Never hand over a file you have not looked at. Capture silently produces
 plausible garbage: a blank first frame, a cursor parked off-target, a click that
 missed, a window that was not the one you named.
 
-For a still, open the image and confirm it is the window you meant and the state
-you are claiming. That check is mandatory on every path and needs no tool beyond
-an image viewer.
+For a still, verify the saved file type and decoded dimensions against its
+intended display size, then inspect the original and intended-size rendering.
+Confirm it is the window you meant and the state you are claiming. Visual
+inspection is mandatory on every path; an image viewer is sufficient for that
+part of the check.
 
 Pair the image with a text assertion as well, so the caption and the pixels have
 to agree. A browser still reads it from the page. A native window reads it from

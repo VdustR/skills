@@ -384,6 +384,21 @@ require_pattern "$recording_still_capture" 'the display has to remain available 
   "vp-recording still capture must keep the display available past the sign-in"
 require_pattern "$recording_still_capture" 'Closing first and planning to fall back does not work' \
   "vp-recording still capture must not offer a fallback to an already-closed context"
+require_pattern "$recording_still_capture" 'Supported original export, permitted by the host' \
+  "vp-recording must prefer an authorized original export"
+require_pattern "$recording_still_capture" 'Do not switch tools to bypass the denial' \
+  "vp-recording must stop on blocked exports"
+require_pattern "$recording_still_capture" 'Read decoded pixel width and height' \
+  "vp-recording must check decoded dimensions"
+require_pattern "$recording_still_capture" 'Do not upscale an existing low-resolution preview' \
+  "vp-recording must reject upscaling as a size fix"
+require_pattern "$recording_fixture" 'Reject it by file signature/type' \
+  "vp-recording fixture must reject mislabeled JPEGs"
+require_pattern "$recording_fixture" 'manual decision walkthrough' \
+  "vp-recording fixture must distinguish evidence types"
+[ -f skills/vp-recording/scripts/still-capture-poc.cjs ] \
+  || fail "vp-recording synthetic artifact exercise must exist"
+node --check skills/vp-recording/scripts/still-capture-poc.cjs
 for recording_overlay_reference in cursor-and-clicks keycast subtitles; do
   require_pattern "$recording_skill" "references/$recording_overlay_reference.md" \
     "vp-recording must route to the $recording_overlay_reference reference"
