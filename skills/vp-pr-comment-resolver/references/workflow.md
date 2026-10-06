@@ -52,7 +52,13 @@ For fixes, push only when authorized and verify the PR's remote head contains th
 commit before replying or resolving. If the fix is not on the PR head, leave the
 thread open and report the pending push.
 
-Reply after the evidence exists. Reply to actionable submitted-review bodies in
+Reply after the evidence exists. A request to process or resolve this PR's
+feedback authorizes routine evidence-backed replies and handled bot-thread
+resolutions without per-message approval. Respect read-only, draft-only, and
+explicit approval constraints; pause for unresolved human decisions or material
+risk under the entrypoint's authorization rules.
+
+Reply to actionable submitted-review bodies in
 the PR conversation, identifying and linking the original review because GitHub
 has no top-level review reply mutation. Resolve handled bot review threads;
 leave human threads open for the reviewer unless the user explicitly directs
