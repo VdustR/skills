@@ -1,6 +1,12 @@
 # Decision Tree
 
-Ask:
+First look for a repository spelling policy in cspell configuration comments,
+contributor or agent documentation that names cspell, and repository-local
+spelling skills. Follow it for the cases it covers, including dictionary
+formatting, directive explanations, and term-promotion thresholds. Existing
+local directives alone do not establish a policy.
+
+For cases the policy does not cover, or when no policy exists, ask:
 
 1. Is the source text misspelled? Correct it.
 2. Is there a canonical product, API, person, or domain spelling? Use that form.
@@ -8,9 +14,8 @@ Ask:
    narrowest repository dictionary. Search first: if a dictionary already
    lists it, add nothing; if local directives in other files already list it,
    it is reused, so add it and delete those directives.
-4. Is it an intentional one-off token? Use a local directive. A repository
-   convention of local directives covers one-off tokens only; it does not make
-   a recurring term local.
+4. Is it an intentional one-off token? Use a local directive. Under these
+   defaults, repeated local directives do not make a recurring term local.
 5. Is the content generated, encoded, or structurally unsuitable for spelling
    checks? Use a narrow ignore pattern or exclude the generated source.
 

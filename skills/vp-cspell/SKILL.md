@@ -10,7 +10,18 @@ description: >-
 Fix the text when it is wrong. Configure cspell only when the spelling is
 intentional and the repository owns an appropriate configuration surface.
 
-## Decision Order
+## Repository Policy
+
+Before using the decision order, look for the repository's spelling policy in
+cspell configuration comments, contributor or agent documentation that names
+cspell, and repository-local spelling skills. Follow that policy, including
+dictionary formatting, directive explanations, and term-promotion thresholds.
+Use the defaults below only for cases the policy does not cover.
+
+When no policy exists, use these defaults. Existing local directives are
+evidence of word usage, not a spelling policy; do not copy them as a convention.
+
+## Default Decision Order
 
 1. Correct an actual typo.
 2. Reuse an established repository spelling or canonical product name.
