@@ -15,6 +15,11 @@ description: >-
 Write the smallest summary that lets the intended reader decide whether the
 artifact concerns them and what, if anything, they need to do.
 
+Read and apply `$vp-clear-writing` for wording, customary domain terminology,
+cross-language expression, and preservation of necessary context and uncertainty.
+This skill owns summary selection and scope; the shared writing skill does not
+add sections or extend the task beyond the summary.
+
 ## Follow the artifact
 
 Apply instructions in this order:
@@ -76,7 +81,8 @@ summary. See `references/rewrite.md` for the update check.
 Ensure the first sentence carries the main point, each remaining sentence earns
 its place, and the summary does not contradict the body. Remove filler,
 unsupported intensifiers, process narration, and detail that belongs in the
-body. Use `references/anti-slop.md` for the final language check.
+body. Apply the final language check from `$vp-clear-writing`; use
+`references/anti-slop.md` for summary-specific omissions and overclaims.
 
 Use a workflow-specific skill when the user needs investigation, review,
 verification, lifecycle work, or edits beyond the summary. Apply this skill to
@@ -84,6 +90,8 @@ the summary portion only when the user requests its TL;DR logic there.
 
 ## Related skills
 
+- [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
+  for shared wording and terminology guidance after selecting summary content.
 - [`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator)
   when the summary opens a problem investigation or issue.
 - [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)

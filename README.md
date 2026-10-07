@@ -60,6 +60,11 @@ npx -y skills@1.5.3 remove vp-chrome-profiles -g -y
 Stacked-change guidance moved out of `vp-git` into `vp-stacked-pr`. Install both
 if you work with stacks.
 
+`vp-tldr` uses `vp-clear-writing` for shared writing guidance. Install both when
+selecting individual skills. Installing either skill does not make it an
+always-on writing policy; reference it from your agent instructions when that
+is the desired behavior.
+
 ## Skills
 
 ### vp-agent-browser-session
@@ -75,6 +80,11 @@ release follow-up when repository policy permits.
 ### vp-checklist-runner
 
 Parse and verify GitHub PR/issue checklists, auto-checking items that pass verification.
+
+### vp-clear-writing
+
+Write clear, concrete prose across languages and formats while preserving meaning,
+necessary context, evidence, and customary domain terminology.
 
 ### vp-cspell
 
