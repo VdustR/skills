@@ -15,6 +15,48 @@ browsers have not been tested."
 
 Do not add a performance claim or infer production success from these facts.
 
+## Describe the test environment instead of a local alias
+
+Source: a notification-diagnosis PR calls screenshots "physical-device
+screenshots" while naming an `android_lab` emulator. Its evidence notes identify
+a Pixel 8 emulator, Android 16 / API 36, and staging; iOS was not tested.
+
+Weak: "Physical-device screenshots — android_lab emulator (Android 16)."
+
+Clear: "Screenshots from a Pixel 8 emulator running Android 16 (API 36), against
+staging. iOS has not been tested."
+
+The alias adds no verification scope, while "physical-device" contradicts the
+source. If a reproduction procedure needs the exact local target, retain it
+there: "On the author's workstation, the emulator is named `android_lab`."
+Do not imply physical-device coverage or drop the model and OS with the alias.
+
+## Explain references and session shorthand
+
+Source: issue 42 tracks final notification copy and translations. They must be
+ready before enabling the feature in production.
+
+Weak: "Wait for #42, then lift the gate as discussed."
+
+Clear: "Keep the feature disabled in production until the final notification
+copy and translations tracked in issue 42 are ready."
+
+In an actual artifact, link "final notification copy and translations" to the
+supplied issue URL. Do not invent a URL or assume a number identifies the same
+issue across repositories. Explain the dependency rather than making the reader
+retrieve the conversation.
+
+Source: the author calls a change "the green path"; it retries a failed push-token
+registration. Only the retry test passed.
+
+Weak: "The green path is fixed."
+
+Clear: "The app can now retry a failed push-token registration. The retry test
+passes; notification delivery has not been verified."
+
+Replace the improvised label with the behavior and keep the evidence boundary.
+If the source omits what the label means, do not guess its expansion.
+
 ## Keep customary terms across languages
 
 For a Traditional Chinese software-development audience:

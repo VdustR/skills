@@ -27,6 +27,19 @@ Put the answer, finding, decision, or required action early when that helps the
 reader. Supply the premise needed to understand it. If the reader is confused,
 identify and explain the missing context instead of merely shortening the text.
 
+Write for someone who has not seen the author's session. Replace local aliases,
+unexplained numbers, improvised labels, and references such as "the earlier fix"
+with the object's role and the premise needed to understand the claim. For useful
+traceability, pair an identifier or link with a descriptive name; a link alone
+does not explain why the reference matters.
+
+Keep details that change the reader's judgment: for verification, these may
+include physical device versus emulator, model, OS, environment, tested behavior,
+and limits. Put session-specific names or handles in reproduction or evidence
+notes when needed to locate the exact resource. Do not delete necessary facts
+along with an alias, expand terms the audience already knows, or invent missing
+details; qualify or ask about a gap when it affects interpretation.
+
 ## Preserve meaning and evidence
 
 - Keep conditions, causes, sequence, limitations, and uncertainty that affect
@@ -93,7 +106,10 @@ would help resolve a wording or context decision.
 
 ## Check the result
 
-Check that the reader can understand the main point, the necessary context, and
+Read the text as if the conversation and local setup were unavailable. Check
+that names, references, and evidence labels explain what they refer to without
+implying a broader result than the source supports. Check that the reader can
+understand the main point, the necessary context, and
 any action or limitation. Confirm that edits preserved the source's meaning and
 evidence, that terms are customary and consistent, and that the form fits the
 artifact. Return the requested output; add an editing explanation only when it
