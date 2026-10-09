@@ -86,6 +86,56 @@ a new token or ask the user to sign in again."
 The explanation is longer because the missing sequence is what makes the issue
 understandable. Do not select a remedy the evidence has not established.
 
+## Connect the problem, solution, and value
+
+Source: when a CSV import contains an invalid row, validation rejects the import
+with a generic error. Users cannot tell which row to correct. A proposal would
+include the row number and invalid field in the error. It has not been implemented
+or tested, and no time savings have been measured.
+
+Weak: "Add structured validation metadata to optimize the import experience."
+
+Clear: "An invalid row currently stops the CSV import with a generic error, so
+users cannot tell which row to correct. The proposal would name the row and
+invalid field in the error, giving users a specific place to fix before retrying.
+It has not been implemented or tested; any time savings remain unmeasured."
+
+The explanation ties the proposed information to the user's difficulty and
+expected benefit. It does not claim that imports will succeed, all errors will
+be resolved, or correction will be faster by an invented amount.
+
+## Order details by the reader's next question
+
+Source: a proposal would add a search index for order history. Customers currently
+need to scroll through that history to find an old order. No search performance
+has been tested. The reader is a product manager unfamiliar with indexing.
+
+Weak: "Build an index and tune retrieval. This will transform discovery.
+Customers currently scroll through order history."
+
+Clear: "Customers currently scroll through their order history to find an old
+order. The proposal would let them search for it instead. A search index would
+organize the order data so the system can look up matching orders. Search
+performance has not been tested."
+
+The problem establishes why search matters before the implementation detail
+appears. For a reader already familiar with the problem, the proposal could come
+first. Neither order proves a speed improvement or requires extra headings.
+
+## Leave an unsupported argument incomplete
+
+Source: "Add a cache to fix stale order totals." The draft provides no evidence
+about the cause, how the cache would work, or why it would correct stale values.
+
+Clear: "The proposal is to add a cache to address stale order totals. The draft
+does not establish what causes the stale values or how a cache would correct
+them. That connection needs evidence before this can be presented as a fix."
+
+When asked only to revise the draft, explain the gap without investigating,
+selecting an alternative solution, or inventing a causal link. If the task
+requires a recommendation, request the missing evidence or route investigation
+through the relevant workflow within the user's authorization.
+
 ## Explain a code constraint
 
 Source: the provider's request signature depends on the original parameter order.

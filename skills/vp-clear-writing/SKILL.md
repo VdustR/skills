@@ -3,6 +3,7 @@ name: vp-clear-writing
 description: >-
   Write or revise clear, concrete prose across languages for user-facing replies,
   documents, code comments, review comments, and pull request descriptions.
+  Make problems, solutions, and value understandable in a logical reading order.
   Preserve meaning, necessary context, and uncertainty while removing empty
   rhetoric. Boundary: improves expression; use vp-tldr to select summary content
   and the relevant workflow to investigate, verify, or publish it.
@@ -39,6 +40,40 @@ and limits. Put session-specific names or handles in reproduction or evidence
 notes when needed to locate the exact resource. Do not delete necessary facts
 along with an alias, expand terms the audience already knows, or invent missing
 details; qualify or ask about a gap when it affects interpretation.
+
+## Build an explanation the reader can follow
+
+When explaining a problem or proposing a change, connect the situation, problem,
+consequence, solution, and value. Explain who encounters the problem, when it
+occurs, and what becomes difficult or impossible. Show how the proposed behavior
+addresses that problem and what becomes better for the reader or affected user.
+A feature list or claim such as "improves the experience" does not establish
+that connection.
+
+Distinguish the symptom from a demonstrated cause, a proposed remedy from an
+implemented change, and expected value from an observed result. If the source
+does not establish a cause, remedy, or benefit, preserve that gap or ask when it
+is essential to the task. Do not invent a rationale, promise an outcome, or imply
+that one change solves a broader problem to make the argument feel complete.
+
+Choose the order by what the reader needs to understand next. A decision or
+result can come first, followed by the context and reasoning that support it;
+an unfamiliar mechanism may need a brief premise first. Introduce concepts and
+conditions before relying on them. Keep each paragraph centered on one point,
+then make its relationship to the next clear: cause, consequence, response,
+tradeoff, or evidence. Use transitions that explain that relationship rather
+than merely announcing the next topic.
+
+Keep implementation details beside the behavior or constraint they explain.
+Move supporting detail later when it interrupts the main reasoning, but retain
+conditions and limitations beside claims they qualify. Use a concrete example
+when an abstract description leaves the trigger, behavior, or benefit unclear;
+label illustrative examples and do not present them as observed evidence.
+
+These are reasoning checks, not mandatory headings or a fixed narrative order.
+Use only the connections relevant to the requested artifact. A one-line reply
+or code comment may need only a result and its reason; a proposal may need the
+full argument. Preserve a supplied template and clarify the connections within it.
 
 ## Preserve meaning and evidence
 
@@ -108,12 +143,16 @@ would help resolve a wording or context decision.
 
 Read the text as if the conversation and local setup were unavailable. Check
 that names, references, and evidence labels explain what they refer to without
-implying a broader result than the source supports. Check that the reader can
-understand the main point, the necessary context, and
-any action or limitation. Confirm that edits preserved the source's meaning and
-evidence, that terms are customary and consistent, and that the form fits the
-artifact. Return the requested output; add an editing explanation only when it
-is requested or helps assess a material change.
+implying a broader result than the source supports. Check whether each sentence
+has a clear referent and purpose, and whether the reader has the premise needed
+to understand it at that point. For a problem or proposal, can the reader explain
+what goes wrong, why it matters, how the response addresses it, and what value
+is supported or still expected? Repair missing links rather than adding generic
+benefit claims. Check that the reader can understand the main point, the
+necessary context, and any action or limitation. Confirm that edits preserved
+the source's meaning and evidence, that terms are customary and consistent,
+and that the form fits the artifact. Return the requested output; add an editing
+explanation only when it is requested or helps assess a material change.
 
 ## Related skills
 
