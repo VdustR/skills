@@ -43,6 +43,23 @@ or publishing anything.
     for retrying failed push-token registration; its retry test passed, but
     notification delivery is unverified. Then consider the same draft without
     the label's definition: do not guess the behavior.
+13. Revise a proposal for a nontechnical reader: "Add structured validation
+    metadata to optimize the import experience." Facts: an invalid CSV row
+    stops the import with a generic error; users cannot identify the row to
+    correct. The proposal would name the row and invalid field in the error.
+    It is not implemented or tested; time savings are unmeasured.
+14. Explain a proposal to a product manager unfamiliar with indexing: "Build
+    an index and tune retrieval. This will transform discovery. Customers
+    currently scroll through order history." Facts: the proposed search would
+    let customers look up old orders; an index organizes order data for matching
+    lookups. Search performance is untested. Make the sequence understandable
+    without deleting the implementation detail or forcing extra sections.
+15. Revise "Add a cache to fix stale order totals." No cause, cache design, or
+    evidence linking the proposal to correct totals is supplied. The request
+    is only to edit the text, not investigate or implement a remedy.
+16. Reply in one sentence to "What changed?" Facts: import errors now name the
+    invalid row and field so users can locate what to correct. Do not expand
+    this into a proposal or impose problem, solution, and value headings.
 
 ## Expected Behavior
 
@@ -67,6 +84,17 @@ or publishing anything.
   issue number. Use a descriptive link when supplied, without inventing a URL.
 - Replace the defined improvised label with concrete behavior and limited test
   evidence. With an undefined label, identify the gap instead of inventing facts.
+- Connect the import trigger, current difficulty, proposed error information,
+  and expected ability to locate a correction. Keep the proposal and measured
+  results distinct; do not promise successful imports or quantified savings.
+- Establish why order search matters and explain the index where it supports
+  the proposed behavior. Preserve the untested performance limit and do not
+  replace causal connections with generic praise or topic transitions.
+- For the cache draft, make the missing causal link visible without inventing
+  a cause or benefit, conducting an investigation, or executing a change.
+- Keep the one-sentence reply focused on changed behavior and its purpose.
+  Treat the argument checks as context-dependent reasoning, not a universal
+  template, required headings, or a fixed order for every artifact.
 
 ## Regression Coverage
 
@@ -74,7 +102,8 @@ Cross-language terminology, missing context, evidence preservation, customary
 original-language terms, context-specific structure, summary composition,
 necessary contrasts, reader-independent references, local alias placement,
 device evidence labels, unknown shorthand, and the boundary between drafting
-and execution.
+and execution, problem-solution-value connections, progressive explanation,
+implementation detail placement, unsupported causal arguments, and short replies.
 
 Static repository validation checks format and parser compatibility; it does not
 prove these decisions. Record a manual decision walkthrough or an independent

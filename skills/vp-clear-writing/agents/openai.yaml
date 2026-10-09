@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Clear Writing"
-  short_description: "Write clear, concrete prose across languages and formats"
-  default_prompt: "Use $vp-clear-writing to write or revise this text for readers without the author's session context while preserving meaning, useful technical details, and uncertainty."
+  short_description: "Explain problems, solutions, and value in a clear reading order"
+  default_prompt: "Use $vp-clear-writing to write or revise this text so readers can follow the problem, solution, and supported value without the author's session context. Preserve meaning, useful technical details, uncertainty, and the requested format."
