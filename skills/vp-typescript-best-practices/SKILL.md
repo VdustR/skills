@@ -64,6 +64,8 @@ Read only the reference relevant to the task:
   literals, conditional spreads, mapped fixtures, and assertions.
 - [Runtime schemas](references/runtime-schemas.md): validation and schema input
   versus output types.
+- [Public API contracts](references/public-api.md): inference sources, literal
+  results, mutation, and shared data.
 - [Type patterns](references/type-patterns.md): relationships and valid states.
 - [Exhaustive unions](references/union-exhaustive.md): closed variants and guards.
 - [Type testing](references/type-testing.md): assignability and negative tests.

@@ -11,5 +11,8 @@ Use types to express relationships and valid states:
 Prefer a small readable union over a clever general abstraction. Do not widen
 types or add optional fields merely to accommodate one invalid state.
 
+For inference sources and mutation/sharing decisions, use
+[public API contracts](public-api.md).
+
 When a type transformation becomes hard to explain, add representative
 type-level tests and consider whether a runtime abstraction would be clearer.
