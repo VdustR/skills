@@ -118,6 +118,11 @@ GitHub platform behavior: attaching media and files to issues and PRs, markdown 
 
 Use structured questions to align on requirements before planning or complex tasks.
 
+### vp-interaction-design
+
+Design and review user intents, interface states, action outcomes, information
+needs, and recovery. Pair with Impeccable for frontend visual direction and craft.
+
 ### vp-issue-investigator
 
 Validate a suspected software problem, find related work, and prepare or file an
