@@ -20,7 +20,7 @@ PLAYWRIGHT_BROWSERS_PATH=.cache/playwright npx playwright install chromium
 npm run validate:browser
 ```
 
-The TypeScript suite runs 37 tests using TypeScript 6.0.3, strictest 2.0.8,
+The TypeScript suite runs 47 tests using TypeScript 6.0.3, strictest 2.0.8,
 ts-reset 0.6.1, Zod 4.6.7, and Node declarations 22.20.5. These are verification
 dependencies, not versions the skill imposes on a consumer repository. Local
 execution uses Node 26.12.0; CI uses the Node 22 line.
@@ -95,7 +95,32 @@ The same seed/restore assertions also execute locally. A local sample measured
 597 ms cold and 119 ms warm for two projects; one sample is not a benchmark or
 a production speedup claim.
 
-## Independent forward test
+## Code-contract guidance verification
+
+Four focused changes cover construction checks, runtime validation, public API
+contracts, and type-design cost. Ten additional tests directly execute the
+published examples or their documented verification commands:
+
+| Area | Executed evidence and self-review outcome |
+| --- | --- |
+| Construction | Both conditional branches reject inserted unknown fields, including the empty branch; removing its local contract reproduces the missed diagnostic. Active/inactive button behavior remains unchanged. Existing map, JSX, structural-typing, and union-variant regressions still apply. |
+| Runtime contracts | A subset predicate compiles but fails in the false branch at runtime. Published guards exercise numeric boundaries and rejected values. Assertion-function failure paths execute. Published Zod output, strictness, coercion controls, key-retention policies, and transformation order are checked. Schema policy is selected per caller, rather than prescribed globally. |
+| Public APIs | The published `pick` retains its literal union, rejects a dependent value outside the choices, and checks runtime membership. Removing `NoInfer` makes a negative consumer assertion unused. The published snapshot accepts frozen inputs, isolates array storage, and demonstrably shares nested references; it does not promise deep immutability. |
+| Type performance | Execute the published diagnostic and trace commands on an 80-property consumer; verify actual checking and trace artifacts. Widening the path API invalidates the same negative consumer tests. No elapsed-time threshold or speedup claim is inferred from this test. |
+
+Each topic received a source/diff and example review before the next topic. Final
+integration reviews the entrypoint, metadata, existing references, and regression
+suite together. This is author self-review with executable checks, not an
+independent agent trial or a guarantee of improved behavior for every request.
+
+Manual routing walkthroughs select consumer contracts for fixture/spread work,
+runtime validation for a custom guard or parsing policy, public API contracts
+for generic inference or sharing, and type performance for slow checking. They
+retain project setup for environment/config work and avoid configuration or
+dependency changes for a code-only request. Existing instruction coverage is
+preserved; the earlier trimming candidate was not adopted.
+
+## Independent project-setup forward test
 
 One independent agent received the candidate skill and a realistic task: build
 a single library with two optional browser hosts defining incompatible `$`,
@@ -131,7 +156,7 @@ initial review.
 
 ## Independent description routing trial
 
-A second agent saw only the current repository skill names/descriptions and 12
+A second agent saw only the repository skill names/descriptions at that trial and 12
 requests, without skill bodies, prior conclusions, or expected answers. Its first
 classification matched the expected primary route for all 12:
 
