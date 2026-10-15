@@ -82,10 +82,15 @@ Compiler validation remains necessary.
 The CI `cache-seed` job builds a two-project composite fixture and saves outputs,
 build info, sources and their hash manifest through GitHub Actions cache. On a
 fresh runner, `cache-restore` requires an exact-key hit, verifies hashes and
-lockfile, requires an unchanged build to reuse both projects, then changes a
+lockfile and emitted contracts, requires a subsequent unchanged build to reuse
+both projects, then changes a
 shared public type and requires downstream TS2322. The cache key includes OS,
 run/attempt, lockfile and the generator script containing all fixture inputs.
-This is a provider round-trip test, not a production task-cache configuration.
+A fresh runner's npm install can make the extended strictest config newer than
+restored outputs; the compiler may revalidate and update unchanged timestamps
+on the first build. The test allows that work, verifies identical emitted
+contracts, then requires the next build to skip both projects. This is a provider
+round-trip test, not a production task-cache configuration.
 The same seed/restore assertions also execute locally. A local sample measured
 597 ms cold and 119 ms warm for two projects; one sample is not a benchmark or
 a production speedup claim.

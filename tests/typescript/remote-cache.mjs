@@ -36,6 +36,12 @@ if (phase === 'seed') {
   const manifest = JSON.parse(readFileSync(join(directory, 'manifest.json'), 'utf8'));
   assert.equal(manifest.lock, hash(join(root, 'package-lock.json')));
   for (const [file, expected] of Object.entries(manifest.artifacts)) assert.equal(hash(join(directory, file)), expected, file);
+  const restored = build(); assert.equal(restored.status, 0, restored.output);
+  // A fresh npm install can make extended configs newer than restored outputs.
+  // Allow compiler revalidation, but require the emitted contract to be identical.
+  for (const file of artifacts.filter(file => !file.endsWith('.tsbuildinfo'))) {
+    assert.equal(hash(join(directory, file)), manifest.artifacts[file], file);
+  }
   const warm = build(); assert.equal(warm.status, 0, warm.output);
   assert.match(warm.output, /is up to date/);
   assert.doesNotMatch(warm.output, /Building project/);

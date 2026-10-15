@@ -89,8 +89,10 @@ untested framework/tool combinations. Do not claim speed improvements without
 comparable measurements or complete coverage from successful exit status alone.
 
 When remote caching is used, save outputs and build info on one runner and
-restore them on a fresh runner. Verify artifact hashes and an unchanged build,
-then edit a dependency contract and require fresh downstream diagnostics. A
+restore them on a fresh runner. Verify artifact hashes and unchanged outputs.
+Inspect any timestamp-based revalidation after dependency installation, then
+require a subsequent unchanged build to reuse state. Edit a dependency contract
+and require fresh downstream diagnostics. A
 local directory copy does not verify the remote provider. Keep a verification
 cache isolated from production caches, require an exact-key hit, and include
 all generated-fixture inputs in its key.

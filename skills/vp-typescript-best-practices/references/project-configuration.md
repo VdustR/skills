@@ -265,7 +265,10 @@ Give each package/environment/build variant a unique writable `tsBuildInfoFile`
 in ignored cache storage. Never let concurrent projects write the same state or
 output directory. Preserve incremental state locally; run cold checks in isolated cache storage rather
 than deleting unrelated caches. Composite outputs and build info must remain
-consistent when restored.
+consistent when restored. A fresh dependency install can give extended package
+configs newer timestamps than restored outputs, causing build-mode revalidation
+even when their contents match. Inspect the verbose reason and unchanged
+outputs before classifying that work as a cache miss or claiming a skipped check.
 
 For task or CI caches, include compiler/tool versions, lockfiles, effective
 configs and their extended bases, source inputs, relevant environment values,
