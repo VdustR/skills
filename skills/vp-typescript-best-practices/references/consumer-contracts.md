@@ -14,7 +14,7 @@ Choose the mechanism for the contract:
 exact-object type, a cast, or a runtime validator. Do not promise that inference
 is completely unchanged. Index signatures deliberately accept extra keys.
 
-## Put checks where literals are fresh
+## Check values at their construction site
 
 ```ts
 type Option = { label: string; value: string };
@@ -33,18 +33,32 @@ fixture contracts from the actual consumer instead of maintaining a second type.
 type Props = { disabled: boolean; onClick?: () => void };
 const action = true;
 const props = {
+  disabled: false,
   ...(action
-    ? ({ disabled: false, onClick: () => {} } satisfies Partial<Props>)
-    : ({ disabled: true } satisfies Partial<Props>)),
-};
+    ? ({ onClick: () => {} } satisfies Partial<Props>)
+    : ({} satisfies Partial<Props>)),
+} satisfies Props;
 ```
 
-An outer `satisfies` cannot restore excess-property checking for fields that
-arrived through a spread; check each property-bearing literal branch. JSX
-spreads have the same issue. Use the selected variant for union props, such as
-`Partial<Extract<PropsUnion, { kind: "link" }>>`. If a branch must supply a
-required property, use a contract that requires it rather than only `Partial`.
-Existing objects still get structural assignability checks, not exact keys.
+The outer check verifies the assembled required fields. Branch checks reject
+unexpected fields introduced inside a spread. Check both branches when they
+represent the same consumer contract, including an empty branch that may gain
+fields later. When changing a branch, verify its construction check still rejects
+an unknown field; an empty object alone does not establish that check.
+
+JSX spreads have the same freshness boundary. For union props, choose the
+intended variant, such as `Partial<Extract<PropsUnion, { kind: "link" }>>`.
+Use `Partial` only for a fragment whose required fields are supplied elsewhere;
+a branch responsible for a required property needs a contract that requires it.
+Existing objects still receive structural assignability checks, not exact keys.
+
+## Keep fixture contracts tied to their consumer
+
+Derive an option element from the receiving function's public parameter, or use
+a framework's prop helper for a component. Choose the applicable overload or
+variant rather than treating a broad union as the intended contract. Keep the
+check where the factory or callback creates the value; an output array annotation
+does not restore freshness inside its callbacks.
 
 Use typed full defaults in factories, then apply typed overrides. Avoid
 `as Entity`, `as unknown as Entity`, and non-null assertions to hide missing
