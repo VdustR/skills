@@ -18,7 +18,7 @@ node --test --test-concurrency=1 tests/typescript/*.test.mjs
 npm run validate
 ```
 
-The TypeScript suite runs 22 tests using TypeScript 6.0.3, strictest 2.0.8,
+The TypeScript suite runs 24 tests using TypeScript 6.0.3, strictest 2.0.8,
 ts-reset 0.6.1, Zod 4.6.7, and Node declarations 22.20.5. These are verification
 dependencies, not versions the skill imposes on a consumer repository.
 
@@ -31,6 +31,7 @@ dependencies, not versions the skill imposes on a consumer repository.
 | Strictest | Effective installed flags, exact optional properties, and nullable indexed reads checked against a strict-only control |
 | Environment isolation | Browser, worker, Node and portable projects accept their own APIs and reject unavailable globals |
 | Third-party globals | Synthetic hosts' incompatible `$` globals isolate; wrong-host members fail; import, triple-slash reference, and barrel leakage expose collisions with declaration checking enabled |
+| Runtime resolution | Emitted imports retain `paths` aliases and fail without a runtime resolver; a higher `lib` with a lower `target` does not supply a missing runtime API |
 | Compiler graph | Composite dependencies build in order, unchanged build mode reuses state, a public-type edit invalidates downstream checks, and `tsc -p` on an empty solution is demonstrated false green |
 | Diagnostic coverage | Handwritten declarations with/without `skipLibCheck`, JavaScript with/without `checkJs`, `@ts-nocheck`, hidden/tool/type-test files, uncovered source, and missing environment rows exercised |
 | Incremental invalidation | Warm checks catch source, dependency-type and extended-config edits; emitted variants use distinct output and build-info paths |
@@ -66,6 +67,40 @@ compatibility exception. That was a trial-specific choice. The committed tests
 instead exercise Node16/Node16 for CommonJS; the skill requires selecting settings
 for the actual loader and compiler rather than prescribing that legacy pair.
 
+A subsequent independent technical review found that the shared JSON base
+example omitted `lib`, allowing TypeScript's default DOM declarations into a
+core leaf that only extended the example. The separate test harness had an
+ES-only base and therefore did not expose the example defect. The example now
+sets `lib: ["ES2022"]`; a regression directly loads the Markdown JSON and
+verifies that a portable leaf rejects `document` while an explicit browser leaf
+accepts it. This review found one defect before correction, not an all-clear
+initial review.
+
+## Independent description routing trial
+
+A second agent saw only the current repository skill names/descriptions and 12
+requests, without skill bodies, prior conclusions, or expected answers. Its first
+classification matched the expected primary route for all 12:
+
+| Request | Primary route observed |
+| --- | --- |
+| A: `.mts` helper preserving literal-key types and type tests | TypeScript |
+| B: one library with two host `$` declarations | TypeScript |
+| C: one library's ESM/CJS builds and declarations | TypeScript |
+| D: worker incorrectly sees `document` | TypeScript |
+| E: warm cache hides unchecked `.tsx` files | TypeScript |
+| F: strictest/reset setup with library consumers preserved | TypeScript |
+| G: Python-only monorepo layout | None |
+| H: zsh `$` escaping | None |
+| I: Zod major-version upgrade | Dependency upgrade |
+| J: author-side GitHub review comment resolution | PR comment resolver; TypeScript secondary |
+| K: one narrowing fix with settings/dependencies unchanged | TypeScript; configuration changes out of scope |
+| L: plain JavaScript runtime global coexistence | None |
+
+The [raw requests and classifications](vp-typescript-routing-results.json) are
+retained for re-evaluation. This is a one-run catalog-choice trial, not a measurement of every client's
+actual automatic invocation. The setup trial and routing trial are distinct.
+
 ## Limits and discoveries
 
 - Synthetic host packages and Node-injected globals establish compile-time
@@ -83,3 +118,6 @@ for the actual loader and compiler rather than prescribing that legacy pair.
   portability. The schema reference explains checking dependency globals.
 - Smoke routing scenarios include positive and negative requests, but this work
   does not measure every client's automatic skill selection.
+
+Skill Creator's frontmatter validator also passed in an isolated PyYAML 6.0.3
+environment; no global Python package installation was required.

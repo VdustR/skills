@@ -1,0 +1,128 @@
+{
+  "method": "Independent descriptions-only catalog-choice trial; no expected answers supplied.",
+  "requests": [
+    {
+      "id": "A",
+      "request": "Write a .mts helper whose generic return type preserves the literal keys of its input, and add type-level tests."
+    },
+    {
+      "id": "B",
+      "request": "One TypeScript library supports two optional browser integrations. Both integrations declare different global $. Design their compiler configuration."
+    },
+    {
+      "id": "C",
+      "request": "Build the same TypeScript library source for ESM and CommonJS, including declarations. It is a single package."
+    },
+    {
+      "id": "D",
+      "request": "A worker TypeScript file compiles with document even though that API does not exist there. Audit the environment types."
+    },
+    {
+      "id": "E",
+      "request": "Our type-check command reports a warm cache hit but newly added .tsx files never get checked. Verify coverage and cache invalidation."
+    },
+    {
+      "id": "F",
+      "request": "Set up @tsconfig/strictest and Matt Pocock's ts-reset for our application without changing public library consumers."
+    },
+    {
+      "id": "G",
+      "request": "Propose package layout for a Python-only monorepo. There is no JavaScript or TypeScript code."
+    },
+    {
+      "id": "H",
+      "request": "Explain escaping $ in a zsh string."
+    },
+    {
+      "id": "I",
+      "request": "Upgrade our installed Zod dependency from major 3 to major 4 and investigate breaking changes."
+    },
+    {
+      "id": "J",
+      "request": "Address and resolve the author's existing GitHub pull request review comments, including one about a TypeScript handler."
+    },
+    {
+      "id": "K",
+      "request": "Fix a TypeScript narrowing error in one function. Keep compiler settings and dependencies unchanged."
+    },
+    {
+      "id": "L",
+      "request": "Two plain JavaScript scripts overwrite the same runtime global $. Explain their runtime coexistence options; no TypeScript configuration is involved."
+    }
+  ],
+  "results": [
+    {
+      "id": "A",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "Directly covers .mts implementation, type-level API design, and type tests."
+    },
+    {
+      "id": "B",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "Directly covers multiple tsconfigs, library integrations, and conflicting ambient globals."
+    },
+    {
+      "id": "C",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "Directly covers TypeScript project configuration and environment-specific builds in a single package; dual module outputs and declarations fit that scope."
+    },
+    {
+      "id": "D",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "Directly covers environment-specific TypeScript configuration and ambient globals; the request concerns inaccurate environment types."
+    },
+    {
+      "id": "E",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "Explicitly covers incremental caches and type-check coverage, including .tsx files."
+    },
+    {
+      "id": "F",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "Explicitly covers strictest and ts-reset setup, with the application versus public-consumer boundary guiding their placement."
+    },
+    {
+      "id": "G",
+      "primary": "none",
+      "secondary": null,
+      "reason": "No catalog skill directly owns Python-only monorepo package design; the TypeScript skill explicitly excludes non-TypeScript monorepo setup."
+    },
+    {
+      "id": "H",
+      "primary": "none",
+      "secondary": null,
+      "reason": "Shell escaping is not directly covered by any catalog description."
+    },
+    {
+      "id": "I",
+      "primary": "vp-deps-upgrade",
+      "secondary": null,
+      "reason": "A major-version change within the same installed dependency directly belongs to dependency upgrades and breaking-change analysis."
+    },
+    {
+      "id": "J",
+      "primary": "vp-pr-comment-resolver",
+      "secondary": "vp-typescript-best-practices",
+      "reason": "The author-side review workflow owns verifying, fixing, replying to, and resolving existing comments; the TypeScript skill can guide the handler fix."
+    },
+    {
+      "id": "K",
+      "primary": "vp-typescript-best-practices",
+      "secondary": null,
+      "reason": "A function-level TypeScript narrowing fix directly fits; the explicit constraint narrows the work to code changes without configuration or dependency changes.",
+      "configuration_changes_in_scope": false
+    },
+    {
+      "id": "L",
+      "primary": "none",
+      "secondary": null,
+      "reason": "The request concerns runtime coexistence of plain JavaScript globals and explicitly excludes TypeScript configuration; no catalog skill directly owns that explanation."
+    }
+  ]
+}

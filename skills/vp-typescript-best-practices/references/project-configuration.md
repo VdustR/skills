@@ -101,6 +101,7 @@ and JSX options for the actual runtime and compiler:
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2022"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "incremental": true,

@@ -215,3 +215,45 @@ test("selected and DOM reset imports work under Bundler and NodeNext resolution"
     w.pass();
   }
 });
+
+test("the published shared base excludes DOM until a leaf explicitly adds it", (t) => {
+  const w = workspace(t);
+  const [base] = blocks("project-configuration.md", "json").map(JSON.parse);
+  w.json("published-base.json", base);
+  w.write("src/index.ts", "export const title = document.title;");
+  w.json("core.json", { extends: "./published-base.json", include: ["src/**/*.ts"] });
+  w.fail(2584, "core.json");
+  w.json("browser.json", { extends: "./published-base.json", compilerOptions: { lib: ["ES2022", "DOM"] }, include: ["src/**/*.ts"] });
+  w.pass("browser.json");
+});
+
+test("paths do not rewrite runtime imports and lib/target do not polyfill APIs", (t) => {
+  const w = workspace(t);
+  w.write("src/value.ts", "export const value = 1;");
+  w.write("src/alias.mts", 'import { value } from "@fixture/value"; export { value };');
+  w.config("alias.json", {
+    compilerOptions: { noEmit: false, rootDir: "src", outDir: "out", paths: { "@fixture/*": ["./src/*"] } },
+    include: ["src/**/*.ts", "src/**/*.mts"],
+  });
+  let result = w.cli("-p", "alias.json");
+  assert.equal(result.status, 0, result.output);
+  assert.match(w.read("out/alias.mjs"), /from "@fixture\/value"/);
+  result = w.command(process.execPath, ["out/alias.mjs"]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /ERR_MODULE_NOT_FOUND/);
+  w.write("src/sorted.mts", "export function sorted() { return [2, 1].toSorted(); }");
+  w.config("sort.json", {
+    compilerOptions: { noEmit: false, target: "ES2015", lib: ["ES2023"], rootDir: "src", outDir: "sort-out" },
+    include: ["src/sorted.mts"],
+  });
+  result = w.cli("-p", "sort.json");
+  assert.equal(result.status, 0, result.output);
+  result = w.command(process.execPath, ["--input-type=module", "-e", `
+    Array.prototype.toSorted = undefined;
+    const { sorted } = await import("./sort-out/sorted.mjs");
+    let rejected = false;
+    try { sorted(); } catch (error) { if (!(error instanceof TypeError)) throw error; rejected = true; }
+    if (!rejected) throw new Error("Expected missing runtime API");
+  `]);
+  assert.equal(result.status, 0, result.output);
+});
