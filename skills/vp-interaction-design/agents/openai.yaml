@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Interaction Design"
+  short_description: "Design intents, UI states, action outcomes, and recovery"
+  default_prompt: "Use $vp-interaction-design to design or review this interaction's user intents, states, information needs, action outcomes, and recovery, together with Impeccable for frontend design."
