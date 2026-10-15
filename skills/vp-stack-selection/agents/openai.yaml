@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Stack Selection"
+  short_description: "Compare ecosystems against project requirements"
+  default_prompt: "Use $vp-stack-selection to compare ecosystem capabilities, maturity, and technical costs for this project, applying TypeScript/Rust preferences when alternatives are comparable."
