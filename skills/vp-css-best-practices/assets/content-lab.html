@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content resilience experiments</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 16px; font: 16px/1.5 system-ui; background: #fff; color: #17212b; }
+  main { max-inline-size: 54rem; margin-inline: auto; min-inline-size: 0; }
+  h1, h2 { line-height: 1.3; overflow-wrap: anywhere; }
+  section { margin-block: 2rem; min-inline-size: 0; }
+  button { font: inherit; min-block-size: 44px; padding: .5rem; }
+  :focus-visible { outline: 3px solid #174ea6; outline-offset: 3px; }
+  .host { inline-size: min(100%, 32rem); min-inline-size: 0; }
+  .panel { inline-size: min(100%, 28rem); min-inline-size: 0; border: 1px solid; padding: .5rem; }
+  .negative-owner { overflow: auto; }
+  .contradictory { min-inline-size: 32rem; max-inline-size: 100%; border: 1px solid; }
+  .glyph { font: 24px/1.5 system-ui; inline-size: min(100%, 14rem); border: 1px solid; }
+  .glyph-bad { block-size: 1em; overflow: hidden; }
+  .glyph-good { min-block-size: 1.5em; padding-block: .25rem; }
+  .wrap { white-space: normal; overflow-wrap: anywhere; min-inline-size: 0; }
+  .preview { inline-size: 100%; min-inline-size: 0; }
+  .single { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .multi { overflow-wrap: anywhere; }
+  @supports (-webkit-line-clamp: 3) {
+    .multi { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  }
+  .full { overflow-wrap: anywhere; }
+  .preview-row { margin-block: 1.5rem; }
+  .preview-row p { margin-block: .5rem; }
+  .scroll-shell { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; block-size: 15rem; max-inline-size: 100%; border: 1px solid; }
+  .scroll-shell > header, .scroll-shell > footer { padding: .5rem; background: #edf1f4; }
+  .scroll-body { overflow: auto; min-block-size: 0; padding: .75rem; overflow-wrap: anywhere; }
+  .scroll-body > p { margin-block: .4rem; }
+  .code-scroll { max-inline-size: 100%; overflow: auto; padding: .75rem; border: 1px solid; }
+</style>
+<main>
+  <h1>Content resilience experiments</h1>
+  <p>Synthetic cases. Negative controls intentionally fail; they are not production patterns.</p>
+  <section id="sizes"><h2>Preferred size and conflicting bounds</h2>
+    <div class="host" id="size-host"><div class="panel" id="bounded">Preferred size yields to its parent.</div></div>
+    <p>Negative control: a minimum larger than the parent overrides the maximum.</p>
+    <div class="host negative-owner" id="bounds-negative"><div class="contradictory" id="contradictory">Contradictory minimum and maximum</div></div>
+  </section>
+  <section id="glyphs"><h2>Line box and visible glyphs</h2>
+    <p>Fixed height clips a line with ascenders, descenders, and diacritics:</p>
+    <div class="glyph glyph-bad" id="glyph-bad" lang="en">ÅÉgjpqy</div>
+    <p>Intrinsic growth and padding preserve the line:</p>
+    <div class="glyph glyph-good" id="glyph-good" lang="en">ÅÉgjpqy</div>
+    <div class="glyph glyph-good wrap" id="glyph-scripts" lang="zh-Hant">臺灣文字測試 ÅÉgjpqy 👩🏽‍💻</div>
+  </section>
+  <section id="text-policies" class="host"><h2>Wrapping and full-content access</h2>
+    <p id="wrap" class="wrap">AnUnbrokenIdentifierThatIsDeliberatelyLongEnoughToOverflowWithoutAWrappingPolicyAndEndsInUniqueSuffix0097</p>
+    <div class="preview-row">
+      <p id="single" class="preview single">Quarterly financial report — translated review notes — Project Aurora — final approved version 0097.pdf</p>
+      <details id="single-details"><summary>Read full file name</summary><p class="full" id="single-full"></p></details>
+    </div>
+    <div class="preview-row">
+      <p id="multi" class="preview multi">This is a deliberately long preview with several sentences and a long identifier: AnUnbrokenIdentifierThatNeedsWrappingAndEndsIn0097. Users need a real full-content route. Wrapping plus an ellipsis is only a preview policy, not a substitute for access to the complete value. The last sentence contains the distinguishing suffix: Project Aurora 0097.</p>
+      <details id="multi-details"><summary>Read complete preview text</summary><p class="full" id="multi-full"></p></details>
+    </div>
+    <p id="short" class="preview single">Short name.pdf</p>
+  </section>
+  <section id="scrolling"><h2>Intentional scroll owners</h2>
+    <div class="scroll-shell" id="scroll-shell"><header>Bounded panel</header><div class="scroll-body" id="scroll-body" tabindex="0" role="region" aria-label="Panel entries"><p>Short content.</p></div><footer><button type="button" id="panel-action">Final action stays reachable</button></footer></div>
+    <p>Intentional local horizontal scroll for code:</p>
+    <pre class="code-scroll" id="code-scroll" tabindex="0" role="region" aria-label="Code sample">const deliberatelyLongCodeStatement = "A single code line that preserves formatting and scrolls locally rather than widening the whole document. A single code line that preserves formatting and scrolls locally rather than widening the whole document.";</pre>
+  </section>
+</main>
+<script>
+  for (const id of ['single', 'multi']) {
+    document.getElementById(`${id}-full`).textContent = document.getElementById(id).textContent;
+  }
+  globalThis.setPanelEntries = count => {
+    const body = document.getElementById('scroll-body');
+    body.replaceChildren();
+    for (let index = 0; index < count; index++) {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = `Entry ${index + 1}: information remains inside the intended scroll owner.`;
+      body.append(paragraph);
+    }
+  };
+</script>
+</html>

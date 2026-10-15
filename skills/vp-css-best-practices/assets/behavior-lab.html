@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS behavior experiments</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 24px; font: 16px/1.5 system-ui; color: #17212b; background: #fff; }
+  main { max-inline-size: 70rem; margin-inline: auto; }
+  section { margin-block: 2rem; }
+  h1, h2 { line-height: 1.2; }
+  button, a { font: inherit; }
+  .action {
+    min-block-size: 44px; padding: .6rem 1rem; border: 2px solid transparent;
+    color: #fff; background: #174ea6; border-radius: .4rem;
+    &:disabled { color: #374151; background: #e5e7eb; cursor: not-allowed; }
+    @media (hover: hover) {
+      &:not(:disabled):hover { background: #103b80; }
+    }
+    &:not(:disabled):active { background: #092653; }
+    &:not(:disabled):focus-visible { outline: 3px solid #111827; outline-offset: 3px; }
+    @media (forced-colors: active) {
+      border-color: ButtonText;
+      &:disabled { color: GrayText; border-color: GrayText; }
+      &:not(:disabled):focus-visible { outline-color: Highlight; }
+    }
+  }
+  .compound {
+    &.flag { border-block-start: 7px solid #174ea6; }
+    & .flag { border-block-end: 5px solid #174ea6; }
+    & > .direct { padding-inline-start: 13px; }
+    & + .sibling { padding-inline-start: 17px; }
+  }
+  .flex { display: flex; inline-size: 240px; border: 1px solid; }
+  .flex .content { overflow-wrap: break-word; }
+  .flex.fixed .content { min-inline-size: 0; overflow-wrap: anywhere; }
+  .rail { flex: 0 0 40px; background: #e5e7eb; }
+  .grid { display: grid; grid-template-columns: 1fr 40px; inline-size: 240px; border: 1px solid; }
+  .grid.fixed { grid-template-columns: minmax(0, 1fr) 40px; }
+  .grid.fixed > .content { min-inline-size: 0; overflow-wrap: anywhere; }
+  .cards { display: grid; inline-size: 180px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .cards.fixed { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+  .variable { color: #17212b; }
+  .variable > span { color: #174ea6; color: var(--tone, #174ea6); }
+  #invalid { --tone: 20px; }
+  .clipbox { inline-size: 160px; block-size: 60px; border: 1px solid; }
+  .clipbox > div { block-size: 160px; }
+  #hidden { overflow: hidden; }
+  #clip { overflow: clip; }
+  .motion { transition: transform 150ms; }
+  @media (prefers-reduced-motion: reduce) { .motion { transition: none; } }
+  .layer-normal { color: rgb(23, 33, 43); }
+  @layer lab { .layer-normal { color: rgb(255, 0, 0); } .layer-important { color: rgb(23, 78, 166) !important; } }
+  .layer-important { color: rgb(255, 0, 0) !important; }
+  .mixed, #unused-specificity { & .label { color: rgb(23, 78, 166); } }
+  .mixed .label { color: rgb(255, 0, 0); }
+</style>
+<main>
+  <h1>CSS behavior experiments</h1>
+  <p>Synthetic fixtures. Passing these experiments does not certify a product.</p>
+  <section aria-labelledby="states">
+    <h2 id="states">Native control states</h2>
+    <button id="enabled" class="action motion" type="button">Enabled action</button>
+    <button id="disabled" class="action" type="button" disabled>Disabled action</button>
+    <fieldset disabled><legend>Disabled fieldset</legend><button id="inherited" class="action" type="button">Inherited disabled</button></fieldset>
+    <button id="after-disabled" type="button">Keyboard sentinel</button>
+    <a id="aria" href="#outcome" aria-disabled="true">ARIA-only disabled link (negative control)</a>
+    <p id="outcome">Activation count: <output id="count">0</output></p>
+  </section>
+  <section><h2>Explicit parent selectors</h2>
+    <div id="parent" class="compound flag">Parent and flag <span id="child" class="flag direct">Descendant flag</span></div>
+    <div id="sibling" class="sibling">Following sibling</div>
+  </section>
+  <section><h2>Intrinsic sizing: failure and remedy</h2>
+    <p>Flex before / after</p>
+    <div id="flex-bad" class="flex"><div class="content">AnUnbrokenIdentifierThatIsDeliberatelyLongEnoughToOverflowTheContainer</div><div class="rail">Rail</div></div>
+    <div id="flex-good" class="flex fixed"><div class="content">AnUnbrokenIdentifierThatIsDeliberatelyLongEnoughToOverflowTheContainer</div><div class="rail">Rail</div></div>
+    <p>Grid before / after</p>
+    <div id="grid-bad" class="grid"><div class="content">AnUnbrokenIdentifierThatIsDeliberatelyLongEnoughToOverflowTheContainer</div><div>Rail</div></div>
+    <div id="grid-good" class="grid fixed"><div class="content">AnUnbrokenIdentifierThatIsDeliberatelyLongEnoughToOverflowTheContainer</div><div>Rail</div></div>
+    <p>Minimum track before / after</p>
+    <div id="cards-bad" class="cards"><div>Card</div></div>
+    <div id="cards-good" class="cards fixed"><div>Card</div></div>
+  </section>
+  <section><h2>Computed values and scroll containers</h2>
+    <div class="variable"><span id="missing">Missing variable uses fallback</span></div>
+    <div class="variable"><span id="invalid">Present but invalid color inherits</span></div>
+    <div id="hidden" class="clipbox"><div>Hidden permits programmatic scrolling</div></div>
+    <div id="clip" class="clipbox"><div>Clip does not permit scrolling</div></div>
+    <p id="layer-normal" class="layer-normal">Normal unlayered declaration</p>
+    <p id="layer-important" class="layer-important">Important layered declaration</p>
+    <div class="mixed"><span id="specificity" class="label">Nesting selector-list specificity</span></div>
+  </section>
+</main>
+<script>
+  globalThis.activations = 0;
+  for (const id of ['enabled', 'disabled', 'inherited', 'aria']) {
+    document.getElementById(id).addEventListener('click', () => {
+      document.getElementById('count').value = String(++globalThis.activations);
+    });
+  }
+</script>
+</html>

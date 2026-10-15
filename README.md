@@ -90,6 +90,11 @@ necessary context, evidence, and customary domain terminology.
 
 Handle cspell unknown word warnings with a prioritized decision tree and config bootstrapping.
 
+### vp-css-best-practices
+
+Write and review CSS with explicit nesting, correct interactive states,
+measured accessibility, and verified defensive layout.
+
 ### vp-deps-migrate
 
 Replace one library with another or migrate deprecated API patterns.

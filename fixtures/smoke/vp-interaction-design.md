@@ -37,6 +37,14 @@ operations. For frontend design, compose with Impeccable using shared context.
 12. A test plan would delete customer records or make a paid purchase to prove
     the interaction. Only design work and controlled testing are authorized.
 
+13. Design a document picker that must work in both a 240 CSS px side panel
+    and a desktop dialog, using the existing design system and fixed backend.
+    Names may be 200-character unbroken strings differing only in their last
+    four characters. Include prose previews and full-value inspection before
+    selection for keyboard, pointer, and touch. There can be 2 or 200 results;
+    confirm/cancel must remain reachable. Propose the policies and verification
+    handoff without inventing working details destinations.
+
 ## Expected Behavior
 
 - Distinguish first-use emptiness from filtered results. Use creation and filter
@@ -68,13 +76,23 @@ operations. For frontend design, compose with Impeccable using shared context.
 - Stop the live commitment and use controlled data or describe the missing safe
   test facility. Do not infer destructive or paid authorization from design work.
 
+- Cover both requested picker surfaces; do not substitute a larger dialog to
+  evade the side-panel constraint. Decide meaningful size bounds, content growth,
+  wrap/ellipsis/clamp policies, real full-content access, and scroll owners/axes.
+  Keep identity-critical suffixes available before selection; preserve readable
+  revealed text, focus/return behavior, and final actions. Test short/long and
+  enlarged/user-spaced content. A title attribute, full accessible name, copy
+  button, or clipping-away-overflow alone does not complete the visual reading
+  route. Hand CSS mechanisms and browser evidence to `vp-css-best-practices`.
+
 ## Regression Coverage
 
 Triggers beyond new screen design; narrow edits; web, native, and embedded chat
 UI; specification-only work; audience-specific technical content; actionable
 states; asynchronous truth; uncertain and partial outcomes; recovery; input and
 accessibility differences; shared Impeccable verification; informed commitment;
-excluded design domains; and authorization limits.
+excluded design domains; authorization limits; content resilience, meaningful
+size constraints, line-box clipping, full-content access, and deliberate scrolling.
 
 Static checks validate skill format and parser compatibility, not these
 decisions. Record the actual manual walkthrough or independent agent output
