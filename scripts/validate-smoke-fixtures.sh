@@ -50,6 +50,7 @@ required_skills=(
   "vp-pr-comment-resolver"
   "vp-git"
   "vp-stacked-pr"
+  "vp-stack-selection"
   "vp-recording"
   "vp-github"
   "vp-agent-browser-session"

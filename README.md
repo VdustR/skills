@@ -177,6 +177,10 @@ Summarize a session before archiving it and clear leftover files, processes, and
 
 Manage agent skills using the `npx skills` CLI.
 
+### vp-stack-selection
+
+Select compatible stacks for new projects, full-system refactors, rewrites, and ports, with TypeScript/Rust preferences and references for web, Go, Flutter, Kotlin, and Swift ecosystems.
+
 ### vp-stacked-pr
 
 Build, submit, merge, and repair stacks of dependent pull requests, merge requests, or branches. Native automation on GitHub, manual Git rebase on any other host.
