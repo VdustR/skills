@@ -54,5 +54,7 @@ and user impact, then apply the normal authorization rules above.
 
 - [`vp-agent-browser-session`](https://github.com/VdustR/skills/tree/main/skills/vp-agent-browser-session)
   for persistent agent-browser sessions and managed Chrome profiles.
+- [`vp-tunnel`](https://github.com/VdustR/skills/tree/main/skills/vp-tunnel)
+  when a remote caller or public page must reach the local daemon.
 - [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
   when a session ends with processes that must be stopped or reported.

@@ -175,6 +175,10 @@ Build, submit, merge, and repair stacks of dependent pull requests, merge reques
 
 Write a concise, reader-first summary for an artifact, message, or update while preserving uncertainty and required action.
 
+### vp-tunnel
+
+Decide whether a local service needs a public tunnel, gate the exposure, and choose between cloudflared, ngrok, and Tunnelmole.
+
 ### vp-typescript-best-practices
 
 Review TypeScript safety, type boundaries, and fallback style preferences.

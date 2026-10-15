@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Tunnel"
+  short_description: "Decide when to tunnel a local service and choose cloudflared, ngrok, or tmole"
+  default_prompt: "Use $vp-tunnel to decide whether a public tunnel to this local service is needed and acceptable, then choose between cloudflared, ngrok, and tmole."

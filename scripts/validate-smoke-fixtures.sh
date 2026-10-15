@@ -54,6 +54,7 @@ required_skills=(
   "vp-github"
   "vp-agent-browser-session"
   "vp-session-wrapup"
+  "vp-tunnel"
 )
 
 for skill_name in "${required_skills[@]}"; do
@@ -87,8 +88,18 @@ agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
 session_wrapup_fixture="fixtures/smoke/vp-session-wrapup.md"
 autodev_fixture="fixtures/smoke/vp-autodev.md"
+tunnel_skill="skills/vp-tunnel/SKILL.md"
 autodev_skill="skills/vp-autodev/SKILL.md"
 autodev_review_observation="skills/vp-autodev/references/automated-review-observation.md"
+
+require_frontmatter_pattern "$tunnel_skill" 'Local Network Access' \
+  "vp-tunnel must route on the Local Network Access symptom, not only tool names"
+require_pattern "$tunnel_skill" 'Never tunnel a service that issues or stores credentials' \
+  "vp-tunnel must forbid tunneling credential or session services"
+require_pattern "$tunnel_skill" 'explicit approval' \
+  "vp-tunnel must require explicit approval for the exposure"
+require_pattern "$tunnel_skill" 'requires `ngrok`, because the other two buffer it' \
+  "vp-tunnel must route live Server-Sent Events to ngrok"
 
 require_pattern "$autodev_fixture" 'branch creation.*commit.*push.*Draft PR' \
   "vp-autodev fixture must cover authorization through Draft PR creation"
