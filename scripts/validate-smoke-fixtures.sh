@@ -55,6 +55,8 @@ required_skills=(
   "vp-agent-browser-session"
   "vp-session-wrapup"
   "vp-tunnel"
+  "vp-css-best-practices"
+  "vp-interaction-design"
   "vp-typescript-best-practices"
 )
 

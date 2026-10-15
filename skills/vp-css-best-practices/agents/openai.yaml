@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP CSS Best Practices"
+  short_description: "Verify CSS states, text overflow, sizing, and accessibility"
+  default_prompt: "Use $vp-css-best-practices to write or review CSS with explicit selectors, accessible states, deliberate text overflow, and verified full-content access."

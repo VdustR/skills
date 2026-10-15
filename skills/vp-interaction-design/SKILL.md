@@ -27,7 +27,9 @@ Follow Impeccable's applicable setup and playbook when doing frontend work.
 For a specification, copy review, or behavioral diagnosis without a frontend
 build, apply the relevant reasoning without starting a visual implementation.
 Keep the user's brief, established design system, platform conventions, and
-fixed service contracts explicit. This skill grants no permission to change
+fixed service contracts explicit. Preserve requested surfaces and supported
+container constraints; a larger replacement surface is not a fix for omitted
+small-container behavior. This skill grants no permission to change
 contracts, publish, deploy, or act on real user data.
 
 Scale work to the change. A button-label fix needs its affected action and
@@ -80,6 +82,16 @@ detail where it can be found. Do not bury consequences in tooltips or hide
 essential actions behind hover. Prefer a clearer control or sequence over
 adding paragraphs to explain a confusing interaction.
 
+## Design for content and available space
+
+Before constraining variable content, choose its sizing bounds, wrapping or
+truncation policy, full-content route, and intentional scroll regions/axes. Use
+[content resilience](references/content-resilience.md) when text, available
+space, or scroll behavior can hide information or actions. Natural content
+growth is a valid size decision; avoid arbitrary bounds on every element.
+Do not leave ellipsis, glyph clipping, or access to the full value as styling
+details to decide after the design is complete.
+
 ## Make controls keep their promises
 
 For every interaction element in scope, connect its label, appearance, semantic
@@ -105,7 +117,8 @@ to the supported platform; visual feedback alone is insufficient.
   meaningful focus order, and access to help and errors.
 - Use realistic content and supported locales, data sizes, and device classes.
   Important distinctions must survive narrow layouts, text scaling, and long
-  or missing content.
+  or missing content. Exercise full-content disclosure and intentional scroll
+  regions, not only the initial truncated preview or first visible rows.
 
 Prevent misleading affordances and manipulative defaults. Make refusal,
 correction, and exit reasonably discoverable; do not disguise costs, consent,
@@ -145,6 +158,8 @@ design skill; it is not a required reading list for every UI task.
 
 - [`impeccable`](https://github.com/pbakaus/impeccable) for frontend visual
   direction, composition, and interface craft alongside this workflow.
+- [`vp-css-best-practices`](https://github.com/VdustR/skills/tree/main/skills/vp-css-best-practices)
+  when web CSS implements sizing, text overflow, disclosure, and scroll decisions.
 - [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
   for clear labels, instructions, feedback, and error messages.
 - [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
