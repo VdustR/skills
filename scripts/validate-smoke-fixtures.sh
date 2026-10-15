@@ -55,6 +55,7 @@ required_skills=(
   "vp-agent-browser-session"
   "vp-session-wrapup"
   "vp-tunnel"
+  "vp-typescript-best-practices"
 )
 
 for skill_name in "${required_skills[@]}"; do
