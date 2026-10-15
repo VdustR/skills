@@ -46,7 +46,10 @@ workers, and `.test-d.ts` type tests. Re-run it after every project split.
 - For hosts with conflicting `$` declarations, confirm each isolated adapter
   and consumer fixture passes, host-specific members from the other integration
   fail, and importing the other host's global declarations exposes the conflict
-  with declaration checking enabled. Do not hide it with `skipLibCheck`.
+  with declaration checking enabled. Do not hide it with `skipLibCheck`. UMD
+  globals such as Lodash/Underscore `_` may silently resolve to one API; test
+  host-specific members and runtime behavior rather than requiring a duplicate
+  declaration diagnostic in every case.
 - For the same source built in multiple formats/environments, run every supported
   variant, inspect runtime-compatible imports/outputs and declarations, and
   verify separate cache/output paths. A single successful build is insufficient.
@@ -59,6 +62,13 @@ workers, and `.test-d.ts` type tests. Re-run it after every project split.
 
 Use negative type tests with meaningful assertions; a false-green command that
 never included the fixture must not count as a successful isolation check.
+
+For Vue/Svelte or another component format, inject an error into a typed
+template and run its actual checker through the root command. A successful
+`tsc` program inventory does not cover a template absent from the program.
+Verify editor project selection through the editor or tsserver `projectInfo`
+and semantic diagnostics: sibling browser and Node files must select the
+intended leaf, rather than an inferred or overly broad project.
 
 ## 3. Exercise cache behavior
 
@@ -77,3 +87,10 @@ verify a clean build and consistent restoration of outputs plus build info.
 Report executable results separately from manual scenario walkthroughs and
 untested framework/tool combinations. Do not claim speed improvements without
 comparable measurements or complete coverage from successful exit status alone.
+
+When remote caching is used, save outputs and build info on one runner and
+restore them on a fresh runner. Verify artifact hashes and an unchanged build,
+then edit a dependency contract and require fresh downstream diagnostics. A
+local directory copy does not verify the remote provider. Keep a verification
+cache isolated from production caches, require an exact-key hit, and include
+all generated-fixture inputs in its key.

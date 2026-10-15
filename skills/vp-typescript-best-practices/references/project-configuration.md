@@ -62,6 +62,25 @@ globals, splitting tsconfig cannot solve that runtime conflict. Model the real
 coexistence contract or state the unsupported combination; do not claim support
 from two independent successful builds.
 
+### Real `$` and `_` examples
+
+jQuery and Zepto both provide `$` declarations. With their corresponding ambient
+packages in one program and `skipLibCheck: false`, the tested declarations report
+a redeclaration. Lodash and Underscore both expose UMD `_`, but loading both type
+packages can silently select one global API instead of reporting a duplicate.
+Check the intended host-specific members as well as compiler exit status; a shared
+symbol name does not guarantee either a diagnostic or compatible behavior.
+
+For separate host integrations, give each leaf only its host's `types` entry,
+such as `["lodash"]` or `["underscore"]`. For simultaneous module use, prefer
+explicit imports with distinct names (`lodash`, `underscore`) and check both APIs.
+For legacy browser globals, verify the actual script order and the library's
+`noConflict()` contract. For example, jQuery loaded after Zepto can restore the
+previous `$` with `jQuery.noConflict(true)` while retaining a local jQuery alias.
+Underscore loaded after Lodash can restore the previous `_` with
+`_.noConflict()` while retaining an Underscore alias. Test calls through both
+aliases; declaration isolation alone cannot establish runtime coexistence.
+
 ## Apply the strategy in a TypeScript monorepo
 
 Use a shared safety base with leaf projects for each TypeScript package, then
@@ -106,7 +125,8 @@ and JSX options for the actual runtime and compiler:
     "moduleResolution": "Bundler",
     "incremental": true,
     "noEmit": true,
-    "types": []
+    "types": [],
+    "erasableSyntaxOnly": true
   }
 }
 ```
@@ -149,6 +169,77 @@ imports. `exclude` also does not prevent an imported file from entering a
 program. Trace the actual program and enforce runtime package boundaries with
 exports or lint rules where compiler configuration alone is insufficient.
 
+## Browser and Node are separate compiler environments
+
+A common single-package layout separates browser source from Node scripts:
+
+```text
+tsconfig.base.json             strictest, ES-only lib, erasableSyntaxOnly
+browser/tsconfig.json           DOM APIs; no Node ambient globals
+node/tsconfig.json              Node APIs; no DOM lib
+```
+
+For a browser leaf next to its own source files:
+
+```json
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
+    "tsBuildInfoFile": "../.cache/tsc/browser.tsbuildinfo"
+  },
+  "include": ["./**/*.ts"]
+}
+```
+
+For a Node leaf whose nearest package.json uses `"type": "module"`:
+
+```json
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
+    "tsBuildInfoFile": "../.cache/tsc/node.tsbuildinfo"
+  },
+  "include": ["./**/*.ts", "./**/*.mts"]
+}
+```
+
+The browser must reject Node-only globals such as `process`; Node must reject
+DOM-only APIs such as `document`. Some APIs, such as `fetch` and `URL`, exist in
+both modern runtimes, so they are poor isolation probes. Check each leaf and run
+its code in the corresponding runtime; compiling browser code with Node types
+is not a browser execution test.
+
+## Erasable TypeScript syntax
+
+Enable `erasableSyntaxOnly: true` in the shared compiler baseline (TypeScript
+5.8 or newer). It rejects non-erasable TypeScript syntax such as runtime enums,
+value-bearing namespaces/modules, and parameter properties. Use literal unions,
+ordinary objects, ES modules, and explicit class fields instead. Type-only or
+ambient namespaces/declarations are not equivalent to runtime namespaces; test
+the installed compiler rather than banning every occurrence of the keyword.
+Do not silently omit this setting when the compiler is too old: upgrade within
+authorized scope or report the compatibility requirement.
+
+This is a syntax restriction, not a runtime transpiler or a type checker at
+execution time. Native Node type stripping ignores tsconfig, does not downlevel
+JavaScript, does not resolve TypeScript `paths`, and does not support TSX. For
+code run directly by Node, use compatible package/module metadata, explicit
+relative file extensions, and type-only imports. Pair that execution config with
+`verbatimModuleSyntax`; choose `rewriteRelativeImportExtensions` when emitting
+JavaScript from TypeScript-extension imports. Keep `tsc` checks in the workflow:
+a successful stripped execution does not establish type correctness.
+
+Do not force verbatim ESM syntax onto a CommonJS emit pipeline that deliberately
+transforms modules. `erasableSyntaxOnly` and module-format conversion are separate
+choices; verify the actual build contract.
+
 ## Matt Pocock's ts-reset
 
 For an application that adopts `@total-typescript/ts-reset`, create a dedicated
@@ -186,6 +277,12 @@ programs only while preserving environment boundaries and complete coverage.
 
 ## Sources
 
+- [jQuery noConflict](https://api.jquery.com/jQuery.noConflict/)
+- [Zepto globals](https://zeptojs.com/)
+- [Lodash noConflict](https://lodash.com/docs/#noConflict)
+- [Underscore noConflict](https://underscorejs.org/#noConflict)
+- [Erasable syntax restriction](https://www.typescriptlang.org/tsconfig/erasableSyntaxOnly.html)
+- [Native Node TypeScript execution](https://nodejs.org/api/typescript.html)
 - [Ambient type inclusion](https://www.typescriptlang.org/tsconfig/types.html)
 - [Custom type discovery](https://www.typescriptlang.org/tsconfig/typeRoots.html)
 - [Library declaration structures](https://www.typescriptlang.org/docs/handbook/declaration-files/library-structures.html)

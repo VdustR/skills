@@ -48,6 +48,11 @@ of the request.
 | A new untracked worker file is not included by any leaf | Independent coverage gate fails even when existing projects have warm-cache hits. |
 | Shared source is checked for Node but also promises browser support | Coverage by the union of files is insufficient; require the browser matrix row too. |
 
+Additional executable scenarios cover browser/Node config examples and actual
+runtimes; erasable syntax versus native Node stripping; jQuery/Zepto `$` and
+Lodash/Underscore `_`; Vue/Svelte typed templates; tsserver project selection;
+and a GitHub Actions cache round trip across independent runners.
+
 ## Description Routing Walkthrough
 
 Evaluate the frontmatter description and agent metadata before loading the body.
