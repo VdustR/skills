@@ -80,3 +80,22 @@ the locked repository dependencies. The suite executes compiler diagnostics,
 package builds, packed consumers and runtime checks instead of only checking
 fixture wording. See [verification results](vp-typescript-best-practices-results.md)
 for the independent trial, tested versions, and remaining limits.
+
+## Code-contract scenarios
+
+- A conditional spread has an empty branch that later gains fields: keep its
+  intended consumer contract check and exercise an inserted unknown field.
+- A predicate accepts only some numbers: review both branches of narrowing and
+  execute boundary values; select a boolean filter when it does not prove a type.
+- A parser changes incoming values: choose key, coercion, default, transform and
+  failure behavior from the caller; inspect actual parsed output.
+- A default or selected value widens a generic's legal set: identify the input
+  that owns that set and preserve inference at ordinary consumer calls.
+- A readonly result shares nested values: distinguish typed access, array
+  storage, and nested ownership before choosing copying or freezing.
+- A type utility is slow: measure representative compiler work and compare the
+  same consumer contract; retain the original when improvement is not established.
+
+These are manual decision scenarios. Executable regression evidence is recorded
+in the linked verification results; static fixture validation is not proof that
+an agent will make the intended decision.

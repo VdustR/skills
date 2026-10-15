@@ -191,7 +191,7 @@ Decide whether a local service needs a public tunnel, gate the exposure, and cho
 
 ### vp-typescript-best-practices
 
-Implement and review TypeScript, or configure isolated tsconfig projects, environment-specific builds, strictest, caches, and complete file/environment coverage.
+Implement and review TypeScript, verify runtime and API contracts, diagnose costly types, or configure isolated projects, builds, strictest, caches, and complete coverage.
 
 ## Development
 

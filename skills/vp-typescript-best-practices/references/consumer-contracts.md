@@ -33,7 +33,7 @@ fixture contracts from the actual consumer instead of maintaining a second type.
 type Props = { disabled: boolean; onClick?: () => void };
 const action = true;
 const props = {
-  disabled: false,
+  disabled: !action,
   ...(action
     ? ({ onClick: () => {} } satisfies Partial<Props>)
     : ({} satisfies Partial<Props>)),
