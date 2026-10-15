@@ -1,4 +1,4 @@
 interface:
   display_name: "VP TypeScript Best Practices"
-  short_description: "Review TypeScript safety and type design"
-  default_prompt: "Use $vp-typescript-best-practices to write, review, or refactor TypeScript with safer type boundaries."
+  short_description: "TypeScript safety, tsconfig isolation, builds, and coverage"
+  default_prompt: "Use $vp-typescript-best-practices to implement or review TypeScript, or configure isolated tsconfig projects and build variants with strictest, valid caches, full environment coverage, and application-scoped ts-reset."

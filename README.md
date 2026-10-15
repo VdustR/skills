@@ -186,7 +186,7 @@ Decide whether a local service needs a public tunnel, gate the exposure, and cho
 
 ### vp-typescript-best-practices
 
-Review TypeScript safety, type boundaries, and fallback style preferences.
+Implement and review TypeScript, or configure isolated tsconfig projects, environment-specific builds, strictest, caches, and complete file/environment coverage.
 
 ## Development
 
