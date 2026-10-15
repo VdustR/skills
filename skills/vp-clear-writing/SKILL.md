@@ -4,9 +4,9 @@ description: >-
   Write or revise clear, concrete prose across languages for user-facing replies,
   documents, code comments, review comments, and pull request descriptions.
   Make problems, solutions, and value understandable in a logical reading order.
-  Preserve meaning, necessary context, and uncertainty while removing empty
-  rhetoric. Boundary: improves expression; use vp-tldr to select summary content
-  and the relevant workflow to investigate, verify, or publish it.
+  Select relevant content and preserve meaning, necessary context, and
+  uncertainty while removing empty rhetoric. Boundary: use vp-tldr to select
+  summary content and the relevant workflow to investigate, verify, or publish it.
 ---
 
 # Clear Writing
@@ -20,9 +20,13 @@ language requirements, artifact template, or permissions.
 
 Use the request and available context to identify the audience, purpose, and
 format. Ask only when missing information would materially change the result.
-For an existing draft, preserve its claims, useful structure, and appropriate
-voice. Make the minimum effective edit; do not invent facts or opinions to make
-the writing more specific.
+Match the extent of editing to the request. For ordinary polishing, preserve
+the draft's supported claims, useful structure, purpose, and appropriate voice;
+make the minimum effective edit. When asked to reorganize or rebuild a document,
+let the reader's needs and current sources determine its content and order
+rather than preserving the old draft. Explicit language, length, format,
+template, and scope requirements still apply. Do not invent facts or opinions
+to make the writing more specific.
 
 Put the answer, finding, decision, or required action early when that helps the
 reader. Supply the premise needed to understand it. If the reader is confused,
@@ -40,6 +44,35 @@ and limits. Put session-specific names or handles in reproduction or evidence
 notes when needed to locate the exact resource. Do not delete necessary facts
 along with an alias, expand terms the audience already knows, or invent missing
 details; qualify or ask about a gap when it affects interpretation.
+
+## Choose what belongs before rewriting
+
+Select content by the artifact's purpose before improving its wording. In a
+result report or deliverable, include facts, reasoning, evidence, and limits
+that help the reader understand, decide, or act. Omit drafting history,
+withdrawn suggestions, resolved misunderstandings, and statements included only
+to demonstrate that the author followed feedback. Explain the resulting behavior
+or decision directly instead of narrating how its description was corrected.
+
+History belongs when the reader requests it or it explains causality, options,
+tradeoffs, evidence, risk, or action. A decision record may need a rejected
+option; an incident timeline or retrospective may need the sequence of events.
+Keep that information in the relevant place. Judge its relevance, not whether
+it uses a negative sentence, a contrast, or a reference to the past.
+
+For a comparison, establish the requested baseline and the status of each side:
+released behavior, an approved upcoming change, competing proposals, or draft
+revisions. Do not turn an unpublished draft into a previous product version.
+If the baseline is missing and changes the comparison, ask rather than choose
+one silently.
+
+When rebuilding from multiple rounds of material, use the current authoritative
+sources and still-valid decisions; later wording alone does not make a source
+more reliable. Recover supported facts and evidence from older material when
+they still apply, replace superseded conclusions, and preserve consequential
+conflicts or unknowns. An old draft is context, not a requirement to repeat its
+claims. This selects the body of the requested text; `$vp-tldr` continues to own
+summary selection. Neither skill establishes missing facts through rewriting.
 
 ## Build an explanation the reader can follow
 
@@ -149,10 +182,14 @@ to understand it at that point. For a problem or proposal, can the reader explai
 what goes wrong, why it matters, how the response addresses it, and what value
 is supported or still expected? Repair missing links rather than adding generic
 benefit claims. Check that the reader can understand the main point, the
-necessary context, and any action or limitation. Confirm that edits preserved
-the source's meaning and evidence, that terms are customary and consistent,
-and that the form fits the artifact. Return the requested output; add an editing
-explanation only when it is requested or helps assess a material change.
+necessary context, and any action or limitation.
+
+Check content selection separately from wording: does each retained point serve
+this reader, and did any necessary history, condition, or uncertainty disappear?
+Confirm that claims reflect the applicable sources and comparison baseline,
+terms are customary and consistent, and the form and extent of editing fit the
+request. Return the requested output; add an editing explanation only when it is
+requested or helps assess a material change.
 
 ## Related skills
 

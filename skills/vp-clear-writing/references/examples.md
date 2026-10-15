@@ -165,3 +165,45 @@ If a PR template has `Problem`, `Changes`, and `Validation`, keep those sections
 and improve their contents. If a user requests a detailed explanation, retain
 the detail necessary to understand it. Do not add an executive summary, a fixed
 number of bullets, or an editing report unless the task calls for one.
+
+## Select result content before polishing it
+
+The following scenarios are fictional and illustrate different purposes, not a
+required output format.
+
+Source: a rental report draft says, "We removed the waiver proposal following
+feedback." Approved facts: reservations show the deposit before checkout; the
+waiver was never released; two branches tested the display; refunds are untested.
+
+For a launch report to branch managers:
+
+Clear: "Reservations now show the deposit before checkout. Two branches tested
+the display; refund handling has not been tested."
+
+Rewriting the sentence about feedback more elegantly would still include the
+wrong content. The managers need behavior and evidence, not the drafting record.
+
+## Keep history that explains a decision
+
+Fictional source: a museum's headphone-based audio-guide pilot caused reported
+interference for visitors using hearing aids. The team deployed captions; no
+follow-up accessibility study has run. A reader requests the decision history.
+
+Clear: "Visitors using hearing aids reported interference during the headphone
+pilot. The team chose captions in response and has deployed them. A follow-up
+accessibility study has not yet been conducted."
+
+The rejected prototype explains the choice. Removing it as obsolete would lose
+necessary causality; deployment alone does not prove accessibility.
+
+## Use the requested comparison baseline
+
+Fictional source: a released parcel service requires a receipt; an approved
+upcoming release accepts a receipt or pickup code. A biometric draft was never
+implemented. The reader asks for released-versus-upcoming behavior.
+
+Clear: "The released service requires a receipt. The upcoming release will also
+accept a pickup code; public release is pending."
+
+The biometric draft is not a previous product version. It could belong in a
+separate comparison of design candidates if that were the reader's request.

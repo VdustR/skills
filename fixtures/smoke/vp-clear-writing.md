@@ -108,3 +108,7 @@ implementation detail placement, unsupported causal arguments, and short replies
 Static repository validation checks format and parser compatibility; it does not
 prove these decisions. Record a manual decision walkthrough or an independent
 agent trial separately, including the actual outputs and remaining limits.
+
+For independent fictional cases about content selection, current sources,
+comparison baselines, and preservation of relevant history, use
+[Reader Purpose and Current Sources](vp-clear-writing-selection.md).
