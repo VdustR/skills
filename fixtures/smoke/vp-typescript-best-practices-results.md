@@ -16,11 +16,14 @@ Install the locked repository dependencies without lifecycle scripts, then run:
 npm ci --ignore-scripts
 node --test --test-concurrency=1 tests/typescript/*.test.mjs
 npm run validate
+PLAYWRIGHT_BROWSERS_PATH=.cache/playwright npx playwright install chromium
+npm run validate:browser
 ```
 
-The TypeScript suite runs 24 tests using TypeScript 6.0.3, strictest 2.0.8,
+The TypeScript suite runs 37 tests using TypeScript 6.0.3, strictest 2.0.8,
 ts-reset 0.6.1, Zod 4.6.7, and Node declarations 22.20.5. These are verification
-dependencies, not versions the skill imposes on a consumer repository.
+dependencies, not versions the skill imposes on a consumer repository. Local
+execution uses Node 26.12.0; CI uses the Node 22 line.
 
 | Area | Executed evidence |
 | --- | --- |
@@ -41,6 +44,56 @@ dependencies, not versions the skill imposes on a consumer repository.
 All assertions examine compiler diagnostics, emitted files, program inputs, or
 runtime results. Test success does not imply universal compiler/framework support.
 Markdown fixtures and parser validation are reported separately from these tests.
+
+## Browser, editor, framework, and remote-cache checks
+
+The follow-up suite uses real jQuery 3.7.1 / Zepto 1.2.0 and Lodash 4.18.1 /
+Underscore 1.13.8, with their locked DefinitelyTyped packages. Each host's
+ambient declarations pass separately. Mixing jQuery and Zepto produces
+TS2451 on `$`. Mixing Lodash and Underscore can compile a Lodash-specific API
+without a duplicate diagnostic while rejecting an Underscore-specific API.
+Distinct module imports accept both APIs. This demonstrates why a duplicate
+error alone is an insufficient boundary check.
+
+The separate `validate:browser` test builds the actual published browser/Node
+JSON examples, executes Node output, and runs browser output in headless Chromium
+through Playwright 1.61.1. It loads real vendor scripts, observes overwritten
+`$` / `_`, applies the documented `noConflict()` calls, and checks both libraries'
+DOM/object operations through aliases. CI installs its matching Chromium binary;
+ordinary repository validation does not silently skip a browser assertion.
+
+Two framework tests use Vue 3.5.44 / vue-tsc 3.3.13 and Svelte 5.57.2 /
+svelte-check 4.7.6. Valid typed templates pass. After changing `number.toFixed`
+to `number.toUpperCase`, vanilla `tsc` succeeds while the complete npm command
+fails and names the component. The inventory confirms that plain TypeScript's
+program never included those component files.
+
+The editor test runs the installed TypeScript tsserver protocol, opens sibling
+browser and Node files, checks `projectInfo` against their nearest configs, and
+checks semantic diagnostics for `process` / `document` leakage. This exercises
+the editor's language-service engine; it is not a VS Code UI test.
+
+Three additional tests execute the actual Markdown configs and native Node
+stripping: runtime enums, const enums, value-bearing namespaces and parameter
+properties fail TS1294; type-only namespaces pass. Native Node executes erasable
+code and even type-invalid code, but rejects runtime enum/namespace syntax.
+Compiler validation remains necessary.
+
+The CI `cache-seed` job builds a two-project composite fixture and saves outputs,
+build info, sources and their hash manifest through GitHub Actions cache. On a
+fresh runner, `cache-restore` requires an exact-key hit, verifies hashes and
+lockfile and emitted contracts, requires a subsequent unchanged build to reuse
+both projects, then changes a
+shared public type and requires downstream TS2322. The cache key includes OS,
+run/attempt, lockfile and the generator script containing all fixture inputs.
+A fresh runner's npm install can make the extended strictest config newer than
+restored outputs; the compiler may revalidate and update unchanged timestamps
+on the first build. The test allows that work, verifies identical emitted
+contracts, then requires the next build to skip both projects. This is a provider
+round-trip test, not a production task-cache configuration.
+The same seed/restore assertions also execute locally. A local sample measured
+597 ms cold and 119 ms warm for two projects; one sample is not a benchmark or
+a production speedup claim.
 
 ## Independent forward test
 
@@ -103,12 +156,10 @@ actual automatic invocation. The setup trial and routing trial are distinct.
 
 ## Limits and discoveries
 
-- Synthetic host packages and Node-injected globals establish compile-time
-  isolation and package loading; they do not prove real browser host behavior
-  or simultaneous runtime coexistence of incompatible globals.
-- The packed fixture checks local tarball exports and declarations, not a registry
-  publication. Framework template checkers, remote task caches, and editor
-  behavior remain outside this executable suite.
+- Runtime evidence covers the named libraries in Chromium, framework evidence
+  covers Vue/Svelte template checks, editor evidence covers tsserver, and cache
+  evidence covers GitHub Actions. It does not establish all browsers, frameworks,
+  editor clients, cache providers, or a registry publication.
 - A warm build demonstrates valid incremental reuse, not optimal performance.
   No production speedup or universal support claim follows from fixture timings.
 - The first implementation of the emit test needed explicit `rootDir` for a

@@ -6,14 +6,28 @@
     "validate:offline": "./scripts/validate-skills.sh",
     "validate:smoke-fixtures": "./scripts/validate-smoke-fixtures.sh",
     "validate:parser": "./scripts/validate-skills-parser.sh",
-    "validate:latest": "./scripts/validate-skills-latest.sh"
+    "validate:latest": "./scripts/validate-skills-latest.sh",
+    "validate:browser": "node --test tests/typescript/integrations.browser.mjs"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "0.6.1",
     "@tsconfig/strictest": "2.0.8",
+    "@types/jquery": "3.5.34",
+    "@types/lodash": "4.17.26",
     "@types/node": "22.20.5",
+    "@types/underscore": "1.13.0",
+    "@types/zepto": "1.0.36",
+    "jquery": "3.7.1",
+    "lodash": "4.18.1",
+    "playwright": "1.61.1",
     "skills": "1.5.3",
+    "svelte": "5.57.2",
+    "svelte-check": "4.7.6",
     "typescript": "6.0.3",
+    "underscore": "1.13.8",
+    "vue": "3.5.44",
+    "vue-tsc": "3.3.13",
+    "zepto": "1.2.0",
     "zod": "4.6.7"
   }
 }

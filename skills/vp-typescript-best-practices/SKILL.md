@@ -5,7 +5,8 @@ description: >-
   .mts, .cts), designing type-level APIs, validating runtime data, or adding type
   tests. Also use for tsconfig/project setup, multiple tsconfigs,
   environment-specific builds, conflicting ambient globals, library integrations,
-  project references, strictest, ts-reset, incremental caches, and type-check
+  browser/Node isolation, project references, strictest, erasableSyntaxOnly,
+  ts-reset, incremental caches, and type-check
   coverage in single packages or TypeScript monorepos. Boundary: does not own
   non-TypeScript monorepo or general workspace setup.
 ---

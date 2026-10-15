@@ -30,7 +30,7 @@ export function workspace(t) {
     extends: "@tsconfig/strictest/tsconfig.json",
     compilerOptions: {
       target: "ES2022", module: "ESNext", moduleResolution: "Bundler",
-      lib: ["ES2022"], types: [], noEmit: true, incremental: true,
+      lib: ["ES2022"], types: [], noEmit: true, incremental: true, erasableSyntaxOnly: true,
       tsBuildInfoFile: ".cache/check.tsbuildinfo", skipLibCheck: false,
     },
   });

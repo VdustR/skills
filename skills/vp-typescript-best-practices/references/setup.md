@@ -14,7 +14,8 @@ incidental fix for an unrelated implementation error.
    matrix, conflicting globals, shared strictest base, build variants, root
    orchestration, and caches. TypeScript monorepos use package-level leaf
    projects; single packages split when environment or build contracts differ.
-3. Use `@tsconfig/strictest` as the safety baseline. Inspect effective settings
+3. Use `@tsconfig/strictest` as the safety baseline and enable
+   `erasableSyntaxOnly: true` with a compatible compiler. Inspect effective settings
    after inheritance and overrides; document compatibility exceptions.
    `strict: true` alone is not equivalent. Keep runtime globals out of the
    shared base and isolate cache/output paths for each active project/variant.

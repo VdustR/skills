@@ -24,3 +24,49 @@ jobs:
 
       - name: Validate skills
         run: npm run validate
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: .cache/playwright
+      - run: npm run validate:browser
+
+  cache-seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: node tests/typescript/remote-cache.mjs seed
+      - uses: actions/cache/save@v4
+        with:
+          path: .cache/remote-verification
+          key: ts-proof-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ hashFiles('package-lock.json', 'tests/typescript/remote-cache.mjs') }}
+
+  cache-restore:
+    needs: cache-seed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/remote-verification
+          key: ts-proof-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ hashFiles('package-lock.json', 'tests/typescript/remote-cache.mjs') }}
+          fail-on-cache-miss: true
+      - run: node tests/typescript/remote-cache.mjs restore
