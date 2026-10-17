@@ -1,15 +1,4 @@
----
-name: vp-interaction-design
-description: >-
-  Design or review user-facing interaction behavior: user intents, interface
-  states, information needs, action outcomes, and recovery. Use for web and
-  native UI planning, implementation, UX copy, interaction bugs, and reviews,
-  including onboarding, navigation, forms, settings, and embedded chat tools.
-  Boundary: not agent tool routing, backend-only architecture, or standalone
-  visual branding and static artwork.
----
-
-# Interaction Design
+# User Interaction Design
 
 Make each interaction understandable before use, truthful while it runs, and
 recoverable when it fails. Cover the user's task across states and transitions,
@@ -52,7 +41,7 @@ conventions; do not treat an imagined persona as research.
 
 Enumerate all known reachable states and transitions within scope, including
 alternate entries and return paths. Use
-[state and transition coverage](references/state-coverage.md) for a new flow,
+[state and transition coverage](state-coverage.md) for a new flow,
 behavioral change, or review with material state gaps. Group equivalent cases
 only when their information needs and outcomes are the same. Mark unsupported,
 unknown, and excluded cases; do not claim literal completeness over unknown
@@ -86,7 +75,7 @@ adding paragraphs to explain a confusing interaction.
 
 Before constraining variable content, choose its sizing bounds, wrapping or
 truncation policy, full-content route, and intentional scroll regions/axes. Use
-[content resilience](references/content-resilience.md) when text, available
+[content resilience](content-resilience.md) when text, available
 space, or scroll behavior can hide information or actions. Natural content
 growth is a valid size decision; avoid arbitrary bounds on every element.
 Do not leave ellipsis, glyph clipping, or access to the full value as styling
@@ -150,17 +139,7 @@ smallest supported correction. Keep internal coverage notes out of the product
 UI. Reopen verification only for changed behavior, new evidence, or a required
 final check; report a persistent blocker instead of polishing indefinitely.
 
-Read [research and design boundaries](references/design-sources.md) when
+Read [research and design boundaries](design-sources.md) when
 extending this workflow or evaluating a conflicting recommendation from another
-design skill; it is not a required reading list for every UI task.
-
-## Related skills
-
-- [`impeccable`](https://github.com/pbakaus/impeccable) for frontend visual
-  direction, composition, and interface craft alongside this workflow.
-- [`vp-css-best-practices`](https://github.com/VdustR/skills/tree/main/skills/vp-css-best-practices)
-  when web CSS implements sizing, text overflow, disclosure, and scroll decisions.
-- [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
-  for clear labels, instructions, feedback, and error messages.
-- [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
-  when the request includes implementation and authorized delivery.
+design skill; its scope decisions apply to the overall skill, while this
+reference covers the user interaction part only.

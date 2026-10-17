@@ -154,7 +154,7 @@ independent agent trial.
 
 ## Related skills
 
-- [`vp-interaction-design`](https://github.com/VdustR/skills/tree/main/skills/vp-interaction-design)
+- [`vp-design-reasoning`](https://github.com/VdustR/skills/tree/main/skills/vp-design-reasoning)
   when the control's states, semantics, or recovery behavior need design work.
 - [`impeccable`](https://github.com/pbakaus/impeccable)
   when visual direction or interface craft is part of the task.

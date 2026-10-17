@@ -103,6 +103,12 @@ Replace one library with another or migrate deprecated API patterns.
 
 Upgrade dependencies with breaking change detection and migration planning.
 
+### vp-design-reasoning
+
+Clarify concepts, workflows, architecture, and user interactions through bounded
+models, scenario walkthroughs, trade-off analysis, and appropriate verification.
+Pair with Impeccable for frontend visual direction and craft.
+
 ### vp-env-secrets
 
 Safely list, choose, load, stage, and persist sensitive `.env*` variables using `dotenvx`.
@@ -122,11 +128,6 @@ GitHub platform behavior: attaching media and files to issues and PRs, markdown 
 ### vp-guided-focus
 
 Use structured questions to align on requirements before planning or complex tasks.
-
-### vp-interaction-design
-
-Design and review user intents, interface states, action outcomes, information
-needs, and recovery. Pair with Impeccable for frontend visual direction and craft.
 
 ### vp-issue-investigator
 

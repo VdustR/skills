@@ -1,8 +1,8 @@
-# Interaction Design Routing and Behavior
+# Design Reasoning Routing and Behavior
 
 ## Prompt
 
-Use `$vp-interaction-design` for each applicable request. Treat these as
+Use `$vp-design-reasoning` for each applicable request. Treat these as
 independent cases, use the supplied contracts, and do not execute external
 operations. For frontend design, compose with Impeccable using shared context.
 
@@ -67,8 +67,9 @@ operations. For frontend design, compose with Impeccable using shared context.
   commentary. Do not interpret the copy rule as a ban on technical content.
 - Surface decision-critical terms before commitment. Do not infer that WCAG
   prohibits an ordinary inline price recalculation merely because it is dynamic.
-- Route agent tool selection, backend-only architecture, and static artwork to
-  their own workflows. Apply this skill only to any actual UI interaction slice.
+- Route agent tool selection and static artwork to their own workflows. Apply
+  architecture reasoning to the backend queue without requiring UI or Impeccable;
+  route technology selection separately when needed.
 - Do not treat screenshots, static validation, or a manual design walkthrough as
   executed interaction tests, physical-device proof, or user research.
 - Separate known partial success, known failure, and uncertainty. Scope any retry
@@ -97,3 +98,62 @@ size constraints, line-box clipping, full-content access, and deliberate scrolli
 Static checks validate skill format and parser compatibility, not these
 decisions. Record the actual manual walkthrough or independent agent output
 and its limitations separately when exercising this fixture.
+
+## Broader Design Scenarios
+
+14. Explain the difference between a task, an execution attempt, and an outcome.
+    Attempts may fail or be retried; the requested outcome may still be unknown.
+    Define relationships and use examples and counterexamples. Do not redesign
+    the service or invent persistence guarantees.
+15. Review a support-to-engineering workflow. Support sends a message and closes
+    the ticket immediately. No rule establishes engineering acceptance or the
+    owner while waiting. Propose the smallest ownership and handoff correction;
+    do not send real messages or add a new notification service.
+16. Review a backend export architecture with an at-least-once queue. The worker
+    writes an external file before marking the job complete. A crash can happen
+    between those effects. Compare viable recovery designs without assuming
+    exactly-once execution, prescribing a stack, or creating frontend code.
+17. The architecture brief says "fast and reliable" but supplies no workload,
+    latency threshold, or availability target. Identify what must be established
+    to compare options; do not invent measurements or block unrelated modeling.
+18. The user requests a design for replacing a production database. Only design
+    is authorized. Deliver a proposal with migration and recovery decisions;
+    do not migrate, deploy, or touch real customer data.
+19. Explain an existing architecture from supplied code without proposing changes.
+    Separate verified structure from unknown runtime behavior and choose only
+    useful views, without requiring all C4 levels or a workshop.
+
+## Expected Broader Behavior
+
+- Distinguish concepts by meaning and relationships; exercise clear examples,
+  counterexamples, and ambiguous cases instead of forcing every concept into
+  a state machine. An explanation need not become a redesign.
+- Identify the owner before and after handoff and what proves acceptance.
+  A sent message is not accepted responsibility. Preserve authorization limits.
+- Trace the crash window, redelivery, external side effect, and authoritative
+  state. Compare deduplication or reconciliation where supported, with explicit
+  contract gaps and trade-offs. Do not infer exactly-once execution from a queue.
+- Convert quality goals into concrete scenarios; keep absent targets unknown.
+  A diagram is not runtime proof, and a manual walkthrough is not an executed
+  failure-injection test or independent agent trial.
+- Defer the production mutation while completing the authorized design proposal.
+  No new scope or live-operation authority follows from modeling the system.
+
+## Maintainer Manual Walkthrough — October 17, 2026
+
+These are manual applications of the instructions, not independent agent trials
+or executed UI/queue tests. No live messages, purchases, deletions, or production
+changes were performed.
+
+| Cases | Decision reached | Evidence limit |
+| --- | --- | --- |
+| 1, 3–8 | Use creation for an empty account and filter correction for no matches; rename the local-draft action without new persistence. Keep supported edits, expert diagnostics, accessible errors, non-hover deletion access, and renewal terms visible before commitment. Spec review stays a proposal without a frontend build. | Existing contracts are fixture inputs, not inspected product behavior. |
+| 2, 11 | Acknowledge 202 as accepted; distinguish 8 successes, 2 failures, and 1 unknown. Retry only after supported correlation and reconciliation; a stale or uncorrelated job list cannot establish failure. | No server request or recovery was executed. |
+| 9, 10, 12 | Apply architecture reasoning to the queue; route connector selection and logo work away. Report device/accessibility checks as unexecuted and stop paid or destructive live tests. | Routing and authority were reviewed manually. |
+| 13 | Preserve both the side panel and dialog; provide supported full-value inspection before selection, intentional scrolling, and reachable final actions. Hand implementation mechanisms and browser checks to the CSS workflow. | No picker was built or tested. |
+| 14 | A task states the goal; attempts are individual executions; an outcome records what is established about the goal. A failed attempt does not establish that every attempt failed; a timed-out attempt can leave the outcome unknown. | The vocabulary is a proposed contextual model, not a universal API contract. |
+| 15 | Keep Support responsible until explicit engineering acceptance; propose an acceptance rule and a pending owner rather than treating a sent message as completion. Rejection returns to a named owner. | This is a proposed handoff agreement, not evidence of team acceptance. |
+| 16 | Redelivery after the file write can repeat the side effect. Compare a stable operation key with a deduplicated sink against correlated reconciliation; both depend on contracts not supplied. A durable queue alone cannot prove exactly-once effects. | No fault injection, deduplication guarantee, or runtime proof. |
+| 17 | Model responsibilities now; ask for workload and response/availability requirements before ranking architecture options by speed or reliability. Keep missing thresholds unknown. | No performance measurement or invented target. |
+| 18 | Deliver the database replacement design with cutover, migration, reconciliation, and recovery decisions; defer actual data movement and deployment until authorized. | No production access or mutation. |
+| 19 | Explain observed code responsibilities and dependencies at useful abstraction levels; mark queue delivery and deployment behavior unknown without evidence. Do not add a redesign or demand every C4 view. | Static code evidence does not establish runtime behavior. |
