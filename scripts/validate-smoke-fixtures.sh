@@ -57,7 +57,7 @@ required_skills=(
   "vp-session-wrapup"
   "vp-tunnel"
   "vp-css-best-practices"
-  "vp-interaction-design"
+  "vp-design-reasoning"
   "vp-typescript-best-practices"
 )
 

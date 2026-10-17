@@ -93,5 +93,6 @@ checks actually run separately from planned checks.
   when an isolated dependency replacement or migration mechanics own the next step.
 - [`vp-typescript-best-practices`](https://github.com/VdustR/skills/tree/main/skills/vp-typescript-best-practices)
   when implementing or reviewing TypeScript type boundaries.
-- [`vp-interaction-design`](https://github.com/VdustR/skills/tree/main/skills/vp-interaction-design)
-  when product interactions and information needs must guide interface decisions.
+- [`vp-design-reasoning`](https://github.com/VdustR/skills/tree/main/skills/vp-design-reasoning)
+  when conceptual boundaries, workflow ownership, or architecture scenarios
+  need clarification before or alongside technology selection.

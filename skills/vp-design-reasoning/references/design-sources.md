@@ -1,6 +1,7 @@
 # Research and Design Boundaries
 
-Reviewed on October 15, 2026. These sources informed the workflow; they are not
+Interaction sources reviewed on October 15, 2026; broader modeling sources
+reviewed on October 17, 2026. These sources informed the workflow; they are not
 additional runtime dependencies. Recheck current upstream guidance before
 adopting a later change. Recommendations below are this skill's synthesis,
 not a claim of endorsement or universal agreement.
@@ -40,18 +41,32 @@ every recommendation into one checklist.
   receiving focus. Do not announce every update or apply one live-region
   pattern indiscriminately.
 
+## Modeling and scenario sources
+
+- [C4: Abstractions](https://c4model.com/abstractions) and
+  [Diagrams](https://c4model.com/diagrams) inform consistent abstraction levels
+  and selecting useful views. C4 supports communicating structure; it does not
+  establish runtime correctness or require every diagram level.
+- [SEI: Scenario-Based Analysis of Software Architecture](https://www.sei.cmu.edu/library/scenario-based-analysis-of-software-architecture/)
+  informs exercising architectures against relevant quality goals.
+- [SEI: Reasoning About Software Quality Attributes](https://www.sei.cmu.edu/library/reasoning-about-software-quality-attributes/)
+  informs making quality requirements concrete through scenarios. This skill
+  does not claim to conduct a formal SEI evaluation or impose its workshops.
+- The GOV.UK whole-problem guidance above supports examining handoffs across
+  organizations. Wider discovery does not authorize changing other teams' work.
+
 ## Scope decisions
 
-Include planning, implementation, UX copy, interaction defects, and reviews of
-web and native interfaces. Embedded conversational tools also have action,
-permission, waiting, and recovery states. Static reading surfaces and landing
-pages are relevant where navigation, forms, disclosure, or other interactions
-affect the user's task.
+The common workflow covers concept definitions, process ownership and handoffs,
+architecture responsibilities and contracts, and user interaction behavior.
+Domain-specific evidence remains necessary: a counterexample can challenge a
+concept, but cannot establish a system's performance or an interface's usability.
+Concept prompts are this skill's synthesis, not a standardized modeling notation.
 
-Exclude backend-only architecture, agent tool selection, standalone branding,
-and static artwork. Their design decisions have different evidence and
-workflows. A task can contain both kinds of work; apply this skill to its
-interaction slice without claiming ownership of the rest.
+Agent tool selection, standalone branding, and static artwork retain separate
+workflows. Technology selection hands off to vp-stack-selection. UI reasoning
+retains its detailed state, content resilience, and recovery references and
+composes with Impeccable for frontend work only.
 
 Keep broad coverage in discovery, then choose risk-relevant verification.
 Do not equate exhaustive enumeration with every possible environment

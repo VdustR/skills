@@ -1,4 +1,0 @@
-interface:
-  display_name: "VP Interaction Design"
-  short_description: "Design UI states, content disclosure, scrolling, and recovery"
-  default_prompt: "Use $vp-interaction-design to design or review user intents, states, full-content access, scroll behavior, action outcomes, and recovery, together with Impeccable for frontend design."

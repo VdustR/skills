@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Design Reasoning"
+  short_description: "Model concepts, workflows, architecture, and interactions"
+  default_prompt: "Use $vp-design-reasoning to clarify the problem, build a bounded model, exercise scenarios, compare options, and verify design decisions at the appropriate level."
