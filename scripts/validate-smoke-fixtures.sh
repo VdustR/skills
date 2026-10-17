@@ -55,6 +55,7 @@ required_skills=(
   "vp-github"
   "vp-agent-browser-session"
   "vp-session-wrapup"
+  "vp-retro"
   "vp-tunnel"
   "vp-css-best-practices"
   "vp-design-reasoning"

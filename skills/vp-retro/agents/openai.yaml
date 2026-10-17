@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Retro"
-  short_description: "Run session retrospectives for agents"
-  default_prompt: "Use $vp-retro to review this session and find workflow improvements."
+  short_description: "Classify session lessons and recommend scoped improvements"
+  default_prompt: "Use $vp-retro to distinguish one-off mistakes from recurring patterns, assess reuse value and scope, and separate actionable user advice from agent improvements without applying unapproved changes."
