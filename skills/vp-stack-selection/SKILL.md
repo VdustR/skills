@@ -19,6 +19,11 @@ explain a different choice with concrete technical reasons.
   contracts. Surface conflicts rather than silently replacing a requirement.
 - Compare actual libraries and tools before choosing a language. A domain label
   or popularity ranking is not evidence of feature coverage.
+- Include alpha, beta, release candidate (RC), preview, and nightly versions
+  when they are credible candidates. Do not exclude them by release label alone;
+  compare required capabilities, known gaps, compatibility, maintenance, and
+  upgrade/rollback costs against stable alternatives. A newer label alone is
+  not a reason to adopt one either.
 - Keep supported existing choices unless the requested change justifies replacing
   them. For a rewrite, compare retaining or incrementally adapting the current stack.
 - Use TypeScript/Rust preferences when technical fit and lifecycle costs are
@@ -46,8 +51,10 @@ flowchart TD
    references below. Compare credible alternatives on feature coverage, ecosystem
    maintenance, integration, deployment, and technical maintenance costs.
 3. Verify decisive claims against version-matched official sources. If capability
-   coverage is uncertain, use a small representative check. Select current stable
-   compatible versions; plan to record them in project config and lockfiles.
+   coverage is uncertain, use a small representative check. Select compatible
+   versions from the relevant release channels; record the channel, exact tested
+   version, adoption evidence, and unresolved risks. Plan reproducible pins in
+   project config and lockfiles, especially for prereleases and nightlies.
 4. Return the choice, main tradeoffs, supporting links, open questions, and checks
    needed before adoption. For a rewrite or port, include parity, migration, and
    rollback. Selection alone does not authorize installation, implementation, or Git changes.

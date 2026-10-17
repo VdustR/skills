@@ -7,7 +7,7 @@ description: >-
   checking. Also use for tsconfig/project setup, multiple tsconfigs,
   environment-specific builds, conflicting ambient globals, library integrations,
   browser/Node isolation, project references, strictest, erasableSyntaxOnly,
-  ts-reset, incremental caches, and type-check
+  ts-reset, incremental caches, native compiler compatibility, and type-check
   coverage in single packages or TypeScript monorepos. Boundary: does not own
   non-TypeScript monorepo or general workspace setup.
 ---

@@ -74,12 +74,22 @@ intended leaf, rather than an inferred or overly broad project.
 
 Run the root command cold, then unchanged with a warm cache. Record elapsed time,
 compiler version, command, project count, and cache state; do not infer an
-optimal setup from one timing sample. Confirm distinct build-info files and non-conflicting
-build outputs exist.
+optimal setup from one timing sample. Confirm distinct build-info files and
+non-conflicting build outputs exist. Inspect verbose reasons/extended diagnostics
+to establish reuse; a faster second run or an existing build-info file alone is
+insufficient. Report compiler reuse separately from task-runner cache hits.
 
 Introduce a source error after warming: the root command must fail. Change a
 shared dependency's public type and verify downstream diagnostics update. Change
-a leaf or extended compiler config and verify it is not skipped by a task cache.
+a shared global declaration loaded outside a consumer's include glob, and verify
+that consumer updates too. After each error-producing change, run twice without
+clearing caches: both runs must fail with the expected diagnostic in the
+consumer. Restore the valid input and require success, then unchanged reuse.
+Include imported workspace source outside the consumer's include glob, not only
+files owned directly by one project. Check missing project references when build
+mode owns the graph. These cases are especially important before changing a
+native/nightly pin or replacing a compiler check with linter diagnostics.
+Change a leaf or extended compiler config and verify it is not skipped by a task cache.
 Add an unowned source file and confirm the independent coverage gate fails even
 when all existing projects are cached. Where declaration output is required,
 verify a clean build and consistent restoration of outputs plus build info.
