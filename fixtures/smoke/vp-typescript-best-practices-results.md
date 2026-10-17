@@ -1,5 +1,26 @@
 # TypeScript Verification Results
 
+## Incremental-cache update: 2026-10-17 (Asia/Taipei)
+
+`node --test tests/typescript/projects.test.mjs` passed all 13 project tests with
+the locked TypeScript 6.0.3 compiler. The added executable scenario checks
+unchanged build-info content and zero warm-run type instantiations, then edits
+imported workspace source and a shared global declaration outside the consumer's
+include glob. Both changes produce the expected consumer diagnostic on two
+consecutive checks; restoring each valid input succeeds and the next run reuses
+diagnostics. Temporary projects are removed by the test harness.
+
+The full `npm run validate` also passed: 50 executable tests, 31 skills,
+15 smoke fixtures, and locked `skills@1.5.3` parser compatibility. Static fixture
+and parser checks are separate from the executable cache assertions.
+
+A manual walkthrough also covered existing build-info without enabled reuse,
+compatible no-emit graph versus declaration graph constraints, and separate
+native checker/JavaScript API compiler roles. The template-aio native nightly
+and remote CI results are linked research evidence in the skill; they were not
+rerun here. This update does not establish native/editor compatibility or a
+production speedup.
+
 ## Scope and baseline
 
 This record covers the TypeScript skill's code guidance and project-configuration

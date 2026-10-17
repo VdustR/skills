@@ -18,7 +18,9 @@ incidental fix for an unrelated implementation error.
    `erasableSyntaxOnly: true` with a compatible compiler. Inspect effective settings
    after inheritance and overrides; document compatibility exceptions.
    `strict: true` alone is not equivalent. Keep runtime globals out of the
-   shared base and isolate cache/output paths for each active project/variant.
+   shared base. Enable incremental checking for compatible project checks and
+   isolate cache/output paths for each active project/variant. A configured
+   `tsBuildInfoFile` alone does not establish that diagnostics are reused.
 4. Address Matt Pocock's `@total-typescript/ts-reset` explicitly. Include a
    dedicated application-owned `reset.d.ts` in every intended project, or
    document the application compatibility limit. Keep resets out of published

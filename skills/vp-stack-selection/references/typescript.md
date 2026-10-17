@@ -1,7 +1,10 @@
 # TypeScript
 
-Prefer pnpm, current stable compatible TypeScript, strict type checking, and ESM
-for new code. Keep required CommonJS consumers supported or plan an explicit
+Prefer pnpm, compatible TypeScript, strict type checking, and ESM for new code.
+Evaluate stable and relevant prerelease/native compiler candidates under the
+main decision rules; verify framework checkers, editor SDKs, compiler API
+consumers, and incremental invalidation with the exact candidate version.
+Keep required CommonJS consumers supported or plan an explicit
 breaking change. Match module resolution and package exports to the host; see
 [TypeScript modules](https://www.typescriptlang.org/docs/handbook/modules/reference.html).
 
@@ -18,6 +21,13 @@ and type checking. Retain targeted framework tools where coverage is missing.
 Bundling and declaration emission do not replace type checking, including
 framework-aware checks for templates. Toolchain ownership belongs in the
 [toolchain reference](toolchain.md).
+
+If a linter offers compiler diagnostics, verify whole-project input coverage,
+effective compiler options, missing references, and shared declaration changes
+before replacing a compiler command. A successful lint run alone does not prove
+build-mode equivalence. Compare a separate incremental compiler check with an
+integrated check using measured reuse and diagnostic coverage; see
+[TypeScript project verification](https://github.com/VdustR/skills/blob/main/skills/vp-typescript-best-practices/references/project-verification.md).
 
 ## Library packaging
 

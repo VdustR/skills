@@ -46,6 +46,15 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | Single published TS library, published library monorepo, and private app-only workspace | Consider Changesets for either package-release case; use pnpm workspaces for workspace management. Omit unneeded release tooling for private apps. |
 | Generated CHANGELOG.md and authored changeset entries | Exclude generated changelogs from formatting/linting, including explicit staged inputs; keep authored entries checked unless repository policy differs. |
 
+### Release-channel decisions
+
+| Case | Expected decision |
+| --- | --- |
+| An alpha, beta, RC, preview, or nightly candidate provides a needed capability and representative compatibility checks pass | Keep it eligible; compare technical benefit, known gaps, maintenance, and rollback against stable alternatives. Record the channel and exact tested version instead of excluding it by label. |
+| A stable release and a newer preview meet the same requirements, but the preview breaks a required framework checker | Select the compatible candidate or identify a verified bridge; do not adopt the preview solely because it is newer. |
+| Native TypeScript caches pass regression checks, but the existing linter needs a JavaScript compiler API | Evaluate separate checker/API compiler roles with explicit entrypoints and pins. Neither reject the native checker by release label nor silently replace the API dependency. |
+| An integrated linter reports compiler diagnostics and the separate compiler has a working warm cache | Compare complete diagnostic/project coverage and measured cached costs before removing the compiler command; lint success is insufficient evidence. |
+
 ### Native and shared applications
 
 | Case | Expected decision |
@@ -119,3 +128,12 @@ successful emission and consumer checks. This trial does not establish support f
 all compiler options. It also does not cover streaming/RSC, StyleX SSR, Storybook,
 React Compiler/Doctor, Vite+, alternate runtimes, native platforms, or performance.
 These results apply to the tested versions and paths, not every stack in this skill.
+
+## Manual release-channel walkthrough: 2026-10-17 (Asia/Taipei)
+
+Walked the four release-channel scenarios through the updated decision rules and
+TypeScript/toolchain references. Each prerelease label remains eligible, a
+required checker incompatibility still blocks that candidate, separate API and
+checker roles remain possible, and compiler removal requires coverage evidence.
+This was a manual walkthrough by the editing agent, not an independent agent
+trial or a new package-integration benchmark.

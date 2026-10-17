@@ -28,10 +28,13 @@ Use the ecosystem's package manager for project dependencies. Platform-coupled
 SDKs and wrappers retain their supported version ownership; see the ecosystem
 references before configuring them.
 
-Resolve current stable compatible versions, then record the result in project
-configuration and locks. Prefer the latest compatible stable TypeScript and a
-supported Node.js version meeting build-tool requirements. Consumer runtime
-support is a separate promise. Avoid floating `latest` in reproducible CI.
+Resolve compatible versions across relevant release channels using the main
+decision rules, then record tested versions in project configuration and locks.
+Alpha, beta, RC, preview, and nightly releases are eligible when their concrete
+benefits and verified compatibility justify adoption. Pin moving channels to
+exact tested releases rather than floating `latest` or `next` in reproducible CI.
+Choose a Node.js version meeting build-tool and deployment requirements;
+consumer runtime support is a separate promise.
 
 When mise owns Node.js/pnpm, align `packageManager` and CI with those versions.
 [Vite+](https://www.viteplus.dev/guide) also manages environments; use its local

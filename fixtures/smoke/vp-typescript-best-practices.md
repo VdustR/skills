@@ -47,6 +47,9 @@ of the request.
 | Add ts-reset to application checking without changing library consumers | Include the reset in each intended application project and keep exported declarations and standalone library checks reset-free. |
 | A new untracked worker file is not included by any leaf | Independent coverage gate fails even when existing projects have warm-cache hits. |
 | Shared source is checked for Node but also promises browser support | Coverage by the union of files is insufficient; require the browser matrix row too. |
+| Build-info files exist but incremental checking is disabled or every project still rechecks | Inspect effective options and command; enable compatible incremental checking and verify actual reuse through diagnostics. File existence alone is insufficient. |
+| A warm project imports workspace source and shared globals outside its include glob | Edit both contracts, require the consumer's expected errors on two consecutive checks, restore valid inputs, then require success and unchanged reuse. |
+| A pinned native nightly is proposed alongside tools requiring the JavaScript compiler API | Verify each compiler role and exact version; use a distinct alias and explicit entrypoint when needed, and verify editor behavior separately. |
 
 Additional executable scenarios cover browser/Node config examples and actual
 runtimes; erasable syntax versus native Node stripping; jQuery/Zepto `$` and

@@ -17,9 +17,11 @@ flowchart TD
     F --> G
 ```
 
-Prefer stable Rust, Cargo, rustfmt, and Clippy. Add an async runtime or nightly
-only for a demonstrated need. Use Cargo workspaces for shared packages and build
-coordination; choose release tooling for the actual distribution model.
+Use Cargo, rustfmt, and Clippy. Compare stable, beta, or nightly Rust when their
+capabilities matter; apply the main release-channel decision rules and pin the
+tested toolchain. Add an async runtime when needed. Use Cargo workspaces for
+shared packages and build coordination; choose release tooling for the actual
+distribution model.
 
 Prefer mise where supported, but check its
 [Rust/rustup integration](https://mise.jdx.dev/lang/rust.html): `RUSTUP_TOOLCHAIN`

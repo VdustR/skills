@@ -177,6 +177,53 @@ test("incremental checks invalidate after source, dependency and extended-config
   assert.match(w.cli("-p", "tsconfig.json").output, /TS7030/);
 });
 
+test("warm checks invalidate imported workspace source and global declarations, retain errors, and recover", (t) => {
+  const w = workspace(t);
+  w.config("app.json", {
+    compilerOptions: { tsBuildInfoFile: ".cache/app.tsbuildinfo" },
+    include: ["app/**/*.ts"],
+  });
+  const source = "export const value: number = 1;";
+  const globals = "declare function cacheInput(input: number): number;";
+  w.write("library/index.ts", source);
+  w.write("library/globals.d.ts", globals);
+  w.write("app/index.ts", `
+    /// <reference path="../library/globals.d.ts" />
+    import { value } from "../library/index";
+    export const result: number = value;
+    export const fromGlobal = cacheInput(1);
+  `);
+  const check = () => w.cli("-p", "app.json", "--extendedDiagnostics");
+  const pass = () => {
+    const result = check();
+    assert.equal(result.status, 0, result.output);
+    return result;
+  };
+  pass();
+  const cache = join(w.dir, ".cache/app.tsbuildinfo");
+  const coldState = readFileSync(cache, "utf8");
+  const warm = pass();
+  assert.equal(readFileSync(cache, "utf8"), coldState);
+  assert.match(warm.output, /Instantiations:\s+0\b/, warm.output);
+
+  for (const [file, invalid, valid, code] of [
+    ["library/index.ts", 'export const value: string = "changed";', source, "TS2322"],
+    ["library/globals.d.ts", "declare function cacheInput(input: string): number;", globals, "TS2345"],
+  ]) {
+    w.write(file, invalid);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = check();
+      assert.notEqual(result.status, 0, result.output);
+      assert.ok(result.output.includes(code), result.output);
+      assert.match(result.output, /app\/index\.ts/, result.output);
+    }
+    w.write(file, valid);
+    pass();
+    const reused = pass();
+    assert.match(reused.output, /Instantiations:\s+0\b/, reused.output);
+  }
+});
+
 test("application reset affects intended programs without leaking into libraries", (t) => {
   const w = workspace(t);
   w.write("app/reset.d.ts", blocks("project-configuration.md", "ts")[0]);

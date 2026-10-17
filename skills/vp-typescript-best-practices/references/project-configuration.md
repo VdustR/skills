@@ -261,12 +261,23 @@ also type-check without the app's reset; test a packed consumer without it.
 
 ## Caches and efficiency
 
+Enable `incremental: true` for compatible checking projects, including `noEmit`
+projects, and set an explicit `tsBuildInfoFile` in each leaf. A build-info path
+only selects storage; the file's existence does not prove incremental checking
+or unchanged-project reuse. Verify the effective config and command together.
+For a compatible no-emit solution graph, build mode may use
+`tsc -b --noEmit --incremental`; independent leaves may use
+`tsc -p <leaf> --incremental`. Check the exact compiler's graph constraints
+before choosing either command; do not force a declaration graph into no-emit
+mode. Use verbose build reasons and extended diagnostics to distinguish an
+unchanged-project skip, reused diagnostics, and a full recheck.
+
 Give each package/environment/build variant a unique writable `tsBuildInfoFile`
 in ignored cache storage. Never let concurrent projects write the same state or
-output directory. Preserve incremental state locally; run cold checks in isolated cache storage rather
-than deleting unrelated caches. Composite outputs and build info must remain
-consistent when restored. A fresh dependency install can give extended package
-configs newer timestamps than restored outputs, causing build-mode revalidation
+output directory. Preserve incremental state locally; run cold checks in isolated
+cache storage rather than deleting unrelated caches. Composite outputs and build
+info must remain consistent when restored. A fresh dependency install can give
+extended package configs newer timestamps than restored outputs, causing build-mode revalidation
 even when their contents match. Inspect the verbose reason and unchanged
 outputs before classifying that work as a cache miss or claiming a skipped check.
 
@@ -278,8 +289,45 @@ without accounting for file additions and deletions. Verify invalidation before
 trusting reuse. Measure cold/warm checks and an edited dependency; reduce redundant
 programs only while preserving environment boundaries and complete coverage.
 
+When CI restores compiler state, install dependencies before restoring build info
+and always run the compiler afterward, including on an exact-key cache hit.
+Scope state by platform/architecture, compiler version and lockfile; a
+revision-specific key with a compatible fallback can seed a new revision while
+the compiler validates its changed inputs. A task-result cache that skips the
+compiler needs the complete input key described above. Save reusable successful
+state after checks pass, under the repository's cache-write policy. Do not treat
+failed restore or save as proof of compiler behavior.
+
+### Native and prerelease compilers
+
+Evaluate stable, alpha, beta, RC, preview, and nightly compilers by required
+capabilities and measured compatibility. Pin the exact tested release and run
+the invalidation gate before updating it. Verify the installed package and CLI:
+older native previews use `tsgo`, while later native TypeScript packages use
+`tsc`; package names, supported flags, and editor settings can change.
+
+Inventory compiler roles separately: project checks, editor language service,
+framework checkers, and JavaScript compiler API consumers such as lint or
+declaration tools. When the native compiler cannot serve an API consumer, keep
+a compatible JavaScript compiler for that tool and install the native checker
+under a distinct alias. Invoke its entrypoint explicitly to avoid competing
+`tsc` binaries. Point the editor at the intended SDK and verify language-service
+behavior after restarting it; CLI success does not prove editor integration.
+
+The [template-aio incremental-checking PR](https://github.com/VdustR/template-aio/pull/92)
+is a version-specific example, reviewed on 2026-10-17: it pins native TypeScript
+`7.1.0-dev.20261016.1` under `typescript-native`, retains TypeScript 6 for API
+consumers, and tests imported workspace source and shared global declarations.
+Its [compiler/linter trade-off research](https://github.com/VdustR/template-aio/pull/93)
+also separates compiler caching from lint diagnostics and declaration emission.
+Use these as regression scenarios, not a universal version recommendation or
+evidence that another native or linter-bundled compiler behaves identically.
+
 ## Sources
 
+- [Incremental checking](https://www.typescriptlang.org/tsconfig/incremental.html)
+- [Build-info storage](https://www.typescriptlang.org/tsconfig/tsBuildInfoFile.html)
+- [Official TypeScript releases and nightly channel](https://github.com/microsoft/TypeScript)
 - [jQuery noConflict](https://api.jquery.com/jQuery.noConflict/)
 - [Zepto globals](https://zeptojs.com/)
 - [Lodash noConflict](https://lodash.com/docs/#noConflict)
