@@ -43,21 +43,98 @@ A recorded follow-up is still open work; recording it does not satisfy the
 condition. Distinguish session obligations from optional future improvements
 and intentionally retained state. Do not invent work to keep the session open.
 
-Before closing, check the session evidence for strongly recommended, doable
-improvements to skills, AGENTS.md, or local agent memory. A candidate needs an
-observed problem, a feasible correction, and enough reuse value to justify
-persistence. Present qualifying candidates to the user first, then apply
-`$vp-retro` to classify them and refine the recommendation. This handoff does
-not itself authorize edits; preserve authorization already granted within its
-scope, including an applicable auto-development request. With no qualifying
-candidate, skip the retro;
-do not manufacture a recommendation or make every goodbye a full audit.
+A completed responsibility transfer is different from delegation. Exclude
+transferred work from this session's TODOs only when the receiving owner has
+confirmed the handoff, the transfer is within the user's authorized scope, and
+this session's required handoff and verification are complete. A suggested
+owner or a handoff note alone does not transfer responsibility. Unrelated work
+does not block closeout.
 
 An optional improvement awaiting approval is not an existing session TODO.
 State its pending status separately. If session risks or TODOs remain, report
-them and the next action without claiming the session is clear. When none
-remain, say the session is ready to close. Archiving and other mutations still
-follow the applicable authorization rules.
+them and the next action without claiming the session is clear. Archiving and
+other mutations still follow the applicable authorization rules.
+
+### Validate blockers and actions
+
+Before concluding that the session cannot bye, verify each proposed blocker
+against current evidence and this session's acceptance criteria. Remove stale,
+irrelevant, optional, or already transferred items from the blocker list.
+For every remaining blocker, validate the next action before recommending it:
+
+- Name the actor, exact target and operation, and observable completion result.
+- Check that the operation is supported, its prerequisites and permissions are
+  available or obtainable, and the actor can actually perform it. Identify any
+  missing prerequisite rather than presenting a conditional step as runnable.
+- Explain how it reduces the risk, advances the assigned outcome, or obtains
+  evidence needed for a decision. Reject vague advice, ineffective busywork,
+  impossible operations, and retries with no new evidence or recovery condition.
+
+Waiting for an external event is a dependency, not an executable action. Check
+the current state once when useful; do not turn repeated polling or "wait
+longer" into progress. If a genuine session obligation is blocked and no
+controllable action exists, say so explicitly. Name the dependency owner when
+known, the observable event needed to resume, and any verified feasible
+escalation or responsibility-transfer option. Do not invent an action or claim
+completion merely because neither the agent nor the user controls the wait.
+
+Only after this check, classify the closeout state. For a non-ready result,
+present the validated actions and prerequisites, or the explicit absence of a
+controllable action, then ask whether the user wants AUTO Flow for the named
+remaining scope. Explain what can run now and what remains gated. If only an
+external dependency remains, make clear that AUTO Flow cannot remove it and
+that later execution requires that prerequisite. The offer does not authorize
+monitoring, scheduling, external messages, or unsupported automatic resumption.
+If AUTO Flow is already authorized for that scope, continue its feasible work
+without asking again; ask only for a new decision or required approval. After
+acceptance, use `$vp-autodev` for development or the directly matching workflow
+for other work. An AUTO Flow offer or acceptance never bypasses a risk gate.
+
+### Closeout decision
+
+Use the first applicable state below after completing safe, authorized work.
+Report any additional blockers alongside it; the primary state must not hide
+them. Risk means a concrete unresolved risk relevant to closing this session,
+not hypothetical risk or the mere existence of retained state.
+
+| State | Condition | Decision |
+| --- | --- | --- |
+| Unresolved risk | Closing would leave a concrete risk, such as exposed credentials or unique work without a safe recovery path. | Cannot bye; identify the risk and the action or approval needed. |
+| Actionable TODO | Required work or verification remains within this session's responsibility and can proceed. | Cannot bye; continue authorized work or name the next action. |
+| Waiting or blocked | A session obligation requires another result, a user decision, permission, or an unavailable service. | Cannot bye; name the dependency, owner, and condition for resuming. |
+| Unverified | Evidence is insufficient to establish completion, ownership, or safe closeout. | Cannot confirm bye yet; identify the missing evidence and how to obtain it. |
+| Ready to close | No unresolved session risk or TODO remains, including required verification and handoff. | Can bye, including when only confirmed transferred work, unrelated work, optional improvements, or intentionally retained safe state remains. |
+
+End every closeout report with one standalone sentence stating the decision in
+the user's language. When ready to close, explicitly say that the user can bye;
+in Traditional Chinese, use `可以 bye。` as the final sentence. Readiness phrasing
+such as "ready to close" alone is insufficient. For unresolved risk, actionable
+TODOs, or blockers, use `目前不能 bye。`; for insufficient evidence, use
+`目前尚無法確認可以 bye。` Explain reasons, validated actions or the lack of a
+controllable action, and any AUTO Flow question before that sentence.
+Place links, notes, and optional suggestions before it, with nothing after it.
+This decision reports readiness; it does not itself archive the session or
+authorize any mutation. Requests to edit this workflow remain editing tasks
+and do not require a closeout verdict.
+
+### Ready-to-close retro
+
+Once the session otherwise qualifies as ready to close, check its evidence for
+actionable improvements to skills, AGENTS.md, or local agent memory. A candidate
+needs an observed problem, a feasible effective correction, and enough reuse
+value to justify persistence. Identify the exact target, proposed change,
+expected benefit, and a representative verification. Reject vague reminders,
+unsupported diagnoses, impossible fixes, and changes already covered correctly
+by existing guidance.
+
+Present qualifying candidates to the user first, then apply `$vp-retro` to
+classify them and refine the recommendation before the final bye verdict. This
+handoff does not itself authorize edits; preserve authorization already granted
+within its scope, including an applicable auto-development request. An optional
+proposal awaiting approval does not block bye. With no qualifying candidate,
+briefly report that no actionable retro improvement was found and skip retro;
+do not manufacture a recommendation or make every goodbye a full audit.
+Recheck closeout only if the analysis exposes a genuine in-scope risk or TODO.
 
 ## Report
 
