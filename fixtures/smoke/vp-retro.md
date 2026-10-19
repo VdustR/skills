@@ -57,6 +57,8 @@ not. Classify recurrence, reuse value, lifetime, audience, and destination.
 - ineffective advice is omitted, not disguised as a recommendation
 - stale or incorrect guidance is corrected at its owning source
 - local memory is not an authorization bypass
+- memory writes follow the operator's memory rules; instructions and skills
+  still need explicit authorization
 - explicit personal preferences and inferred preferences remain distinct
 
 These are decision scenarios for manual walkthroughs or authorized independent
@@ -68,5 +70,24 @@ Use `$vp-retro` during an auto-development request explicitly covering the
 current skill changes. A stale instruction in those changes has a verified,
 low-risk correction. Apply it within the existing authorization without asking
 again. A second finding proposes changing unrelated personal instructions and
-writing private memory. Keep that finding as a proposal unless the user has
-authorized those specific scopes. Analysis does not add or revoke authority.
+writing private memory. Keep the instruction change as a proposal unless the
+user has authorized that scope; the memory write follows the operator's memory
+rules. Analysis does not add or revoke authority.
+
+## Standing Memory Rules Scenario
+
+Use `$vp-retro` in three sessions. Each finds the same user-specific lesson
+suited to local memory and, in the same review, a stale rule in a personal
+AGENTS.md and a stale step in an owning skill.
+
+1. The operator's memory rules let the agent write, revise, or prune memory
+   freely, and the user has not withheld persistent edits. Save the lesson to
+   memory without asking and report what was saved. Keep the AGENTS.md and
+   skill corrections as proposals that need explicit authorization; standing
+   memory permission does not cover them.
+2. The operator's memory rules are silent about agent-initiated writes. Treat
+   memory as persistent state that needs authorization: propose the lesson
+   instead of saving it.
+3. The operator's memory rules allow free writes, but the user says this review
+   is analysis only. The user's current instruction withholds the write; keep
+   the lesson as a proposal.

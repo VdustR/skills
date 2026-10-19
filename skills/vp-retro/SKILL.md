@@ -48,8 +48,12 @@ guidance, then strongly recommend correction when evidence, impact, reuse value,
 and feasibility justify it. Name the exact target, proposed correction, expected
 benefit, and a representative check. For private or user-specific learning that
 does not belong in shared guidance, prefer the agent's own local memory over
-AGENTS.md or CLAUDE.md. Memory is still persistent state, requires authorization,
-and must follow the client's supported write mechanism.
+AGENTS.md or CLAUDE.md. Memory writes follow the operator's own memory rules and
+the client's supported write mechanism. When those rules grant standing
+permission to write, revise, or prune memory, save a qualifying lesson without
+asking and report what was saved, unless the user has withheld persistent edits
+for this review. When no such rule exists, treat memory as persistent state that
+needs authorization.
 
 Keep observations with no worthwhile action separate from recommendations. It
 is valid to conclude that no persistent enhancement is warranted. Present strong
@@ -60,8 +64,9 @@ auto-development request; do not ask again for changes it already covers.
 
 Recommend changes only when the expected benefit exceeds the added context and
 maintenance cost. Prefer deleting or narrowing guidance over adding another
-duplicate rule. Do not update instructions, skills, or memory without explicit
-authorization.
+duplicate rule. Do not update instructions or skills without explicit
+authorization; standing memory permission does not extend to them. Update memory
+as the operator's memory rules allow.
 
 Read `references/dimensions.md` for placement criteria and analysis lenses, and
 `references/subagent-guide.md` only when delegated evidence gathering is useful

@@ -22,7 +22,7 @@ change.
 | Durable repository contract or contributor convention | Repository AGENTS.md or existing repo documentation | Confirm it applies to the repo's audience. Personal repos may carry owner conventions; team and public repos need relevance to their contributors. |
 | Reusable procedure or incorrect workflow guidance | The owning skill | Correct the existing source and verify a representative task; avoid copying its procedure into AGENTS.md. |
 | Explicit, durable user preference across projects | Personal instructions, if the user wants it enforced there | Confirm cross-project intent. Do not promote an inferred preference into a universal rule. |
-| Private context, personal learning, or a narrow agent reminder unsuitable for shared guidance | Local agent memory | Preserve scope, evidence, and freshness limits; follow memory authorization and write rules. Do not use AGENTS.md or CLAUDE.md as a private learning log. |
+| Private context, personal learning, or a narrow agent reminder unsuitable for shared guidance | Local agent memory | Preserve scope, evidence, and freshness limits; follow the operator's memory rules and the client's write mechanism. Do not use AGENTS.md or CLAUDE.md as a private learning log. |
 | Uncertain cause, weak benefit, or no feasible effective correction | No persistent change | Report an evidence gap only when it matters; do not invent advice or storage work. |
 
 Repository visibility and ownership inform audience; neither alone determines
