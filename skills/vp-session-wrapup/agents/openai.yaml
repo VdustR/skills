@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Session Wrap-Up"
   short_description: "Summarize and clean up a session before archiving it"
-  default_prompt: "Use $vp-session-wrapup for bye if no risk or todo: check remaining work, clear authorized risk-free leftovers, and present strong, doable improvements before retro analysis."
+  default_prompt: "Use $vp-session-wrapup for bye if no risk or todo: verify session blockers and concrete feasible actions before deciding; distinguish uncontrollable waiting from action; offer AUTO Flow for remaining scope unless already authorized. When otherwise ready to close, check for actionable improvements and use $vp-retro for qualifying candidates. End the closeout report with an explicit bye decision as its final sentence."
