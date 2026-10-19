@@ -164,7 +164,9 @@ found problem as a follow-up. Count it as a session TODO only when it affects
 this session's assigned outcome or required verification; report unrelated
 follow-ups separately without blocking closeout. Recording an in-scope problem
 does not complete it. Improvement analysis follows the handoff above; applying
-a recommendation requires authorization that covers that change.
+a recommendation requires authorization that covers that change. The operator's
+standing memory rules can cover a memory write; they do not cover instructions
+or skills.
 
 ## Related skills
 
