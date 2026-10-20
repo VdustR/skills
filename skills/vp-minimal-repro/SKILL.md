@@ -1,21 +1,42 @@
 ---
 name: vp-minimal-repro
 description: >-
-  Reduce an observed failure to a small reproduction that fails on demand and
-  passes once the cause is removed. Use when a failure has been seen and the
-  next step would otherwise be to drive the whole system again to watch it, or
-  when a reproduction has to be rebuilt standalone to demonstrate or share it.
-  Applies at any layer, including build tools, libraries, services, runtimes,
-  and version-specific behavior. Boundary: starts from an observed failure and
-  ends at a re-runnable reproduction; not for filing the report or deciding
-  where it goes.
+  Isolate an observed failure or uncertain external-system behavior in a small,
+  re-runnable check. Use before repeating a full-system or end-to-end run to
+  confirm the same library, service, runtime, OS, or device behavior, or when
+  preparing a standalone reproduction to share. Preserve verified observations
+  and their reuse conditions. Boundary: establishes a bounded behavior or
+  failure; not a substitute for integration acceptance or a report-filing workflow.
 ---
 
 # Minimal Reproduction
 
-Turn an observed failure into something that can be run again and answers with
-an exit code. Driving the whole system to watch a symptom is slow, hard to
-repeat, and produces evidence nobody can re-run.
+Answer one uncertain behavior with the smallest check that still reaches the
+real boundary. For a failure, produce a re-runnable reproduction, preferably
+with an exit code. For external behavior, verify the specific event, response,
+or effect before using it as a premise for application tests. A failure is not
+required to investigate an unknown behavior.
+
+## Before another full-system run
+
+State the exact question and inspect existing evidence first. If its environment
+and relevant code still match, reuse the recorded observation within its stated
+limits. Otherwise, isolate the missing fact at the real boundary; a mock or
+synthetic event cannot establish what the external system actually does.
+
+For external behavior, read
+[references/external-behavior.md](references/external-behavior.md) for choosing
+the check, retaining evidence, and deciding when it needs to run again. Record
+reusable findings in the repository's existing documentation or evidence location,
+with a link from the relevant test or acceptance plan. Recommend that location
+when writing it is outside the authorized scope. Session history alone should
+not be the only way to recover a premise.
+
+Use the resulting facts to test application logic cheaply. Keep integration,
+physical-device, or human acceptance for claims the isolated check cannot prove.
+Before repeating an end-to-end run, name the unresolved interaction or changed
+condition it will test. Follow required repository checks; do not remove or skip
+mandated acceptance merely because a smaller check passes.
 
 ## Two levels
 
@@ -35,13 +56,19 @@ is a reason for a stranger to run it, typically an instruction to prepare a
 demo or a shared artifact. If a working reproduction is about to be shared as
 is, say that it can be upgraded first and what that would add.
 
-## Requirements at both levels
+## Evidence requirements
 
-Verify the reproduction yourself instead of asking anyone else to confirm it.
-Run it and watch it fail; a reproduction that has only been reasoned about is a
-guess. Once a candidate fix exists, also watch it pass with the fix applied and
-fail again once the fix is reverted. That pair is required before claiming a
-cause, not before reporting a reproduction.
+Execute the check when authorized and feasible. A failure reproduction must
+actually fail; reasoning alone is not a run. Once a candidate fix exists, also
+watch it pass with the fix applied and fail again once the fix is reverted
+safely in the reproduction. That sequence is required before claiming a cause,
+not before reporting an observation. A successful external-behavior check does
+not need an artificial failure or a change to the external system.
+
+When the decisive observation needs human perception, physical access, or
+additional authority, finish the safe preparation and give the smallest manual
+procedure with the expected observation. Keep that claim unverified until the
+observation is supplied. A machine-readable proxy proves only what it measures.
 
 Separate what was observed from what explains it. State plainly which parts are
 verified by a run and which are inference, and never let an explanation inherit

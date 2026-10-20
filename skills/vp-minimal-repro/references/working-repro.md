@@ -6,9 +6,10 @@ repeatedly without thinking about it.
 Prefer a check a machine can make. When the only honest observation is visual —
 paint, layout, animation, rendered output — assert the closest machine-readable
 proxy instead: computed values, measured geometry, serialized state, or a
-comparison against a recorded baseline. Keep the human look as the last step
-rather than the whole check, and write down what the viewer is expected to see
-so the observation can be repeated by someone else.
+comparison against a recorded baseline. Treat the proxy as evidence only for
+the property it measures. Keep any necessary human observation as an explicit
+remaining step, and write down what the viewer is expected to see so the
+observation can be repeated by someone else.
 
 ## Observe the artifact, not the symptom
 
@@ -62,5 +63,7 @@ Until all three have been observed, describe the cause as a candidate.
 A working reproduction belongs wherever the work is happening, with whatever
 names and paths are already there. There is no reason to move it out of the
 repository or rename anything at this level. When it turns out to be worth
-keeping as a regression test, that is a normal test-suite decision, not part of
-this workflow.
+keeping as a regression test, that is a normal test-suite decision. Before
+discarding it, preserve any external-behavior finding that later work will rely
+on, including its evidence and reuse conditions; see
+[external-behavior.md](external-behavior.md).
