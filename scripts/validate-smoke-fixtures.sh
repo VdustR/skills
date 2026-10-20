@@ -46,6 +46,7 @@ refute_frontmatter_pattern() {
 
 required_skills=(
   "vp-autodev"
+  "vp-minimal-repro"
   "vp-skills"
   "vp-pr-comment-resolver"
   "vp-git"
