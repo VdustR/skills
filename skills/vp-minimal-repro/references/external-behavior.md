@@ -24,6 +24,16 @@ variation rather than promoting one successful run into a universal rule. Do
 not manipulate a live service or device beyond the task's authorization just to
 obtain a control case.
 
+## Stop or escalate from the result
+
+Stop exploration once the scoped question is answered well enough to choose
+an implementation. Carry the evidence and its limits into design and acceptance;
+do not turn a small probe into a production implementation or broad benchmark.
+An inconclusive result is not a pass or a disproof: identify the missing control,
+trace, sample, or environment before another attempt. If the next check needs
+unavailable hardware, human perception, additional authority, or material cost,
+prepare the procedure and report that dependency rather than expanding the run.
+
 ## Keep evidence that can be reused
 
 Prefer the repository's existing testing notes, investigation document, or
@@ -77,3 +87,35 @@ acceptance gates still apply.
   layers while retaining integration coverage.
 - [Contract Test](https://martinfowler.com/bliki/ContractTest.html) explains
   checking test doubles against real external-service behavior as it changes.
+
+## Terminology and scope
+
+Use **validate a technical premise** to describe the purpose of this workflow;
+it is plain language for checking a decision-relevant assumption, not a claim
+that every probe is a standardized testing technique.
+
+- A [minimal, reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
+  preserves enough code and context for another person to reproduce a problem.
+  Use it for a known failure; do not invent a failure for a feasibility question.
+- A **technical spike** is focused research to resolve a technical unknown;
+  [Agile Alliance's XP guidance](https://agilealliance.org/glossary/xp/)
+  uses spikes for technical considerations that prevent estimation. This skill
+  takes the small experiment that informs a decision, not a whole planning process.
+- **Assumption validation** describes deciding what must be learned before
+  committing further effort. [IDEO.org's prototype guidance](https://www.designkit.org/methods/determine-what-to-prototype.html)
+  starts from learning needs and testable components. Here the assumption is
+  specifically about technical behavior, not general product desirability.
+- **Hypothesis testing** is useful as a reasoning pattern: state competing
+  explanations and choose a discriminating observation. A single API or device
+  probe is not automatically a statistical hypothesis test;
+  [NIST's definition](https://www.itl.nist.gov/div898/handbook/prc/section1/prc13.htm)
+  concerns quantitative evidence and a null hypothesis.
+- **Problem isolation** describes narrowing a failure to its relevant stage or
+  dependency. The [MRE reduction guidance](https://stackoverflow.com/help/minimal-reproducible-example)
+  supports this technique; without a failure, isolate the question instead.
+
+Here **interface** means the actual library call, service endpoint, runtime
+operation, or device interaction being observed. State the experiment's scope
+and the limits of its conclusions explicitly. This is different from
+[boundary value analysis](https://glossary.istqb.org/en_US/search?term=boundary%20value%20analysis),
+which selects test conditions at boundary values.

@@ -25,6 +25,13 @@ calls, publishing artifacts, and creating scheduled work are not.
    probe can answer the question; one result varies with event order. Later
    sessions will need the result, and the repo has an existing testing-notes file.
 
+7. A team proposes a complete streaming UI to learn whether a library emits a
+   completion callback before or after resolving its promise. Either order could
+   work, but it changes the adapter design. A tiny real-library call is available.
+8. The probe's output does not distinguish event ordering because the logger
+   buffers timestamps. Another complete UI run is proposed without a new trace.
+9. A copy-only typo fix has no material behavior question.
+
 ## Expected Behavior
 
 - Reuse the first observation after matching relevant conditions. Verify the
@@ -46,6 +53,15 @@ calls, publishing artifacts, and creating scheduled work are not.
   in the existing notes with procedure, evidence, environment, observation time,
   relevant revision, reuse conditions, and reasons to recheck. Link those facts
   from the acceptance plan rather than relying on chat history alone.
+
+- For case 7, define the decision, actual library interface, relevant version and
+  sequencing, excluded UI scope, distinguishable event trace, conclusion limits,
+  and stopping condition before coding the probe. Stop once ordering is known
+  for those conditions; keep UI integration acceptance separate.
+- For case 8, report the result as inconclusive, identify a sequence counter or
+  other discriminating trace, and rerun only that check when authorized. Do not
+  treat ambiguous output as confirmation or expand into the complete UI.
+- For case 9, skip a separate experiment and use proportionate ordinary checks.
 
 ## Regression Coverage
 
