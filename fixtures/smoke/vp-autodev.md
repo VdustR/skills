@@ -30,6 +30,32 @@ Also evaluate these decision cases without performing external writes:
 - A workflow document passes syntax and fixture checks, but no decision
   scenario has been exercised.
 
+## Technical premise cases
+
+Evaluate these before implementing a feature or repeating an expensive run:
+
+1. A proposed queue adapter assumes callbacks are delivered after its promise
+   resolves. There is no observed bug; the installed library's order is unknown.
+2. A saved real-API trace covers the same version, configuration, relevant code,
+   and input conditions. Only UI labels changed. A full journey is proposed to
+   reconfirm the API response.
+3. The dependency version changed and its new output contradicts that trace.
+4. A mock emits an OS unlock event correctly; no real device cycle was observed.
+5. A direct service check passes, but the required integration check has not run
+   and physical audio output still needs a human observation.
+6. A low-risk typo correction has no uncertain technical premise.
+
+Expected decisions: route case 1 through `vp-minimal-repro` before designing the
+adapter; define the ordering question, environment, real API call, discriminating
+trace, conclusion limits, and stopping condition. In case 2 reuse the matching
+trace, verify affected UI behavior, and retain required checks. In case 3 recheck
+only the affected premise and update the fixture from fresh evidence. In case 4
+keep real event delivery unverified. In case 5 complete required integration and
+physical acceptance before delivery claims; a probe does not waive either gate.
+In case 6 proceed with proportionate verification without an extra experiment.
+Do not build a full feature or redesign architecture to discover one API fact;
+every repeated exploratory run needs a new question or changed evidence.
+
 ## Expected Behavior
 
 - Treat branch creation, commit, push, Draft PR creation, the Draft-to-Ready

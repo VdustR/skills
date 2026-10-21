@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Minimal Repro"
   short_description: "Isolate failures and verify reusable external behavior"
-  default_prompt: "Use $vp-minimal-repro to isolate this failure or external behavior, verify it, and record when the evidence can be reused."
+  default_prompt: "Use $vp-minimal-repro to define the question and scope, isolate this failure or validate an uncertain technical premise, and retain reusable evidence."

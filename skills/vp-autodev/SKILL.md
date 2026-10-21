@@ -33,19 +33,31 @@ Keep evidence for each decision from issue validation through delivery:
 1. Start from a current issue disposition and acceptance criteria. Use
    `vp-issue-investigator` first when the problem is still suspected, stale, or
    unverified. Propose or make external corrections only when authorized.
-2. Research the root cause and verify the failure at the strongest practical
-   level: the real situation, a faithful simulation, or a minimal reproduction.
-   State what each method does and does not prove.
+2. Research the problem and the technical premises needed for the next design
+   decision. Before implementation or an expensive validation run, use
+   `vp-minimal-repro` when uncertain library, API, service, runtime, OS, or
+   device behavior could change that decision, even without a known failure.
+   Reuse applicable evidence first; otherwise run the smallest authorized check
+   at the real interface. State the question, relevant conditions, observable
+   result, and what it can and cannot establish. For a known failure, verify it
+   at the strongest practical level and distinguish observation from cause.
+   Do not add an experiment to a clear, low-risk change with no material unknown.
 3. Design a focused solution and review the design before coding. Check that it
-   addresses the cause, fits repository conventions, and avoids foreseeable
-   regressions. Record material alternatives, trade-offs, and the reason for the
-   selected approach.
+   addresses the problem using validated premises, fits repository conventions,
+   and avoids foreseeable regressions. Record material alternatives, trade-offs,
+   and the reason for the selected approach.
 4. Create the working branch when needed and implement the smallest coherent
    change. Preserve unrelated user work and avoid opportunistic fixes. Commit
    and push the verified change as part of the delivery workflow.
-5. Verify the fix against the reproduction and relevant tests, checks, builds,
-   or real behavior. Compare before and after evidence and retain any unverified
-   environment or hardware cases.
+5. Verify the change against the reproduction or established premises and
+   relevant tests, checks, builds, or real behavior. Before repeating an
+   expensive or end-to-end run, name the new question, changed condition, or
+   invalidated evidence; use `vp-minimal-repro` to isolate an uncertain premise
+   rather than rebuild the feature to rediscover it. Reuse observations while
+   their versions, environment, relevant code, and conditions still apply.
+   Preserve required repository checks and integration, physical-device, or
+   human acceptance for claims the isolated check cannot establish. Compare
+   before and after evidence where applicable and retain unverified cases.
 6. Create a Draft PR as part of the requested delivery workflow. Review the
    full diff, commits, and PR text as a maintainer before requesting human or
    automated review. Keep it Draft while material design, verification, or
@@ -156,7 +168,8 @@ proceeding would be unsafe or would materially expand scope.
 - [`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator)
   for validating and recording a distinct problem found during development.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
-  for a re-runnable failure.
+  for isolating a failure or validating an uncertain technical premise before
+  implementation or expensive revalidation.
 - [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git and
   pull-request lifecycle decisions.
 - [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when

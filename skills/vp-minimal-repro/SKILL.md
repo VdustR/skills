@@ -2,7 +2,8 @@
 name: vp-minimal-repro
 description: >-
   Isolate an observed failure or uncertain external-system behavior in a small,
-  re-runnable check. Use before repeating a full-system or end-to-end run to
+  re-runnable check. Use before implementation when an uncertain technical
+  premise affects the design, before repeating a full-system or end-to-end run to
   confirm the same library, service, runtime, OS, or device behavior, or when
   preparing a standalone reproduction to share. Preserve verified observations
   and their reuse conditions. Boundary: establishes a bounded behavior or
@@ -16,6 +17,27 @@ real boundary. For a failure, produce a re-runnable reproduction, preferably
 with an exit code. For external behavior, verify the specific event, response,
 or effect before using it as a premise for application tests. A failure is not
 required to investigate an unknown behavior.
+
+## Define the question and scope
+
+Before choosing a check, state:
+
+- The unknown behavior and which implementation decision depends on the answer.
+- The real interface under test, necessary environment and preconditions, and
+  what the check deliberately leaves out.
+- The observable result that distinguishes the plausible answers, and the
+  conclusions it can and cannot support.
+- When to stop: an answer sufficient for that decision, an inconclusive result
+  needing a specific additional control, or a missing permission or environment
+  that blocks the observation.
+
+Inspect applicable evidence before creating a new probe. Skip a separate
+experiment when existing evidence resolves the material unknown or the change
+has no such unknown. Do not build a complete feature or change architecture
+merely to discover a dependency's behavior. See
+[references/external-behavior.md](references/external-behavior.md) for evidence
+handling and the distinction between failure reproduction and technical
+exploration.
 
 ## Before another full-system run
 
@@ -39,6 +61,9 @@ condition it will test. Follow required repository checks; do not remove or skip
 mandated acceptance merely because a smaller check passes.
 
 ## Two levels
+
+For observed failures, choose between these two levels. An unknown-behavior
+probe may establish normal behavior and does not need to fail.
 
 A **working reproduction** exists to find the problem and to test a candidate
 fix. It only has to fail reliably, run fast, and be honest about what has
