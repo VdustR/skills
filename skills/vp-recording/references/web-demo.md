@@ -24,23 +24,45 @@ Recording starts when the page is created, before the first paint, so the file
 opens on a blank frame. Note the time the page was created, then trim that lead-in
 during the ffmpeg pass. Playwright writes WebM; convert it in the same run.
 
-Set the viewport to the size you deliver, at `deviceScaleFactor: 1`. A CDP
-screencast does not use the scale factor: a screencast of a 1440x810 viewport
-at `deviceScaleFactor: 2` still returned 1440x810 frames with `maxWidth: 2880`,
-while `page.screenshot()` from the same context returned 2880x1620. For a sharper
-1080p video, record a 1920x1080 viewport instead.
+Set the viewport to the size you deliver, at `deviceScaleFactor: 1`. Neither
+video path reliably uses the scale factor. A CDP screencast of a 1440x810
+viewport at `deviceScaleFactor: 2` returned 1440x810 frames even with
+`maxWidth: 2880`, while `page.screenshot()` from the same context returned
+2880x1620. `recordVideo` of a 640x360 viewport at `deviceScaleFactor: 2` with a
+1280x720 `size` captured 2x frames in 3 of 17 runs across Chromium 156 and
+Chrome 155; the rest drew 1x frames in the top-left corner of a grey canvas,
+which is also what any `size` larger than the captured frame produces. For a
+sharper 1080p video, record a 1920x1080 viewport instead.
 
 Record with Playwright's bundled Chromium rather than `channel: "chrome"`. With
 headless system Chrome 155.0.8059.85 on macOS and Playwright 1.64.1, observed
 2026-10-23, every frame lost the bottom 87 px of the viewport, which is where
 subtitles sit. Screencast frames came back 1440x723 for a 1440x810 viewport, and
-`recordVideo` shrank the page to about half size on a grey canvas.
-`--window-size` and the `screen` context option did not change the screencast
-frame size. The bundled
-headless shell, Chromium 151 and 156, returned full frames. Whichever browser
-runs, check the first frame's decoded size against the viewport before recording
-the walkthrough. `scripts/screencast-poc.cjs` fails on a mismatch, and
-`CHANNEL=chrome` reruns it against the system browser.
+`recordVideo` lost the same band; at 1440x810 it also drew the page at about
+half size. Playwright sizes the headless window to the viewport, and that
+Chrome's headless window spends 87 px of it on browser UI, so the captured
+content area is shorter than the viewport the page reports. A `--window-size`
+launch flag does not help, because Playwright resizes the window afterwards.
+The bundled headless shell, Chromium 151 and 156, has no such UI and returned
+full frames.
+
+When system Chrome is required, grow its window by the missing height before
+recording. The page keeps its emulated viewport, and at 1280x720 both the
+screencast and `recordVideo` then returned full frames:
+
+```js
+// missing = viewport height - decoded height of the first captured frame
+const cdp = await context.newCDPSession(page);
+const { windowId, bounds } = await cdp.send("Browser.getWindowForTarget");
+await cdp.send("Browser.setWindowBounds", {
+  windowId,
+  bounds: { height: bounds.height + missing },
+});
+```
+
+Check the first frame's decoded size against the viewport before recording the
+walkthrough, whichever browser runs. `scripts/screencast-poc.cjs` fails on a
+mismatch, and `CHANNEL=chrome` reruns it against the system browser.
 
 ## Add interaction overlays only when they carry the explanation
 
