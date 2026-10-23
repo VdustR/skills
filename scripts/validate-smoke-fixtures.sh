@@ -144,6 +144,14 @@ require_pattern "$autodev_fixture" 'fixed deadline' \
   "vp-autodev fixture must keep the unattended wait reference adaptable"
 require_pattern "$autodev_fixture" 'Never degrade a repository-required review' \
   "vp-autodev fixture must preserve required reviews through failure and quota exhaustion"
+require_pattern "$autodev_fixture" 'a pending check is not passing evidence' \
+  "vp-autodev fixture must not treat a pending check as passing"
+require_pattern "$autodev_fixture" 'with no required checks, auto-merge merges' \
+  "vp-autodev fixture must not use auto-merge to defer non-required checks"
+require_pattern "$autodev_skill" 'A pending check is not passing evidence' \
+  "vp-autodev must not treat a pending check as passing"
+require_pattern "$autodev_skill" 'GitHub auto-merge waits only for branch-protection requirements' \
+  "vp-autodev must state what GitHub auto-merge waits for"
 require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment' \
   "vp-autodev fixture must include every applicable reaction surface"
 require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \

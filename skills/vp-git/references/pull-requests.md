@@ -28,5 +28,11 @@ Move out of draft or merge only with explicit authorization and when:
 - automated review signals are positive or clearly non-blocking;
 - the merge method and post-merge effects are understood.
 
+Before merging, also wait until the checks the repository runs have finished
+and passed for the current head, unless repository convention shows a check is
+non-blocking. A pending check is not a pass. GitHub auto-merge waits only for
+branch-protection requirements, so it merges at once in a repository without
+them and cannot stand in for that wait.
+
 After merging, synchronize the local checkout non-destructively and verify the
 remote and local state independently.
