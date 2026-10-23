@@ -63,9 +63,10 @@ Close the browser in a `finally`. A navigation or screenshot that throws
 otherwise leaves Chromium running and the script alive with it.
 
 Set `deviceScaleFactor: 2` and request PNG with device-scale pixels. Measured:
-a 900x300 viewport wrote 1800x600 at
-`deviceScaleFactor: 2` and 900x300 at the default `1`. A 1x image of a real
-interface is too small for a reviewer to read the text that proves the claim.
+a 900x300 viewport wrote 1800x600 at `deviceScaleFactor: 2` and 900x300 at the
+default `1`. A 1x image of a real interface is too small for a reviewer to read
+the text that proves the claim. Video is different: a screencast ignores the
+scale factor, as `web-demo.md` records.
 
 ## Wait for the state you are claiming, not for load
 

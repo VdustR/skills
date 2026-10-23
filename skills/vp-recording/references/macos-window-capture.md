@@ -137,8 +137,8 @@ drive while the recorder runs.
 
 Read the tool's own skill or `--help` for current syntax before the first call.
 This skill names no input commands, because flags get renamed and a copied
-invocation goes stale. Measured behavior is different: it stays true after a
-rename, so the limits below name their source and stay.
+invocation goes stale. A measured limit survives a rename, so the limits below
+stay, each naming the tool it was measured on.
 
 Three constraints apply whichever tool you use:
 

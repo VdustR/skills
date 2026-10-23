@@ -68,9 +68,9 @@ ask about anything missing before starting.
 
 The browser paths, still and video, run on any platform and inside a container,
 with one exception: an isolated still capture that needs an interactive login
-needs a display for the whole capture, so it does not run on a displayless runner. That exception is
-stated once, under Prefer the browser path, and every platform claim here defers
-to it. The macOS window paths depend on macOS system tools and have no equivalent
+needs a display for the whole capture, so it does not run on a displayless
+runner; the section "Prefer the browser path" has the details. The macOS window
+paths depend on macOS system tools and have no equivalent
 here for Linux or Windows.
 
 ## Prefer the browser path
@@ -91,8 +91,8 @@ service workers, or SSO. It owns managed profile identity, permissions, and
 deletion. The throwaway-profile sequence in `references/still-capture.md` is for a
 login that begins and ends inside one capture.
 
-An isolated still capture behind a login is the exception, and it stays the exception through the
-whole sequence. The interactive sign-in needs a visible window and a display, and
+An isolated still capture behind a login is the exception for the whole
+sequence. The interactive sign-in needs a visible window and a display, and
 Playwright cannot switch that running context to headless afterwards, so the
 capture happens in the same visible window. Plan for a display for the entire
 run, and expect it to take focus. It does not run from a scheduled job or a

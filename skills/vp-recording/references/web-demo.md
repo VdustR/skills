@@ -24,8 +24,8 @@ Recording starts when the page is created, before the first paint, so the file
 opens on a blank frame. Note the time the page was created, then trim that lead-in
 during the ffmpeg pass. Playwright writes WebM; convert it in the same run.
 
-Set the viewport to the size you deliver, at `deviceScaleFactor: 1`. Video
-capture does not use the scale factor: a CDP screencast of a 1440x810 viewport
+Set the viewport to the size you deliver, at `deviceScaleFactor: 1`. A CDP
+screencast does not use the scale factor: a screencast of a 1440x810 viewport
 at `deviceScaleFactor: 2` still returned 1440x810 frames with `maxWidth: 2880`,
 while `page.screenshot()` from the same context returned 2880x1620. For a sharper
 1080p video, record a 1920x1080 viewport instead.
