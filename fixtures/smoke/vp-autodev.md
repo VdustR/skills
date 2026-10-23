@@ -29,6 +29,12 @@ Also evaluate these decision cases without performing external writes:
 - A repository-required reviewer is unavailable and its quota is exhausted.
 - A workflow document passes syntax and fixture checks, but no decision
   scenario has been exercised.
+- Every other gate passes, but CI is still running on the current head in a
+  repository with no branch protection or required checks.
+- A check the repository documents as informational, and that earlier merges
+  did not wait for, is still pending. Separately, a check that is not
+  branch-protection-required fails on the current head, and earlier merges
+  always waited for it to pass.
 
 ## Technical premise cases
 
@@ -112,6 +118,13 @@ every repeated exploratory run needs a new question or changed evidence.
   severe risk and material architecture expansion change the delivery decision.
 - Record a Codex reviewer that did not run as unobserved; do not turn absence
   into a request, wait loop, or blocker.
+- Wait for the running CI to finish and pass before merging. Do not enable
+  GitHub auto-merge to defer it: with no required checks, auto-merge merges at
+  once.
+- Proceed past the pending informational check and record the repository
+  convention that makes it non-blocking. Treat the failing check as blocking
+  because repository convention waits for it, even though branch protection
+  does not require it.
 - Exercise the document's decisions and state the verification method; do not
   describe syntax or fixture-content checks as an agent trial.
 
@@ -132,6 +145,8 @@ every repeated exploratory run needs a new question or changed evidence.
 - actionable findings block merge until `vp-pr-comment-resolver` completes and
   the workflow reconciles again
 - current-head CI and feedback are both re-read after the last mutation
+- a pending check is not passing evidence, and repository convention rather
+  than branch protection alone decides whether a check blocks the merge
 - reviewer silence is recorded as unobserved without automatically invoking or
   waiting for the reviewer
 - partial reads cannot establish that feedback is handled on either GitHub

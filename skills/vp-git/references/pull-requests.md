@@ -23,7 +23,10 @@ comment resolution, and reviewer-side follow-up.
 
 Move out of draft or merge only with explicit authorization and when:
 
-- required checks pass for the current head;
+- the checks the repository runs have finished and passed for the current head,
+  unless repository convention shows a check is non-blocking. A pending check
+  is not a pass, and GitHub auto-merge waits only for branch-protection
+  requirements, so it merges at once in a repository without them;
 - no material risk or unresolved required feedback remains;
 - automated review signals are positive or clearly non-blocking;
 - the merge method and post-merge effects are understood.

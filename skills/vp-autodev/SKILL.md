@@ -110,6 +110,15 @@ Keep evidence for each decision from issue validation through delivery:
    develop the change as authorization for this in-scope merge. Ask before
    merging when ownership is unclear, policy requires a human decision, risk is
    material, verification is incomplete, or the merge would expand scope.
+   CI is green only when the checks the repository runs on the current head
+   have finished and passed. A pending check is not passing evidence, and
+   branch protection's required checks are a floor, not the whole gate: a
+   repository without required checks still expects its CI to finish. Decide
+   whether a particular pending or failing check blocks the merge from
+   repository convention, such as a check documented as informational or an
+   optional job that earlier merges did not wait for, and record that reason.
+   GitHub auto-merge waits only for branch-protection requirements and merges
+   at once when there are none, so it cannot hold a merge for any other check.
 12. After merge, determine from repository policy and release mechanics whether
     a release is required. Under the same ownership, policy, verification, and
     low-risk conditions, run the in-scope release workflow and verify the

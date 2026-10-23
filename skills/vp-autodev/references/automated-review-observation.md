@@ -70,6 +70,7 @@ After Ready and after every later mutation:
    implementation, CI, repository policy, feedback that exists, and remaining
    risk.
 
-Do not merge from a partial read, a stale positive check, unresolved actionable
-feedback, or incomplete verification. Reviewer silence is neither proof of no
+Do not merge from a partial read, a stale positive check, a pending check that
+repository convention treats as blocking, unresolved actionable feedback, or
+incomplete verification. Reviewer silence is neither proof of no
 findings nor an automatic reason to summon or wait for the reviewer.
