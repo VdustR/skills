@@ -35,7 +35,8 @@ headless system Chrome 155.0.8059.85 on macOS and Playwright 1.64.1, observed
 2026-10-23, every frame lost the bottom 87 px of the viewport, which is where
 subtitles sit. Screencast frames came back 1440x723 for a 1440x810 viewport, and
 `recordVideo` shrank the page to about half size on a grey canvas.
-`--window-size` and the `screen` context option did not change it. The bundled
+`--window-size` and the `screen` context option did not change the screencast
+frame size. The bundled
 headless shell, Chromium 151 and 156, returned full frames. Whichever browser
 runs, check the first frame's decoded size against the viewport before recording
 the walkthrough. `scripts/screencast-poc.cjs` fails on a mismatch, and

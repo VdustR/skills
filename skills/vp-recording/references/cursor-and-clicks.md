@@ -17,8 +17,8 @@ its own animation timeline can visibly miss the control that receives the click.
 
 An init script runs in every frame, iframes included, and before the document
 has a root element. In headless Chromium 156 and Chrome 155,
-`document.documentElement` was null at that point even in the top frame, so observing it with a
-`MutationObserver` threw `parameter 1 is not of type 'Node'` once per frame. The
+`document.documentElement` was null at that point even in the top frame, so
+observing it with a `MutationObserver` threw `parameter 1 is not of type 'Node'` once per frame. The
 exception is uncaught, so the page's own error reporting receives it; in one
 staging recording it blanked the app shell and flooded the site's error monitor.
 Mount the overlay in the top frame only, once the document exists:
