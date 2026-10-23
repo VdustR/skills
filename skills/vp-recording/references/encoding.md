@@ -29,12 +29,14 @@ missing. Measured on one machine:
 | Build | `drawtext` | `subtitles` / `ass` |
 |---|---|---|
 | macOS Homebrew ffmpeg 8.1.1 | absent | absent |
+| macOS Homebrew ffmpeg 9.0.2 | absent | absent |
 | BtbN static `linux64-gpl` | present | present |
 
 Check the installed build's filter list before depending on any of them.
 
 Without libfreetype and libass there is no text or subtitle filter at all, which
-is why `web-demo.md` renders captions in the DOM. With a capable build, a WebVTT
+is why `web-demo.md` renders captions in the DOM and `subtitles.md` overlays
+caption images in post. With a capable build, a WebVTT
 sidecar can be burned in afterward, so captions can be restyled without
 re-recording:
 

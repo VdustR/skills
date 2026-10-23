@@ -49,6 +49,10 @@ Situation 2 routes to `references/web-demo.md`:
   `mousemove` events, rather than animating a decorative cursor independently of
   the click coordinates.
 - Resolve every click target from live geometry with `boundingBox()`.
+- Record with Playwright's bundled browser at the delivery size, and check the
+  first frame's decoded size against the viewport before recording; a system
+  Chrome channel cropped the bottom of every frame.
+- Mount an injected overlay in the top frame only, after the document exists.
 - Read `references/cursor-and-clicks.md`, `references/keycast.md`, and
   `references/subtitles.md` because this request needs all three independent
   layers.
@@ -131,6 +135,11 @@ All situations:
 - keycast reports input while subtitles explain the step;
 - sensitive input is suppressed before it reaches the overlay or event log;
 - click targets come from live geometry, not remembered coordinates;
+- the first captured frame's size is checked against the viewport before the
+  walkthrough is recorded;
+- an init-script overlay skips subframes and waits for the document root;
+- a clip built from held frames is checked against wall-clock duration, not
+  only its frame rate;
 - output is verified by looking at frames before delivery;
 - ffmpeg filter availability is checked rather than assumed.
 

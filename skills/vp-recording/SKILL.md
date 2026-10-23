@@ -43,6 +43,11 @@ Run `scripts/annotation-poc.cjs <output-directory>` to preview all three layers
 in a self-contained Konami Code walkthrough. It writes an H.264 MP4 and a WebVTT
 sidecar and uses the same Playwright and ffmpeg dependencies as the browser path.
 
+Run `scripts/screencast-poc.cjs <output-directory>` before relying on a browser
+build you have not recorded with. It fails when screencast frames are cropped or
+an encoded clip does not match the time it recorded, and it shows the
+lossless-frame path, scene cuts, and a caption added in post.
+
 Read `references/encoding.md` before delivering a video: default output settings
 decide whether it plays inline or downloads as a blob. Its size-ceiling table
 applies to a still as well.
@@ -166,6 +171,10 @@ timebase in one measurement. Watch instead for change-aware sampling, which drop
 much further. Peekaboo's live capture kept 1 frame across 4 seconds on a static
 region. Treat single-digit effective fps as a sampled file rather than a rate
 below the timebase.
+
+A file built from held frames, such as an encoded screencast, reports its target
+rate however wrong its timing is. Compare its duration with the wall-clock time
+it recorded instead.
 
 ```bash
 ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames \
