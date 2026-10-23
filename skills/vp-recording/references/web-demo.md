@@ -30,10 +30,9 @@ viewport at `deviceScaleFactor: 2` returned 1440x810 frames even with
 `maxWidth: 2880`, while `page.screenshot()` from the same context returned
 2880x1620. `recordVideo` of a 640x360 viewport at `deviceScaleFactor: 2` with a
 1280x720 `size` captured 2x frames in 3 of 17 runs across Chromium 156 and
-Chrome 155; the rest drew 1x frames in
-the top-left corner of a grey canvas, which is also what any `size` larger than
-the captured frame produces. For a sharper 1080p video, record a 1920x1080
-viewport instead.
+Chrome 155; the rest drew 1x frames in the top-left corner of a grey canvas,
+which is also what any `size` larger than the captured frame produces. For a
+sharper 1080p video, record a 1920x1080 viewport instead.
 
 Record with Playwright's bundled Chromium rather than `channel: "chrome"`. With
 headless system Chrome 155.0.8059.85 on macOS and Playwright 1.64.1, observed
