@@ -365,6 +365,10 @@ require_pattern "$recording_web_demo" 'check the first frame.s decoded size agai
   "vp-recording web demo must check the first frame size before recording"
 require_pattern "$recording_web_demo" 'Compare the clip.s duration with the wall-clock span' \
   "vp-recording web demo must check screencast clips against wall-clock duration"
+require_pattern "$recording_web_demo" 'Browser.setWindowBounds' \
+  "vp-recording web demo must give the window fix for a cropped system Chrome capture"
+require_pattern "$recording_web_demo" 'path reliably uses the scale factor' \
+  "vp-recording web demo must not promise high-DPI video capture"
 require_pattern "$recording_cursor" 'window.top !== window' \
   "vp-recording cursor layer must skip subframes in init scripts"
 require_frontmatter_pattern "$recording_skill" 'still (screenshot|image)' \
