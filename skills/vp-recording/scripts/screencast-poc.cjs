@@ -98,7 +98,6 @@ function bandHashes(inputs, filter) {
 async function main() {
   const encoders = run(ffmpeg, ["-hide_banner", "-encoders"]);
   if (!encoders.includes("libx264")) throw new Error("ffmpeg has no libx264 encoder");
-  fs.rmSync(outputDir, { recursive: true, force: true });
   fs.mkdirSync(outputDir, { recursive: true });
 
   const browser = await chromium.launch(process.env.CHANNEL ? { channel: process.env.CHANNEL } : {});
