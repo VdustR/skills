@@ -29,5 +29,23 @@ Keep a cue to one short line when possible, place it consistently near the lower
 edge, and keep it clear of the focused control, pointer target, and keycast.
 Reserve the lower center for subtitles and a lower corner for keycast.
 
+## Add or replace captions in post
+
+Without `drawtext` or `subtitles`, captions can still be added after recording.
+Render each cue on a page with a transparent background, screenshot it at the
+video size with `omitBackground: true`, and overlay the PNG for the cue's
+interval with `overlay=enable='between(t,2.0,4.4)'`. The caption keeps the
+browser's fonts, and restyling means rendering new images instead of recording
+again. `scripts/screencast-poc.cjs` does this for one cue.
+
+To correct a caption already in the frame, cover it with the corrected image on
+a backing plate at least as large as the old one. Find the frame where the old
+caption appears with `framemd5` on a crop of the caption band, so changes
+elsewhere in the frame do not count, and switch the new image on at that frame
+with `enable='gte(n,FRAME)'`. Do not fade it in: while the alpha ramps, the old
+text shows through the new one as a double-text ghost.
+
+## Check the cues
+
 Escape WebVTT text independently from DOM text. Verify the first cue, the final
 cue, a cue adjacent to a cut, and a frame where subtitles and keycast overlap.

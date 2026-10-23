@@ -15,6 +15,25 @@ Hide the page cursor, use a familiar arrow silhouette with a contrasting edge,
 and set `pointer-events: none` on every overlay element. A decorative cursor with
 its own animation timeline can visibly miss the control that receives the click.
 
+An init script runs in every frame, iframes included, and before the document
+has a root element. In headless Chromium 156 and Chrome 155,
+`document.documentElement` was null at that point even in the top frame, so
+observing it with a `MutationObserver` threw `parameter 1 is not of type 'Node'` once per frame. The
+exception is uncaught, so the page's own error reporting receives it; in one
+staging recording it blanked the app shell and flooded the site's error monitor.
+Mount the overlay in the top frame only, once the document exists:
+
+```js
+await page.addInitScript(() => {
+  if (window.top !== window) return;
+  const mount = () => {
+    // Create the cursor layer and observe document.documentElement here.
+  };
+  if (document.body) mount();
+  else document.addEventListener("DOMContentLoaded", mount, { once: true });
+});
+```
+
 For deliberate motion, resolve the target from its current `boundingBox()`, ease
 the pointer toward its center, pause briefly, then split the click into
 `mouse.down()`, a visible 70-100 ms pressed state, and `mouse.up()`.

@@ -89,6 +89,8 @@ stacked_rebase_fixture="fixtures/smoke/vp-stacked-pr.md"
 recording_fixture="fixtures/smoke/vp-recording.md"
 recording_skill="skills/vp-recording/SKILL.md"
 recording_still_capture="skills/vp-recording/references/still-capture.md"
+recording_web_demo="skills/vp-recording/references/web-demo.md"
+recording_cursor="skills/vp-recording/references/cursor-and-clicks.md"
 github_fixture="fixtures/smoke/vp-github.md"
 agent_browser_session_fixture="fixtures/smoke/vp-agent-browser-session.md"
 vp_skills_fixture="fixtures/smoke/vp-skills.md"
@@ -353,6 +355,18 @@ require_pattern "$recording_fixture" 'no documented deletion path' \
   "vp-recording fixture must state that attachment upload is not reliably reversible"
 require_pattern "$recording_fixture" 'textual assertion from the same page state' \
   "vp-recording fixture must pair a still with a textual assertion"
+require_pattern "$recording_fixture" "first captured frame's size is checked against the viewport" \
+  "vp-recording fixture must check captured frame size against the viewport"
+require_pattern "$recording_fixture" 'skips subframes and waits for the document root' \
+  "vp-recording fixture must guard init-script overlays"
+require_pattern "$recording_fixture" 'checked against wall-clock duration' \
+  "vp-recording fixture must check held-frame clips against wall-clock duration"
+require_pattern "$recording_web_demo" 'check the first frame.s decoded size against the viewport' \
+  "vp-recording web demo must check the first frame size before recording"
+require_pattern "$recording_web_demo" 'Compare the clip.s duration with the wall-clock span' \
+  "vp-recording web demo must check screencast clips against wall-clock duration"
+require_pattern "$recording_cursor" 'window.top !== window' \
+  "vp-recording cursor layer must skip subframes in init scripts"
 require_frontmatter_pattern "$recording_skill" 'still (screenshot|image)' \
   "vp-recording frontmatter description must include still images"
 require_frontmatter_pattern "$recording_skill" 'screenshots?' \
