@@ -72,5 +72,5 @@ After Ready and after every later mutation:
 
 Do not merge from a partial read, a stale positive check, a pending check that
 repository convention treats as blocking, unresolved actionable feedback, or
-incomplete verification. Reviewer silence is neither proof of no
-findings nor an automatic reason to summon or wait for the reviewer.
+incomplete verification. Reviewer silence is neither proof of no findings nor
+an automatic reason to summon or wait for the reviewer.
