@@ -3,7 +3,8 @@ name: vp-stack-selection
 description: >-
   Select a technology stack for a new project, full-system refactor, rewrite,
   port, or explicit stack evaluation. Compare ecosystem capabilities and
-  technical costs, with TypeScript/Rust preferences when alternatives fit equally
+  technical costs. Default to TypeScript over JavaScript for new JS-ecosystem
+  code; prefer TypeScript/Rust across ecosystems when alternatives fit equally
   well. Not for routine fixes, local refactoring, or isolated dependency changes.
 ---
 
@@ -26,8 +27,20 @@ explain a different choice with concrete technical reasons.
   not a reason to adopt one either.
 - Keep supported existing choices unless the requested change justifies replacing
   them. For a rewrite, compare retaining or incrementally adapting the current stack.
-- Use TypeScript/Rust preferences when technical fit and lifecycle costs are
-  comparable. Exclude team experience, familiarity, staffing, and training cost.
+- Default to TypeScript over JavaScript for newly authored JS-ecosystem code,
+  including Node.js utilities, build/release scripts, tests, and Electron code.
+  Small size, direct execution, or avoiding a build step alone does not justify
+  JavaScript. Choose JavaScript only for an explicit user choice or a concrete
+  compatibility or technical-cost constraint; explain the exception and scope it
+  to the affected files. See [TypeScript](references/typescript.md).
+- Across different ecosystems, use TypeScript/Rust preferences when technical fit
+  and lifecycle costs are comparable. Exclude team experience, familiarity,
+  staffing, and training cost.
+- For lightweight Node.js scripts, prefer native TypeScript execution when the
+  supported runtime and erasable syntax fit. Use `tsx` for a concrete transform
+  or resolution need. Both paths require `@tsconfig/strictest`, application-owned
+  `@total-typescript/ts-reset`, and independent type checking; see the
+  [TypeScript reference](references/typescript.md) for setup and publication boundaries.
 
 These rules apply to every reference and diagram. Diagram leaves identify
 candidates, not mandates; investigate cases the diagrams do not cover.
