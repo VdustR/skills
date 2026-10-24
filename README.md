@@ -158,10 +158,6 @@ Handle GitHub PR review comments with verification, focused fixes, and thread re
 
 Follow up on GitHub PR review conversations from the reviewer side.
 
-### vp-prename
-
-Generate concise session titles based on the whole conversation theme.
-
 ### vp-recording
 
 Capture a still screenshot or a demo video: a screenshot of a running interface, a scripted browser walkthrough, a frame-accurate render of generated motion, or a macOS window capture.
