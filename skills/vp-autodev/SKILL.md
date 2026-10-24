@@ -42,10 +42,21 @@ Keep evidence for each decision from issue validation through delivery:
    result, and what it can and cannot establish. For a known failure, verify it
    at the strongest practical level and distinguish observation from cause.
    Do not add an experiment to a clear, low-risk change with no material unknown.
+   Before choosing a failure fix, trace the relevant producer, caller, lifecycle,
+   and ownership boundaries, including cleanup and reporting. Separate the
+   symptom, supported causes, and mitigation; use discriminating evidence rather
+   than assuming one root cause. Issue confirmation does not require a known
+   cause. Urgent, authorized mitigation may precede complete diagnosis; retain
+   evidence and report what remains unresolved.
 3. Design a focused solution and review the design before coding. Check that it
    addresses the problem using validated premises, fits repository conventions,
    and avoids foreseeable regressions. Record material alternatives, trade-offs,
    and the reason for the selected approach.
+   Check whether the proposal repairs behavior or only hides its symptom, and
+   preserve unrelated failure propagation and reporting. For cancellation or
+   error-filtering changes, read
+   [references/failure-diagnosis.md](references/failure-diagnosis.md) before
+   choosing the handling boundary or classification rule.
 4. Create the working branch when needed and implement the smallest coherent
    change. Preserve unrelated user work and avoid opportunistic fixes. Commit
    and push the verified change as part of the delivery workflow.
@@ -58,6 +69,10 @@ Keep evidence for each decision from issue validation through delivery:
    Preserve required repository checks and integration, physical-device, or
    human acceptance for claims the isolated check cannot establish. Compare
    before and after evidence where applicable and retain unverified cases.
+   Exercise the repaired path and nearby failures that must still propagate or
+   report. Verify cleanup, completion state, retry behavior, and observability
+   affected by the change. An error or alert disappearing alone does not prove
+   repair; distinguish verified recovery from mitigation and unresolved causes.
 6. Create a Draft PR as part of the requested delivery workflow. Review the
    full diff, commits, and PR text as a maintainer before requesting human or
    automated review. Keep it Draft while material design, verification, or

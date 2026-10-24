@@ -3,10 +3,12 @@ name: vp-design-reasoning
 description: >-
   Turn unclear problems into bounded models and testable design decisions.
   Use to define or explain concepts, design or review workflows and system
-  architecture, and plan or improve user interactions. Connect intent,
+  architecture, plan or improve user interactions, or review a recurring
+  mistake to choose a preventive model or enforcement boundary. Connect intent,
   responsibilities, relationships, states, consequences, and evidence.
   Boundary: use domain workflows for implementation and validation; not a
-  replacement for agent tool routing, technology selection, or visual craft.
+  replacement for agent tool routing, technology selection, visual craft,
+  or routine implementation with no design decision.
 ---
 
 # Design Reasoning
@@ -61,6 +63,37 @@ when their relationship matters, and keep names and boundaries consistent.
 Do not force a concept into a state machine or treat a component diagram as
 proof of runtime behavior. Agent tool selection belongs to interaction-routing
 workflows; standalone branding and artwork belong to visual workflows.
+
+## Prevent errors at the owning boundary
+
+When designing or reviewing a system, or addressing a recurring mistake,
+state the invariant first: what must remain true, for which inputs and
+transitions, and who owns every path that can violate it? Distinguish a
+representation's guarantee from assumptions about ingestion, mutation,
+external data, and concurrent writers.
+
+1. Prefer a data model, API, type, or ownership boundary that makes invalid
+   states unavailable through supported operations. Valid-state types belong
+   here, before considering formatters or checks.
+2. For violations that remain possible, prefer a safe formatter or autofix when
+   the correction is unambiguous and preserves the required semantics.
+3. Otherwise reject violations automatically at the relevant boundary through
+   lint, type checks, runtime validation, or storage constraints.
+4. Use reminders and manual review for contextual judgment or residual gaps;
+   name what automation cannot establish.
+
+Compare mechanisms against the same correctness requirement. This is a
+preference for reducing error opportunities, not an absolute ranking of tools:
+account for semantics, compatibility, adoption, and maintenance cost. Combine
+layers when they protect different boundaries. Do not build an elaborate type
+framework for a formatting rule or redesign a sound system for a one-off edit.
+
+Read [invariants and prevention](references/invariants-and-prevention.md) when
+choosing among these mechanisms, especially for keyed collections, dynamic
+input, valid-state types, or ambiguous repairs. Hand TypeScript implementation
+and compiler verification to
+[vp-typescript-best-practices](https://github.com/VdustR/skills/tree/main/skills/vp-typescript-best-practices);
+this skill owns the invariant, boundary, and design trade-off.
 
 ## Exercise scenarios and compare options
 
@@ -117,7 +150,7 @@ this synthesis; they do not impose a universal notation or mandatory workshop.
   when architecture decisions require choosing a technology stack.
 - [`vp-css-best-practices`](https://github.com/VdustR/skills/tree/main/skills/vp-css-best-practices)
   when web CSS implements content, sizing, disclosure, and scroll decisions.
-- [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
-  for understandable definitions, explanations, labels, and feedback.
+- [`vp-typescript-best-practices`](https://github.com/VdustR/skills/tree/main/skills/vp-typescript-best-practices)
+  when valid-state modeling needs TypeScript implementation or compiler checks.
 - [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
   when the design proceeds through authorized implementation and delivery.

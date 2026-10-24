@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Session Organization"
+  short_description: "Name sessions and organize verified related work"
+  default_prompt: "Use $vp-session-organization to suggest a concise title for this session."
