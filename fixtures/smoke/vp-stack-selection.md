@@ -23,6 +23,29 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | Required in-process SDK demonstrably needs GC, but a fixed contract forbids GC | Surface the verified conflict and ask which boundary may change. Do not silently choose TS, Rust, or a multi-process architecture. |
 | Native CLI without an installed JS runtime versus API automation on an accepted Node.js host | Compare Rust/Go and relevant domain tools for the CLI; consider TS SDK support for the automation. |
 
+### TypeScript over JavaScript
+
+| Case | Expected decision |
+| --- | --- |
+| New offline game wrapper needs Node.js asset collection, patching, packaging, tests, and Electron main/preload code; upstream game is JavaScript | Default owned source to TypeScript and compare compatible execution/emission paths. Preserve upstream JavaScript. Do not choose `.mjs` merely because these are scripts or the project uses ESM. |
+| Small Node.js utility; user wants direct execution without a build step but has not required JavaScript | Evaluate supported TypeScript execution for the exact host and a separate type check. Script size and no-build preference alone do not establish an exception. |
+| Distribution requires `.mjs` files; source language is unconstrained | Prefer TypeScript source with a compatible output path. Distinguish required output extensions from authored source. |
+| One configuration loader is verified to accept only JavaScript; remaining new source supports TypeScript | Keep that config in JavaScript, state the contract, and default the remaining source to TypeScript. Do not extend the exception to the whole repo. |
+| User explicitly requires JavaScript for a new project | Honor the explicit choice and explain the departure from the default without silently substituting TypeScript. |
+| Local bug fix in an existing `.mjs` project, with no stack evaluation or migration request | Keep the local fix scoped to the existing stack. Do not start a TypeScript migration from the new-project default. |
+
+### Node.js script execution and required checking
+
+| Case | Expected decision |
+| --- | --- |
+| New lightweight asset/API/file automation script on a compatible Node host | Prefer native TypeScript execution. Require a checking project extending `@tsconfig/strictest`, an included application-owned `reset.d.ts` importing `@total-typescript/ts-reset`, and a separate type-check command. No-build execution does not waive dependencies or checking. |
+| Required JSX or existing tsconfig path aliases; contrast a larger erasable script needing only watch mode | Use tsx for the required extra capability and retain strictest/ts-reset checking. Size or watch alone does not disqualify native execution. |
+| Existing code must keep runtime enums and needs tsx; new code has no such contract | Document and verify the bounded erasableSyntaxOnly exception for existing code. Retain the erasable baseline for new code; tsx does not automatically waive it. |
+| Framework requires emitDecoratorMetadata | Evaluate its compiler or TypeScript emission. Do not claim tsx implements every TypeScript compiler feature. |
+| Native execution succeeds but strictest rejects an unsafe index access or ts-reset makes JSON unknown | Treat the independent type check as failing. Validate/narrow the value; do not replace the baseline with strict alone or remove the reset. |
+| Offline machine lacks strictest/ts-reset, and dependency installation is not authorized | Report the missing required setup; preserve the prepared script and verification plan. Do not silently omit the packages or install them without authority. |
+| Node script project also publishes a reusable npm library | Keep resets scoped to the script checking project; publish JS/declarations and verify a consumer without the application reset. Do not runtime-import reset.d.ts. |
+
 ### Web, styling, and optional capabilities
 
 | Case | Expected decision |
@@ -72,10 +95,32 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 - Agreement between diagrams and prose, including fallback and conflict paths.
 - Framework-native styling, kit priority, and overridable React preferences.
 - Package versus workspace tooling and TS-only hooks.
+- Native Node first for fitting scripts, concrete tsx exceptions, strictest and
+  ts-reset requirements on both paths, publication boundaries, and blocked setup.
 - Selection evidence versus later adoption checks and authorization.
 
 Static fixture checks verify structure, not decisions. Report manual walkthroughs,
 syntax/parser checks, and independent agent trials separately.
+
+## Manual source-language walkthrough: 2026-10-24 (Asia/Taipei)
+
+The editing agent walked the six TypeScript-over-JavaScript scenarios through the
+entrypoint and language/TypeScript references. New owned scripts and Electron
+code default to TypeScript; direct execution and required `.mjs` output lead to
+execution/output evaluation. A verified config-loader constraint stays local,
+explicit JavaScript requests prevail, and local fixes do not trigger migration.
+This was a manual decision walkthrough, not an independent agent trial or a
+runtime compatibility test. No game repository was changed.
+
+## Script-runner verification: 2026-10-24 (Asia/Taipei)
+
+The editing agent manually walked the seven script-execution scenarios through
+the entrypoint and TypeScript reference, including the unauthorized-install stop.
+`tests/typescript/script-runner.test.mjs` executes the published native script
+configuration and reset declaration against pinned repository dependencies. It
+checks native execution, strictest diagnostics, and JSON-as-unknown behavior with
+and without the reset. This is an executable configuration check plus manual
+decision walkthrough, not an independent agent trial or a tsx/framework runtime test.
 
 ## Independent trial: 2026-10-15
 

@@ -180,7 +180,7 @@ Manage agent skills using the `npx skills` CLI.
 
 ### vp-stack-selection
 
-Select compatible stacks for new projects, full-system refactors, rewrites, and ports, with TypeScript/Rust preferences and references for web, Go, Flutter, Kotlin, and Swift ecosystems.
+Select compatible stacks for new projects, full-system refactors, rewrites, and ports. Default new JS-ecosystem code to TypeScript and lightweight Node scripts to native execution, with tsx for extra capabilities, required strictest/ts-reset checks, and TypeScript/Rust preferences across comparable ecosystems.
 
 ### vp-stacked-pr
 

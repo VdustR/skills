@@ -4,6 +4,11 @@ Start with the operations the project needs. Find maintained libraries and tools
 that implement them, then compare language and runtime costs. Other ecosystems
 remain eligible even when absent from the examples below.
 
+Within the JS ecosystem, default newly authored code to TypeScript, including
+automation and test scripts; see [TypeScript](typescript.md) for execution choices
+and bounded JavaScript exceptions. The cross-ecosystem tie-breaker below does not
+reduce this source-language default to an equal-fit preference.
+
 ```mermaid
 flowchart TD
     A[Required operations and contracts] --> B[Find libraries and tools<br/>covering those operations]
