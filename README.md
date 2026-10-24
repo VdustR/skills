@@ -170,6 +170,10 @@ Capture a still screenshot or a demo video: a screenshot of a running interface,
 
 Review recent agent work to discover workflow, instruction, and skill improvements.
 
+### vp-session-organization
+
+Generate concise session titles or manage authorized names and verified related groups through supported harness interfaces.
+
 ### vp-session-wrapup
 
 Summarize a session before archiving it and clear leftover files, processes, and state.
