@@ -154,10 +154,23 @@ Check the library's effective tsconfig inputs and declaration settings, especial
 when it shares a repository with an application. Record experimental compiler
 integration separately from a successful build.
 
-## Utilities
+## Utilities and common needs
 
-Prefer relevant TanStack packages when their adapters and capabilities improve
-on the framework's existing facilities. Select individual packages as needed.
-Prefer [es-toolkit](https://es-toolkit.dev/) for nontrivial utilities; use native
-language APIs for straightforward operations. This is a utility-library choice,
-not an exception to the TypeScript source default. Verify semantics before replacement.
+Prefer an established library over hand-written code for a common need, after
+checking that the repository does not already own one for that need:
+
+- Remote data and its cache: [TanStack Query](https://tanstack.com/query/latest).
+  Prefer other TanStack packages when their adapters and capabilities improve
+  on the framework's existing facilities; select individual packages as needed.
+- Typed API contracts between a TypeScript server and client:
+  [oRPC](https://orpc.dev/), which serves one router over RPC and OpenAPI
+  without code generation. Verify its adapter for the target framework and
+  runtime.
+- Runtime validation and schema-derived types: [zod](https://zod.dev/). Use
+  the repository's existing schema library when it has one.
+- Nontrivial utilities: [es-toolkit](https://es-toolkit.dev/). Use native
+  language APIs for straightforward operations.
+
+These are library choices, not an exception to the TypeScript source default.
+Verify semantics before replacing existing code, and follow the dependency
+installation rules that apply to the repository.

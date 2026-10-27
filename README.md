@@ -186,6 +186,10 @@ Select compatible stacks for new projects, full-system refactors, rewrites, and 
 
 Build, submit, merge, and repair stacks of dependent pull requests, merge requests, or branches. Native automation on GitHub, manual Git rebase on any other host.
 
+### vp-test-design
+
+Decide whether a change needs a test, write it first, and judge it by the behavior it protects.
+
 ### vp-tldr
 
 Write a concise, reader-first summary for an artifact, message, or update while preserving uncertainty and required action.

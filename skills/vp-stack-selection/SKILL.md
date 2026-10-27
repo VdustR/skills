@@ -90,7 +90,7 @@ flowchart TD
 
 For React applications, use the web and TypeScript references alongside React.
 For mixed stacks, read the relevant ecosystem references and define the boundary.
-Technical sources were reviewed on 2026-10-15; recheck relevant releases and integrations.
+Technical sources were reviewed on 2026-10-27; recheck relevant releases and integrations.
 
 ## Output and evidence
 

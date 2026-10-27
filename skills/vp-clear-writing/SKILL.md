@@ -128,7 +128,8 @@ languages.
 
 Use standard terminology customary in the subject area and for the intended
 audience. Keep one term per concept; do not cycle through synonyms or invent
-names for ordinary concepts. Preserve identifiers and official names.
+names for ordinary concepts. Preserve identifiers and official names. When the
+repository keeps a glossary, use its terms before coining new ones.
 
 Do not force translations of terms commonly used in their original language, or
 introduce uncommon literal translations. In software development, keep terms
@@ -160,6 +161,13 @@ Let the context determine what the reader needs:
 
 - A reply gives the answer and relevant state; add a next action only if needed.
 - A document supplies the purpose, context, conditions, and detail needed to use it.
+  When writing or restructuring a document, decide which need it serves: a
+  tutorial teaches by doing, a how-to gives steps to a goal, a reference
+  states facts for lookup, and an explanation gives context and reasons.
+  Prefer one need per document and link to another document for the rest. A
+  how-to that stops to explain, or a reference that argues, makes the document
+  harder for each of those readers to use. This follows
+  [Diátaxis](https://diataxis.fr/).
 - A code comment explains a non-obvious reason, constraint, or tradeoff rather
   than narrating the code.
 - A review comment identifies the problem, trigger, consequence, and proposed
@@ -170,7 +178,9 @@ Let the context determine what the reader needs:
 Use `$vp-tldr` when the task requires selecting or rewriting summary content;
 apply these writing principles to its result without adding a summary to every
 artifact. Read [references/examples.md](references/examples.md) when an example
-would help resolve a wording or context decision.
+would help resolve a wording or context decision. Read
+[references/english.md](references/english.md) for procedure wording, patterns
+that add nothing, and, for an English artifact, ambiguity checks.
 
 ## Check the result
 
