@@ -54,6 +54,36 @@ owns durable state and what happens if the process stops between two effects.
 Establish consistency, ordering, delivery, deduplication, and reconciliation
 contracts when the scenario depends on them; verify rather than assume.
 
+When an operation must survive retries, restarts, and crashes, design it to
+converge: a run that executes twice, or resumes after a stop at any point,
+reaches the same end state as a clean run. Derive each step from the state
+that exists rather than from what the previous run intended, and make anything
+a run leaves behind, such as a lock, a temporary file, or a half-written
+record, recognizable as stale by the next run. If the outcome depends on what
+was left behind, the operation needs a reconciliation step.
+
+When concurrent actors might write to the same file, key, branch, or state
+object, first ask whether they need a shared write target at all. The default
+is to eliminate it: give each actor its own file, key, branch, or state
+directory and merge only at the read or reporting boundary. Two workers
+writing their own fields into one state file still share a write target.
+Serialize access structurally, through a lockfile, a sequential phase, a
+single-writer actor, or an atomic compare-and-swap, only when a real invariant
+requires one shared write target; treat "we need a lock" as a design smell to
+check. Instructions and conventions are not concurrency control.
+
+Inside the system boundary, trust data that passed the entry check described
+in [invariants and prevention](invariants-and-prevention.md). Entry points
+include command-line arguments, configuration, network payloads, and external
+APIs; re-validating their data deeper in a call chain adds noise without
+adding safety. Validate again only where a cast, an untyped path, or a later
+mutation can bypass the entry check.
+
+Keep business logic in pure functions that a thin, mechanical shell calls, so
+the logic can be exercised without the framework. Expose domain concepts
+through the module's public surface, and do not re-export transport, storage,
+framework, or wire types through it.
+
 Turn quality goals into scenarios: under which trigger and conditions must the
 system produce which response, and how would that response be assessed? Obtain
 thresholds from requirements or measurement. "Fast" and "reliable" alone are not

@@ -1,10 +1,11 @@
 # Research and Design Boundaries
 
 Interaction sources reviewed on October 15, 2026; broader modeling sources
-reviewed on October 17, 2026. These sources informed the workflow; they are not
-additional runtime dependencies. Recheck current upstream guidance before
-adopting a later change. Recommendations below are this skill's synthesis,
-not a claim of endorsement or universal agreement.
+reviewed on October 17, 2026; pstack principle sources reviewed on October 27,
+2026. These sources informed the workflow; they are not additional runtime
+dependencies. Recheck current upstream guidance before adopting a later change.
+Recommendations below are this skill's synthesis, not a claim of endorsement or
+universal agreement.
 
 ## Existing skills and responsibilities
 
@@ -54,6 +55,15 @@ every recommendation into one checklist.
   does not claim to conduct a formal SEI evaluation or impose its workshops.
 - The GOV.UK whole-problem guidance above supports examining handoffs across
   organizations. Wider discovery does not authorize changing other teams' work.
+- The pstack principle skills
+  [Make Operations Idempotent](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-make-operations-idempotent/SKILL.md),
+  [Separate Before Serializing Shared State](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-separate-before-serializing-shared-state/SKILL.md),
+  and [Boundary Discipline](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-boundary-discipline/SKILL.md)
+  inform the guidance on converging operations, shared write targets, and
+  trust inside the validated boundary in the Architecture section of
+  [Concepts, Workflows, and Architecture](models-and-scenarios.md). They state
+  defaults to check against the system's actual contracts, not rules that
+  replace that check.
 
 ## Scope decisions
 

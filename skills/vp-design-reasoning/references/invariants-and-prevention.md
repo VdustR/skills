@@ -5,6 +5,15 @@ prevented by changing a model, API, type, ownership rule, or enforcement boundar
 Routine implementation does not need a separate design exercise merely because
 it uses types or collections.
 
+Three signs suggest that domain modeling was skipped: a feature that grows an
+existing if/else chain by one more branch, a second boolean that must stay in
+sync with the first, and modules named for phases such as load, validate,
+transform, and save that each repeat the same domain rule. Execution order is
+not ownership: splitting modules by phase assigns no owner to the rule they
+repeat. When one of these signs appears, state the invariant the code must
+preserve, then consider a structure that encodes it, such as a state machine,
+a lookup table, or a discriminated union, before extending the code.
+
 ## Establish the guarantee before choosing a mechanism
 
 State the rule in observable terms. "One current value per key," "reject any
@@ -51,9 +60,9 @@ to the model. Validation belongs where those values enter; a cast is not proof.
 
 ## Sources and limits
 
-Reviewed October 24, 2026. The preference order is this skill's synthesis;
-these sources establish specific techniques and boundaries, not a universal
-cost-independent hierarchy.
+Reviewed October 24, 2026, with the pstack entry reviewed October 27, 2026.
+The preference order is this skill's synthesis; these sources establish
+specific techniques and boundaries, not a universal cost-independent hierarchy.
 
 - [Scott Wlaschin: Making illegal states unrepresentable](https://fsharpforfunandprofit.com/posts/designing-with-types-making-illegal-states-unrepresentable/)
   demonstrates modeling allowed alternatives instead of permitting invalid
@@ -69,3 +78,6 @@ cost-independent hierarchy.
 - [PostgreSQL 18: Unique constraints](https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS)
   documents database-enforced uniqueness and null treatment. It does not prove
   a particular deployment's schema, topology, or cross-store guarantees.
+- [pstack: Model the Domain](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-model-the-domain/SKILL.md)
+  names the signs that modeling was skipped. Its list of structures is a menu,
+  not a requirement to abstract clear local code.

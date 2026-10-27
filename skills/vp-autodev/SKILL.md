@@ -177,10 +177,14 @@ the narrowest evidence-backed outcome and continue delivery.
 
 Treat the user's iteration budget as an upper bound when provided. After two
 correction passes for the same unresolved finding, reassess the cause and
-evidence before editing again. Continue with a concrete new hypothesis and a discriminating
-check; do not repeat a failed approach or add unrelated improvements. If no safe
-next step exists, report the blocker. A pass count never makes unresolved
-findings or incomplete verification safe to merge.
+evidence before editing again. Write down, in one sentence, the premise every
+failed correction shared, then test that premise with an observation that
+would come out differently if it were false; a failed correction is also
+evidence against the premise it assumed. Continue with a concrete new
+hypothesis and a discriminating check; do not repeat a failed approach or add
+unrelated improvements. If no safe next step exists, report the blocker. A
+pass count never makes unresolved findings or incomplete verification safe to
+merge.
 
 ## Problems discovered during the work
 
