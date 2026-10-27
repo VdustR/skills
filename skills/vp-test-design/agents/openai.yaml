@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Test Design"
+  short_description: "Decide, write, and judge tests by the behavior they protect"
+  default_prompt: "Use $vp-test-design to decide whether this change needs a test, write the failing test first when a cheap path exists, judge each affected test by whether it fails when the behavior breaks and survives an internal refactor, and report the failing-before and passing-after evidence."
