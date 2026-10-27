@@ -9,6 +9,10 @@ history. Use Conventional Commits only as a fallback.
 ## Decisions
 
 - Group changes by one coherent reason, not by file count or reviewer comment.
+- Order commits so the sequence reads as an argument to the reviewer: the
+  failing test before the fix when the repository accepts a commit whose test
+  fails, the removal before the refactor, the baseline measurement before the
+  change it measures.
 - Keep unrelated user work out of the commit.
 - Explain why when the diff alone does not capture intent, risk, or migration
   order.

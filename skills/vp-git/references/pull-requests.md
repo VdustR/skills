@@ -8,7 +8,9 @@ repository template. Create a draft first when PR-stage work is requested.
 
 Follow the user's requested structure and the repository's pull request
 template. Apply vp-tldr to the summary only when the user requests its TL;DR
-logic.
+logic. Link logs, commit lists, and metric tables from the PR body instead of
+pasting them; keep the body, within the template, short enough to read before
+opening the diff.
 
 ## Review
 

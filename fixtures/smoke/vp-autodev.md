@@ -106,8 +106,10 @@ every repeated exploratory run needs a new question or changed evidence.
   or the action would expand scope.
 - Report an explicit bounded terminal state and missing gate when progress must
   stop.
-- Reassess repeated failures with a discriminating check; report a blocker if
-  no safe next step exists instead of repeating the same edit.
+- Reassess repeated failures with a discriminating check: write the premise the
+  failed corrections shared in one sentence and, before editing again, test it
+  with an observation that would differ if the premise were false; report a
+  blocker if no safe next step exists instead of repeating the same edit.
 - With a five-pass budget, reassess after the second failed correction before
   attempting a third; the budget does not postpone reassessment. With a
   one-pass budget, do not run a second correction just to reach reassessment.
@@ -155,3 +157,5 @@ every repeated exploratory run needs a new question or changed evidence.
 - merge is followed by release follow-up and published-result verification
 - safety gates and scope boundaries remain intact
 - automated feedback converges without weakening severe-risk escalation
+- a third correction for the same finding starts from a written, tested
+  premise rather than another correction on the untested one
