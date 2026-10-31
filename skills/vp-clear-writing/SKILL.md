@@ -4,6 +4,7 @@ description: >-
   Write or revise clear, concrete prose across languages for user-facing replies,
   documents, code comments, review comments, and pull request descriptions.
   Make problems, solutions, and value understandable in a logical reading order.
+  Proactively use useful diagrams to explain relationships and behavior.
   Select relevant content and preserve meaning, necessary context, and
   uncertainty while removing empty rhetoric. Boundary: use vp-tldr to select
   summary content and the relevant workflow to investigate, verify, or publish it.
@@ -108,6 +109,18 @@ Use only the connections relevant to the requested artifact. A one-line reply
 or code comment may need only a result and its reason; a proposal may need the
 full argument. Preserve a supplied template and clarify the connections within it.
 
+## Explain visually when useful
+
+Proactively add a diagram when relationships, flows, states, timing, or branching
+choices become easier to understand visually; do not wait for the reader to ask.
+Choose the representation for the question, then a tool the destination supports.
+Use the [visual explanation guide](references/visual-explanations.md) for user
+flows, workflows, state diagrams, decision trees, architecture, and data views.
+Keep the explanation, evidence limits, and accessible text alongside the visual.
+Preserve explicit format constraints and focused edits; a single fact or simple
+sentence does not need a decorative diagram. A diagram must not invent missing
+behavior or imply that a proposed system has been tested.
+
 ## Preserve meaning and evidence
 
 - Keep conditions, causes, sequence, limitations, and uncertainty that affect
@@ -205,3 +218,7 @@ requested or helps assess a material change.
 
 - [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr)
   when selecting the content and scope of a concise summary.
+- [`vp-design-reasoning`](https://github.com/VdustR/skills/tree/main/skills/vp-design-reasoning)
+  when the underlying concepts, workflow, states, or architecture need investigation.
+- [`vp-stack-selection`](https://github.com/VdustR/skills/tree/main/skills/vp-stack-selection)
+  when a visual requires selecting an application renderer or technology stack.
