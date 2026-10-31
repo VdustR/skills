@@ -69,6 +69,18 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | Pele supports() accepts the type but the source uses a new Mermaid feature | Render the actual source and inspect output; a type check does not prove syntax/configuration or semantic parity. |
 | Untrusted source requests custom icon/math markup or rendering options | Keep application control of resolvers/options and apply resource/navigation policy; do not treat source filtering as application-wide safety. |
 
+### Syntax highlighting
+
+| Case | Expected decision |
+| --- | --- |
+| New static docs need TextMate themes and code blocks | Prefer Shiki through the build integration; avoid unnecessary client highlighting. |
+| Browser-only dynamic snippets, WASM prohibited | Evaluate Shiki's JavaScript engine and actual grammar/runtime compatibility; do not reject all Shiki configurations. |
+| Browser highlighter exceeds a fixed measured budget | Compare fine-grained bundles with Prism or another fitting option; do not compare Prism core with all Shiki languages. |
+| Existing Prism plugin/token-class CSS contract | Keep it or verify a scoped migration; Shiki is not a drop-in replacement. |
+| User requires completion, undo, and incremental editing | Select an editor and assess its highlighter integration, rather than claim either highlighter supplies those behaviors. |
+| Fully synchronous initialization required, all resources can be preloaded | Evaluate Shiki's synchronous core and explicit engine; do not claim Shiki always requires async initialization. |
+| Untrusted snippets contain HTML; unknown language cannot load | Preserve escaping and a plain-code fallback; highlighting does not sanitize surrounding Markdown HTML. |
+
 ### Packaging and toolchain ownership
 
 | Case | Expected decision |
@@ -142,6 +154,16 @@ integration is retained; newer syntax requires rendering the corpus; untrusted
 resolver/options inputs remain application-controlled. All six reached the
 expected decision. This was a manual instruction walkthrough, not a package
 integration run, visual comparison, benchmark, or independent agent trial.
+
+## Manual highlighter-selection walkthrough: 2026-10-31 (Asia/Taipei)
+
+The editing agent traced all seven syntax-highlighting cases through the guide.
+Static docs reach build-time Shiki; browser/WASM constraints reach JavaScript
+engine checks; measured budget failures reach alternatives; Prism contracts are
+retained; editing reaches editor selection; sync initialization reaches the
+preloaded core option; untrusted/unknown snippets retain escaping and fallback.
+All reached the expected decision. This was a manual walkthrough, not an
+independent agent trial, grammar-accuracy comparison, or runtime benchmark.
 
 ## Independent trial: 2026-10-15
 
