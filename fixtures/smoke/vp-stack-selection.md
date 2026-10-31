@@ -58,6 +58,17 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | Required kit's styling cannot support the required rendering setup | Both kit and non-kit diagram paths must reach compatibility checks. Surface fixed-choice conflicts instead of silently changing the engine or kit. |
 | Custom React UI needs remote data, shared client state, and isolated reusable components | Compare relevant TanStack packages, nanostores, and Storybook only for those needs. Plan Compiler/Doctor checks during adoption; do not install all tools to answer a design request. |
 
+### Diagram rendering
+
+| Case | Expected decision |
+| --- | --- |
+| New documentation app owns Mermaid-to-SVG rendering and needs synchronous build rendering and CSS theming | Prefer evaluating Pele; check the real diagram corpus, fonts, layout, and integration before adoption. Keep Mermaid source. |
+| README renders only on GitHub | Use the host's supported Mermaid syntax; do not install Pele to change GitHub rendering. |
+| Required ZenUML plugin, HTML labels, JavaScript callbacks, or exact Mermaid.js layout | Keep/evaluate Mermaid.js for the required behavior; Pele type coverage is insufficient. |
+| Existing working Mermaid.js integration, no migration need | Keep it; do not force the new-renderer preference onto existing projects. |
+| Pele supports() accepts the type but the source uses a new Mermaid feature | Render the actual source and inspect output; a type check does not prove syntax/configuration or semantic parity. |
+| Untrusted source requests custom icon/math markup or rendering options | Keep application control of resolvers/options and apply resource/navigation policy; do not treat source filtering as application-wide safety. |
+
 ### Packaging and toolchain ownership
 
 | Case | Expected decision |
@@ -121,6 +132,16 @@ configuration and reset declaration against pinned repository dependencies. It
 checks native execution, strictest diagnostics, and JSON-as-unknown behavior with
 and without the reset. This is an executable configuration check plus manual
 decision walkthrough, not an independent agent trial or a tsx/framework runtime test.
+
+## Manual diagram-selection walkthrough: 2026-10-31 (Asia/Taipei)
+
+The editing agent traced the six diagram-rendering cases through the reference:
+new owned rendering reaches conditional Pele adoption; GitHub reaches the host
+syntax contract; required callbacks/plugins reach Mermaid.js; an existing fitting
+integration is retained; newer syntax requires rendering the corpus; untrusted
+resolver/options inputs remain application-controlled. All six reached the
+expected decision. This was a manual instruction walkthrough, not a package
+integration run, visual comparison, benchmark, or independent agent trial.
 
 ## Independent trial: 2026-10-15
 

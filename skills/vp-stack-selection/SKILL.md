@@ -80,6 +80,7 @@ flowchart TD
 | Selecting environments, hooks, workspaces, or release tooling | [Toolchain](references/toolchain.md) |
 | TypeScript libraries or web tooling are involved | [TypeScript](references/typescript.md) |
 | Choosing web frameworks, rendering, styles, or shared state | [Web](references/web.md) |
+| Selecting a renderer for Mermaid diagram source | [Diagram rendering](references/diagrams.md) |
 | Choosing service capabilities and integration boundaries | [Backend](references/backend.md) |
 | React is a candidate or already selected | [React](references/react.md) |
 | Evaluating Rust | [Rust](references/rust.md) |
