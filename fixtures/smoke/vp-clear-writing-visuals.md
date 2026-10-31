@@ -28,6 +28,15 @@ facts. Do not install tools, publish content, or investigate a real system.
    image export tool is available. Write the useful explanation now.
 10. Present measured latency samples versus a proposed interface. Neither a
     chart nor a generated screenshot establishes that the interface was tested.
+11. Compare three deployment options across offline use, native format, and
+    verification status. One capability is unknown, not unsupported.
+12. Explain a five-step manual installation procedure, and contrast a matrix of
+    overlapping eligibility rules whose policy says every matching rule applies.
+13. Explain an algorithm that retains the first item for each id, preserves input
+    order, returns a new list, and leaves the input unchanged. Include an empty
+    input and repeated ids. The audience does not need runnable source code.
+14. A user needs copyable TypeScript for an exact library API. Contrast a design
+    note with an unspecified retry limit and asynchronous completion behavior.
 
 ## Expected Behavior
 
@@ -43,6 +52,10 @@ facts. Do not install tools, publish content, or investigate a real system.
 | 8 | Split views, retain editable source, inspect rendered labels/fonts, and use text explanations/labels alongside colors. |
 | 9 | Preserve the unknown and provide a compact text/table fallback; report that a rendered diagram is unavailable. |
 | 10 | Use a data plot for samples and a real capture for interface evidence; label proposals and limits. |
+| 11 | Use a consistent comparison table; mark unknown separately from unsupported and retain evidence limits. |
+| 12 | Use numbered steps for the procedure, and an all-match decision table for eligibility. Do not silently make rules exclusive. |
+| 13 | Use labeled text-fenced pseudocode; state ordering, duplicate policy, output, and mutation boundary; trace repeated ids and empty input. |
+| 14 | Identify the version/API evidence needed for runnable TypeScript; do not invent it or investigate beyond this fixture's scope. Preserve unspecified retry/async rules in the design note. |
 
 ## Regression Coverage
 
@@ -50,6 +63,9 @@ Proactive visuals without a diagram request, user flow versus state/workflow/
 sequence, nonexclusive decisions, focused text-only scope, destination/native
 format contracts, BPMN semantics, accessible dense diagrams, missing facts/tools,
 and measured versus proposed behavior.
+Also covers comparison tables, sequential-list boundaries, all-match rule tables,
+pseudocode versus runnable source, stable duplicate handling, empty inputs, and
+unknown asynchronous behavior.
 
 ## Manual walkthrough: 2026-10-31 (Asia/Taipei)
 
@@ -82,3 +98,27 @@ stateDiagram-v2
     Running --> Failed: error
     Failed --> Queued: retry
 ```
+
+## Manual table/pseudocode walkthrough: 2026-10-31 (Asia/Taipei)
+
+The editing agent exercised cases 11-14. Case 11 selected a comparison table
+with an explicit Unknown cell; case 12 retained numbered installation steps and
+an all-match rule table. Case 14 kept real API code separate from design notation
+and left unspecified retry/completion behavior open. Case 13 produced:
+
+Pseudocode: return the first item per id in input order, without changing input.
+
+```text
+output := new empty list
+seenIds := new empty set
+FOR EACH item IN input, in order
+    IF item.id IS NOT IN seenIds
+        ADD item.id TO seenIds
+        APPEND item TO output
+RETURN output
+```
+
+Manual trace: `[A1(id=a), B1(id=b), A2(id=a)]` returns `[A1, B1]`;
+empty input returns an empty list. The output list is new; item objects are
+retained, not deep-cloned. These are manual traces of an illustrative algorithm,
+not executable tests or proof of a concrete implementation's equality semantics.

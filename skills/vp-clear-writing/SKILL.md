@@ -4,7 +4,8 @@ description: >-
   Write or revise clear, concrete prose across languages for user-facing replies,
   documents, code comments, review comments, and pull request descriptions.
   Make problems, solutions, and value understandable in a logical reading order.
-  Proactively use useful diagrams to explain relationships and behavior.
+  Proactively use useful diagrams, tables, or pseudocode to explain structure
+  and behavior.
   Select relevant content and preserve meaning, necessary context, and
   uncertainty while removing empty rhetoric. Boundary: use vp-tldr to select
   summary content and the relevant workflow to investigate, verify, or publish it.
@@ -169,6 +170,14 @@ Use paragraphs for connected explanations, bullets for parallel information,
 numbered steps for ordered actions, and tables for comparisons. Add headings
 when they help readers navigate. Avoid fixed sentence lengths, list limits, and
 mandatory sections or next actions.
+
+Choose tables for comparable attributes, mappings, or rule coverage; choose
+pseudocode when ordered conditions, iteration, or data transformations need
+precision without a language-specific implementation. Read
+[tables and pseudocode](references/tables-and-pseudocode.md) when choosing these
+forms, including decision/transition tables and runnable-code boundaries. Do not
+force sequential human instructions into a table or disguise pseudocode as a
+tested implementation.
 
 Let the context determine what the reader needs:
 

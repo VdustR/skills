@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Clear Writing"
   short_description: "Choose relevant content and write clear, concrete prose"
-  default_prompt: "Use $vp-clear-writing to write or revise this text around the reader's purpose and applicable sources. Proactively add useful diagrams for relationships, flows, states, timing, or choices; preserve the editing scope, evidence, uncertainty, accessible explanation, and requested format."
+  default_prompt: "Use $vp-clear-writing to write or revise this text around the reader's purpose and applicable sources. Proactively use useful diagrams, tables, or pseudocode to explain relationships, comparisons, flows, states, timing, or rules; preserve the editing scope, evidence, uncertainty, accessible explanation, and requested format."

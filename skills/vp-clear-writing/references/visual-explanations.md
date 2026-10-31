@@ -4,6 +4,8 @@ Make the reader's question visible. Proactively draw relationships, flows,
 states, timing, and choices where a visual helps the reader follow the argument.
 These are selection guidelines, not requirements to install tools or create
 every view. Preserve explicit text-only formats and the scope of a narrow edit.
+Use [tables and pseudocode](tables-and-pseudocode.md) when attribute comparison,
+rule coverage, or ordered algorithmic logic is the clearer explanation.
 
 ## Choose the view before the tool
 
