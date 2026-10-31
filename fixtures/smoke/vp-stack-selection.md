@@ -58,6 +58,40 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | Required kit's styling cannot support the required rendering setup | Both kit and non-kit diagram paths must reach compatibility checks. Surface fixed-choice conflicts instead of silently changing the engine or kit. |
 | Custom React UI needs remote data, shared client state, and isolated reusable components | Compare relevant TanStack packages, nanostores, and Storybook only for those needs. Plan Compiler/Doctor checks during adoption; do not install all tools to answer a design request. |
 
+### Diagram rendering
+
+| Case | Expected decision |
+| --- | --- |
+| New documentation app owns Mermaid-to-SVG rendering and needs synchronous build rendering and CSS theming | Prefer evaluating Pele; check the real diagram corpus, fonts, layout, and integration before adoption. Keep Mermaid source. |
+| README renders only on GitHub | Use the host's supported Mermaid syntax; do not install Pele to change GitHub rendering. |
+| Required ZenUML plugin, HTML labels, JavaScript callbacks, or exact Mermaid.js layout | Keep/evaluate Mermaid.js for the required behavior; Pele type coverage is insufficient. |
+| Existing working Mermaid.js integration, no migration need | Keep it; do not force the new-renderer preference onto existing projects. |
+| Pele supports() accepts the type but the source uses a new Mermaid feature | Render the actual source and inspect output; a type check does not prove syntax/configuration or semantic parity. |
+| Untrusted source requests custom icon/math markup or rendering options | Keep application control of resolvers/options and apply resource/navigation policy; do not treat source filtering as application-wide safety. |
+
+### Syntax highlighting
+
+| Case | Expected decision |
+| --- | --- |
+| New static docs need TextMate themes and code blocks | Prefer Shiki through the build integration; avoid unnecessary client highlighting. |
+| Browser-only dynamic snippets, WASM prohibited | Evaluate Shiki's JavaScript engine and actual grammar/runtime compatibility; do not reject all Shiki configurations. |
+| Browser highlighter exceeds a fixed measured budget | Compare fine-grained bundles with Prism or another fitting option; do not compare Prism core with all Shiki languages. |
+| Existing Prism plugin/token-class CSS contract | Keep it or verify a scoped migration; Shiki is not a drop-in replacement. |
+| User requires completion, undo, and incremental editing | Select an editor and assess its highlighter integration, rather than claim either highlighter supplies those behaviors. |
+| Fully synchronous initialization required, all resources can be preloaded | Evaluate Shiki's synchronous core and explicit engine; do not claim Shiki always requires async initialization. |
+| Untrusted snippets contain HTML; unknown language cannot load | Preserve escaping and a plain-code fallback; highlighting does not sanitize surrounding Markdown HTML. |
+
+### Internationalization
+
+| Case | Expected decision |
+| --- | --- |
+| "Use only x18n instead of i18n" without naming a library | Distinguish the capability from the management toolkit; establish the layer before selecting a replacement. |
+| Application needs runtime plurals, fallback, locale switching, and SSR | Keep/select a fitting runtime; x18n can complement resource management, not replace runtime localization. |
+| New multilingual repo needs locale checks, CLI, and editor navigation | Prefer evaluating x18n presets/formats/coverage, with version and CI checks before adoption. |
+| Migrate i18n Ally with translation-provider settings and custom wrappers | Inspect dry-run conversion and dropped settings; verify wrappers, editor behavior, reviews, and the separate translation workflow before removal. |
+| Existing resource tool meets requirements and no migration is requested | Preserve it; a new-tooling preference alone does not justify replacement. |
+| Scanner reports unused keys, but runtime uses fully dynamic t(key) | Treat scan coverage as incomplete; verify dynamic-key policy and runtime uses before deletion. |
+
 ### Packaging and toolchain ownership
 
 | Case | Expected decision |
@@ -121,6 +155,36 @@ configuration and reset declaration against pinned repository dependencies. It
 checks native execution, strictest diagnostics, and JSON-as-unknown behavior with
 and without the reset. This is an executable configuration check plus manual
 decision walkthrough, not an independent agent trial or a tsx/framework runtime test.
+
+## Manual diagram-selection walkthrough: 2026-10-31 (Asia/Taipei)
+
+The editing agent traced the six diagram-rendering cases through the reference:
+new owned rendering reaches conditional Pele adoption; GitHub reaches the host
+syntax contract; required callbacks/plugins reach Mermaid.js; an existing fitting
+integration is retained; newer syntax requires rendering the corpus; untrusted
+resolver/options inputs remain application-controlled. All six reached the
+expected decision. This was a manual instruction walkthrough, not a package
+integration run, visual comparison, benchmark, or independent agent trial.
+
+## Manual highlighter-selection walkthrough: 2026-10-31 (Asia/Taipei)
+
+The editing agent traced all seven syntax-highlighting cases through the guide.
+Static docs reach build-time Shiki; browser/WASM constraints reach JavaScript
+engine checks; measured budget failures reach alternatives; Prism contracts are
+retained; editing reaches editor selection; sync initialization reaches the
+preloaded core option; untrusted/unknown snippets retain escaping and fallback.
+All reached the expected decision. This was a manual walkthrough, not an
+independent agent trial, grammar-accuracy comparison, or runtime benchmark.
+
+## Manual internationalization walkthrough: 2026-10-31 (Asia/Taipei)
+
+The editing agent traced the six internationalization cases: ambiguous category
+comparison requires layer identification; runtime needs retain a runtime;
+new management tooling reaches conditional x18n evaluation; i18n Ally migration
+checks dropped settings and custom behavior; a fitting existing tool remains;
+dynamic-key scan gaps prevent unsupported deletion. All reached the expected
+decision. This was a manual walkthrough, not an executed migration, editor trial,
+translation-quality review, or runtime localization test.
 
 ## Independent trial: 2026-10-15
 

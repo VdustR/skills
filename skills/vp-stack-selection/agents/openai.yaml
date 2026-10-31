@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Stack Selection"
   short_description: "Compare ecosystems against project requirements"
-  default_prompt: "Use $vp-stack-selection to compare fitting ecosystems and credible prereleases, default new JS-ecosystem code to TypeScript and lightweight Node scripts to native execution, use tsx for concrete extra capabilities, and require strictest, application-owned ts-reset, and independent type checks."
+  default_prompt: "Use $vp-stack-selection to compare fitting ecosystems and credible prereleases, default new JS-ecosystem code to TypeScript and lightweight Node scripts to native execution, use tsx for concrete extra capabilities, and require strictest, application-owned ts-reset, and independent type checks. Read the diagram-rendering, syntax-highlighting, and internationalization guides when relevant."

@@ -112,3 +112,6 @@ agent trial separately, including the actual outputs and remaining limits.
 For independent fictional cases about content selection, current sources,
 comparison baselines, and preservation of relevant history, use
 [Reader Purpose and Current Sources](vp-clear-writing-selection.md).
+
+For proactive visual explanations and destination-aware tool selection, use
+[Visual Explanation Decisions](vp-clear-writing-visuals.md).

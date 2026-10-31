@@ -38,6 +38,17 @@ SPA/MPA navigation, CSR/SSR, and prerendering are separate decisions. Adoption
 checks should cover direct links, reloads, history, production hosting, and
 hydration where used. Server-rendered HTML alone does not establish MPA navigation.
 
+## Content tooling
+
+Read only the relevant selection guide:
+
+- [Diagram rendering](diagrams.md) for an owned Mermaid-to-SVG pipeline versus
+  host-controlled Markdown rendering.
+- [Syntax highlighting](syntax-highlighting.md) for Shiki/Prism and the boundary
+  between displaying code and providing an editor.
+- [Internationalization](internationalization.md) for runtime localization versus
+  x18n resource management and i18n Ally migration.
+
 ## Styling
 
 | Situation | Default approach |
