@@ -55,6 +55,7 @@ required_skills=(
   "vp-recording"
   "vp-github"
   "vp-agent-browser-session"
+  "vp-session-organization"
   "vp-session-wrapup"
   "vp-retro"
   "vp-tunnel"
