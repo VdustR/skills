@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Pixel Art"
+  short_description: "Create and review native-grid pixel artwork"
+  default_prompt: "Use $vp-pixel-art to create, adapt, or review authored native-grid pixel artwork with the requested palette, platform, and use-size constraints."
