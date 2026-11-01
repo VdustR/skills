@@ -38,6 +38,23 @@ the title after exiting and resuming the same session ID. This establishes that
 operator route, not a self-rename tool or permission to attach to arbitrary live
 sessions. Preserve the distinction when reporting support.
 
+An absent built-in tool does not rule out supported local APIs. The official
+[Agent SDK](https://code.claude.com/docs/en/agent-sdk/typescript#renamesession)
+provides `renameSession` and `getSessionInfo`, scoped by session ID and project
+directory. Use a verified registered companion when available; do not infer
+its installation or manually rewrite transcript records.
+
+The personal [Claude session-naming integration](https://github.com/VdustR/dotfiles/tree/main/home/.claude/session-naming)
+uses native `SessionStart` and `UserPromptSubmit` hooks to bind the current
+session and load this workflow independently of description matching. Its
+`session-name.ts set 'Title'` command uses the SDK and checks readback;
+`protect` records an explicit request to retain a managed name. Native hooks
+can refresh the already-persisted title through
+[`hookSpecificOutput.sessionTitle`](https://code.claude.com/docs/en/hooks#userpromptsubmit-decision-control).
+SDK persistence, a running CLI's rendered title, the desktop sidebar, and Remote
+Control propagation are separate verification boundaries. Do not promise an
+immediate update of every surface from SDK readback alone.
+
 Picker grouping or shared repository paths do not establish an arbitrary
 user-created group operation. Discover grouping separately. Explicitly inspect
 the active permission mode; a default can inherit local settings. Do not enable

@@ -27,6 +27,12 @@ the procedure. Session notes preserve working context, not proof that a title or
 group was changed. Keep execution lifecycle and closeout with their owning
 workflows.
 
+Skill discovery is not a lifecycle subscription. When a harness integration
+loads this workflow at a native prompt or session event, use its verified
+current-session operation instead of waiting for a separate naming request or
+assuming that a `Skill` tool call is required. The integration must retain the
+same authorization, identity, user-name protection, and readback boundaries.
+
 ## Name the durable goal
 
 Identify the context and intended outcome from the conversation. Once they are
