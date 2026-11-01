@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP SVG Art"
+  short_description: "Create and review editable SVG artwork"
+  default_prompt: "Use $vp-svg-art to create, adapt, or review genuine editable SVG artwork for the requested brief, reference, and use sizes."

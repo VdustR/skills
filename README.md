@@ -146,6 +146,11 @@ Cleanly uninstall macOS applications with research-backed residual file cleanup.
 
 Reduce an observed failure to a reproduction that fails on demand, and rebuild it standalone when it has to be shared.
 
+### vp-pixel-art
+
+Create, reconstruct, adapt, edit, and review native-grid pixel artwork with
+explicit palette, alpha, readability, and platform evidence.
+
 ### vp-pr-briefing
 
 Research a pull request and present a structured, progressive-disclosure briefing.
@@ -185,6 +190,11 @@ Select compatible stacks for new projects, full-system refactors, rewrites, and 
 ### vp-stacked-pr
 
 Build, submit, merge, and repair stacks of dependent pull requests, merge requests, or branches. Native automation on GitHub, manual Git rebase on any other host.
+
+### vp-svg-art
+
+Create, reconstruct, adapt, edit, and review genuine editable SVG logos,
+illustrations, website art, and slide graphics from a brief or reference.
 
 ### vp-test-design
 
