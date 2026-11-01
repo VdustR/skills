@@ -40,3 +40,6 @@ on stderr and no state readback.
 - no grouping substitute changes project membership or execution context
 - reopen persistence is limited to the boundary actually exercised
 - static fixture validation does not establish agent or product behavior
+- native lifecycle loading can supply the workflow and a supported companion
+  independently of main-agent skill discovery; persisted readback does not
+  establish immediate live-client or remote title propagation
