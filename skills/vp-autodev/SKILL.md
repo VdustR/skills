@@ -101,13 +101,13 @@ Keep evidence for each decision from issue validation through delivery:
    head is a branch-protection required check, enable the platform's
    auto-merge, through the host's PR tool when it offers one, and name it as
    the resume event. Every other blocking signal must already be final and
-   passing on that head: review markers for that SHA, every check the
-   repository treats as blocking, and no unresolved thread. Keep the failure
-   and comment monitor on. A real finding, a failed check, or a new push
-   reopens the merge decision: disable auto-merge before handling it, because a
-   push from someone with write access does not cancel it. When that condition
-   does not hold, tell the user that nothing will resume the merge and which
-   reply from them resumes it.
+   passing on that head: review markers for that SHA, every non-required check
+   the repository treats as blocking, and no unresolved thread. When that
+   condition does not hold, tell the user that nothing will resume the merge
+   and which reply from them resumes it. After enabling auto-merge, keep the
+   failure and comment monitor on. A real finding, a failed check, or a new
+   push reopens the merge decision: disable auto-merge before handling it,
+   because a push from someone with write access does not cancel it.
 8. Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
    a complete, independently paginated snapshot of PR conversation issue
    comments and review threads with all inline comments and replies; a partial
