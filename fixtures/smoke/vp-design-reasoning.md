@@ -157,3 +157,58 @@ changes were performed.
 | 17 | Model responsibilities now; ask for workload and response/availability requirements before ranking architecture options by speed or reliability. Keep missing thresholds unknown. | No performance measurement or invented target. |
 | 18 | Deliver the database replacement design with cutover, migration, reconciliation, and recovery decisions; defer actual data movement and deployment until authorized. | No production access or mutation. |
 | 19 | Explain observed code responsibilities and dependencies at useful abstraction levels; mark queue delivery and deployment behavior unknown without evidence. Do not add a redesign or demand every C4 view. | Static code evidence does not establish runtime behavior. |
+
+## Working Representation Scenarios
+
+20. Review an export policy. Active paid workspaces allow Owners and Admins to
+    export, Members cannot, and suspended workspaces cannot export. Billing grace
+    retains access for "existing admins" without defining Owner eligibility or
+    newly added Admins. One rule blocks all exports during a legal hold; another
+    lets an additional Legal Reviewer capability export held records, without
+    defining precedence. Workspace status can change while work is queued.
+    Recommend a bounded approach without changing live accounts or adding an
+    approval service.
+21. Model an export cancellation contract. Running work accepts a cancellation
+    request and a worker later confirms stopping. Completion can race with the
+    request, but precedence and the authority over the final result are absent.
+    Identify what must be settled before implementation; do not make live requests.
+22. Review a support escalation proposal. Support removes sent tickets from its
+    queue before Engineering accepts them; rejection has no next owner. Customers
+    can close a ticket while Engineering accepts it. Engineering completion still
+    requires Support to verify the customer outcome. Only the ticket page and
+    Engineering intake queue exist; email, automatic reassignment, and timers do
+    not. Model handoffs and what a returning customer can understand or do.
+23. For the preceding escalation, save a working design note and a separate
+    stakeholder note in plain prose, at most 150 words, with no tables or diagrams.
+24. Use `$vp-clear-writing` to explain a supplied process whose diagram labels a
+    sent escalation as accepted responsibility, although the source says acceptance
+    is a later decision. Resolve the modeling question without restarting already
+    established facts, inventing acceptance, or launching a frontend build.
+
+## Expected Working Representation Behavior
+
+- Select useful working views before settling the conclusion. Use comparable
+  rows or paths to expose overlapping rules, missing cases, ambiguous precedence,
+  ownership gaps, or competing events. Equivalent representations are valid;
+  do not require a particular heading, syntax, renderer, or every listed view.
+- For the policy, distinguish specified cases from ambiguous grace eligibility
+  and conflicting legal-hold rules. Show the combinations that change a decision
+  and retain missing queued-job authorization semantics. Label a conservative
+  proposal as a proposal rather than asserting it is the existing policy.
+- For cancellation, distinguish a request from confirmed stopping and leave the
+  completion race unresolved until evidence or an authorized decision settles it.
+  Do not invent an event-ordering guarantee to complete a state diagram.
+- For escalation, trace ownership before and after acceptance, rejection, customer
+  closure, and outcome verification. Keep user-visible knowledge separate from
+  backend work. No new email, timer, automatic reassignment, or real message follows
+  from a modeling gap.
+- Use clear-writing guidance while constructing and revising the model, not only
+  after reaching a conclusion. Reuse context across the two skills and investigate
+  only unresolved parts. Preserve the distinction between supplied facts and
+  proposals in every view.
+- Keep the final stakeholder note within its prose-only constraint even when a
+  separate working model uses a table or diagram. Keep narrow case 3 narrow and
+  preserve the live-operation authorization boundary in cases 12 and 18.
+- Rendering or syntax checks establish neither model correctness nor runtime
+  behavior. Record walkthroughs and independent trials separately; a successful
+  trial does not establish reliable behavior across all models or tasks.

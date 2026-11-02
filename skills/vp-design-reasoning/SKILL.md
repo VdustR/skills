@@ -6,6 +6,7 @@ description: >-
   architecture, plan or improve user interactions, or review a recurring
   mistake to choose a preventive model or enforcement boundary. Connect intent,
   responsibilities, relationships, states, consequences, and evidence.
+  Use tables and diagrams as working models to expose gaps before deciding.
   Boundary: use domain workflows for implementation and validation; not a
   replacement for agent tool routing, technology selection, visual craft,
   or routine implementation with no design decision.
@@ -63,6 +64,31 @@ when their relationship matters, and keep names and boundaries consistent.
 Do not force a concept into a state machine or treat a component diagram as
 proof of runtime behavior. Agent tool selection belongs to interaction-routing
 workflows; standalone branding and artwork belong to visual workflows.
+
+## Reason with tables and diagrams
+
+When conditions, relationships, states, or handoffs are difficult to track in
+prose, build a compact working table or diagram while investigating the problem.
+Use it to discover missing cases and contradictions before choosing a solution;
+revise it as evidence or decisions change. A simple definition or narrow wording
+edit may need no separate model artifact.
+
+Read [working representations](references/working-representations.md) to choose
+among comparison or decision tables, state diagrams, workflows, user flows,
+sequence diagrams, and other useful views. Trace concrete cases through the
+chosen representation. Turn an empty cell, unexplained edge, or conflicting
+path into a question to resolve, not a capability to invent.
+
+Use [vp-clear-writing](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
+when constructing or revising these representations, including during analysis:
+reuse its view-selection and clarity guidance for names, relationships, tables,
+diagrams, and pseudocode. This skill owns the modeled behavior, design decisions,
+and evidence checks. Share the same facts and open questions; a handoff should
+address the unresolved part, not restart both workflows.
+
+Choose the final presentation separately. Retain only the working views the
+reader needs, preserve material uncertainty, and honor the requested format.
+An analysis table does not require a table in a prose-only deliverable.
 
 ## Prevent errors at the owning boundary
 
@@ -144,6 +170,8 @@ this synthesis; they do not impose a universal notation or mandatory workshop.
 
 ## Related skills
 
+- [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
+  for clear working representations during analysis and reader-facing explanations.
 - [`impeccable`](https://github.com/pbakaus/impeccable) for frontend visual
   direction and craft alongside user interaction reasoning.
 - [`vp-stack-selection`](https://github.com/VdustR/skills/tree/main/skills/vp-stack-selection)
@@ -152,5 +180,3 @@ this synthesis; they do not impose a universal notation or mandatory workshop.
   when web CSS implements content, sizing, disclosure, and scroll decisions.
 - [`vp-typescript-best-practices`](https://github.com/VdustR/skills/tree/main/skills/vp-typescript-best-practices)
   when valid-state modeling needs TypeScript implementation or compiler checks.
-- [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
-  when the design proceeds through authorized implementation and delivery.
