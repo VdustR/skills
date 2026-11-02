@@ -2,7 +2,8 @@
 name: vp-github
 description: >-
   Work with GitHub platform behavior that is not a Git operation: attaching
-  images, videos, or files to issues, pull requests, and comments; controlling
+  images, videos, or files to issues, pull requests, and comments; managing
+  issue artifacts for research, plans, HTML documents, and links; controlling
   how Markdown renders on GitHub surfaces; and choosing a credential that can
   reach the endpoint. Use for any request to upload, attach, embed, or show a
   local artifact on GitHub. Also use proactively when writing or editing GitHub
@@ -16,6 +17,9 @@ description: >-
 
 ## Route
 
+- Choosing between a body, issue artifact, attachment, and link, or managing
+  an issue artifact: read
+  [issue artifacts and the destination decision tree](references/issue-artifacts.md).
 - Putting an image, video, or file into an issue, PR, comment, discussion, or
   README: read
   `references/attachments.md`.
@@ -23,7 +27,9 @@ description: >-
   `references/markdown-rendering.md`.
 
 Media upload through the supported path needs an authenticated GitHub CLI
-v2.99.0 or later. Non-media attachment upload also needs a browser signed in to
+v2.99.0 or later. Issue artifacts have a separate preview command; check its
+availability instead of inferring it from media support. Ordinary non-media
+attachment upload also needs a browser signed in to
 GitHub and a way to run scripts in its page context. Confirm what the chosen path
 needs before promising the result, and never treat choosing the upload method as
 authorization to publish.

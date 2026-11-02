@@ -1,4 +1,4 @@
 interface:
   display_name: "VP GitHub"
-  short_description: "Upload and render GitHub attachments safely"
-  default_prompt: "Use $vp-github to upload or render this local artifact in GitHub content."
+  short_description: "Manage GitHub artifacts, attachments, and rendering"
+  default_prompt: "Use $vp-github to choose and verify the right GitHub body, issue artifact, attachment, or link for this content."

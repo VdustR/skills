@@ -7,10 +7,55 @@ complete diff and commit history, run proportionate checks, and follow the
 repository template. Create a draft first when PR-stage work is requested.
 
 Follow the user's requested structure and the repository's pull request
-template. Apply vp-tldr to the summary only when the user requests its TL;DR
-logic. Link logs, commit lists, and metric tables from the PR body instead of
-pasting them; keep the body, within the template, short enough to read before
-opening the diff.
+template. Apply `vp-clear-writing` to the title and description. Use
+`vp-design-reasoning` when the change needs a model of behavior, a design
+trade-off, or a decision flow; share the same evidence rather than restarting
+research. Apply vp-tldr to the summary only when the user requests its TL;DR
+logic.
+
+## Make the change readable
+
+Write for a reviewer who has not read the conversation. Lead with the concrete
+problem and resulting behavior. Include a trigger and before/after example
+when they clarify the effect. Keep relevant verification and material risks,
+migrations, or unresolved limits in the body, within the repository template.
+Name where reviewer attention is needed when there is a specific decision or
+risk. Do not hide approval-critical information behind a link or collapsed
+section.
+
+Select supporting detail by the question it answers:
+
+- Use a decision tree when reviewers need to see which behavior applies under
+  different conditions, including the relevant fallback or failure path.
+- Use a sequence or flow diagram when timing, ownership, or handoffs explain
+  the change. Use a comparison table when reviewers need to compare options or
+  before/after cases across the same attributes.
+- Keep a small change in prose when a visual adds no information. Do not add
+  a diagram, HTML artifact, or fixed section count to every PR.
+
+Route artifact placement, publication, and rendering through `vp-github` and its
+[issue-artifact destination tree](https://github.com/VdustR/skills/blob/main/skills/vp-github/references/issue-artifacts.md).
+Keep detailed research or evolving plans on a relevant issue as artifacts when
+supported, and link them from the PR with a label that explains their purpose.
+Issue artifacts are issue-only; do not assume PR support or create an issue
+solely to shorten a small PR. Existing maintained documents stay authoritative.
+Media evidence uses the attachment workflow. A committed document, ordinary
+link, or optional `<details>` section can serve when artifacts are unavailable;
+keep publication within the authorized audience and scope.
+
+State what each evidence item establishes, its relevant revision/version, and
+what remains unverified. Avoid duplicate documents and pasted logs, commit
+lists, or large metric tables. Verify the saved body, links, and destination
+rendering before claiming the reading experience works. `/markdown` can check
+HTML structure but does not prove Mermaid rendering or interactive behavior.
+Read the description once without opening its supporting links: the reviewer
+should still understand the problem, result, verification limits, and material
+risks. This is a manual reading check, not measured reviewer usability.
+
+The information hierarchy follows
+[GitHub's guidance for helping reviewers](https://docs.github.com/en/pull-requests/concepts/helping-others-review-your-changes).
+The choice of supporting representation is a design decision, not a requirement
+to use every available format.
 
 ## Review
 
