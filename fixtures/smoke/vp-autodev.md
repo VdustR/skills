@@ -35,6 +35,11 @@ Also evaluate these decision cases without performing external writes:
   did not wait for, is still pending. Separately, a check that is not
   branch-protection-required fails on the current head, and earlier merges
   always waited for it to pass.
+- The review just passed and a blocking check is still pending. The host PR
+  monitor wakes the session only for failures, conflicts, or new comments, and
+  host rules forbid self-polling. Separately, the repository reruns an
+  advisory workflow whenever the PR description is edited, and a final fix
+  also needs a description update.
 
 ## Technical premise cases
 
@@ -127,6 +132,11 @@ every repeated exploratory run needs a new question or changed evidence.
   convention that makes it non-blocking. Treat the failing check as blocking
   because repository convention waits for it, even though branch protection
   does not require it.
+- Classify pending checks when the review passes, not only at merge time. For
+  the pending blocking check, name the resume event; a passing check emits
+  no monitor event, so tell the user nothing will resume the merge and which
+  reply resumes it rather than ending the turn as if work will continue. Do
+  not poll. Edit the description before the final push.
 - Exercise the document's decisions and state the verification method; do not
   describe syntax or fixture-content checks as an agent trial.
 
@@ -149,6 +159,8 @@ every repeated exploratory run needs a new question or changed evidence.
 - current-head CI and feedback are both re-read after the last mutation
 - a pending check is not passing evidence, and repository convention rather
   than branch protection alone decides whether a check blocks the merge
+- a turn that ends to wait on a blocking check names its resume event, and a
+  success path with no event is reported to the user instead of left silent
 - reviewer silence is recorded as unobserved without automatically invoking or
   waiting for the reviewer
 - partial reads cannot establish that feedback is handled on either GitHub

@@ -153,6 +153,18 @@ require_pattern "$autodev_skill" 'A pending check is not passing evidence' \
   "vp-autodev must not treat a pending check as passing"
 require_pattern "$autodev_skill" 'GitHub auto-merge waits only for branch-protection requirements' \
   "vp-autodev must state what GitHub auto-merge waits for"
+require_pattern "$autodev_skill" 'name the event that will resume the work' \
+  "vp-autodev must name the resume event before ending a turn to wait"
+require_pattern "$autodev_skill" 'a check that passes emits nothing' \
+  "vp-autodev must state that a passing check wakes no monitor"
+require_pattern "$autodev_skill" 'nothing will resume the merge' \
+  "vp-autodev must tell the user when no event resumes the merge"
+require_pattern "$autodev_skill" 'finish description edits before the' \
+  "vp-autodev must finish description edits before the final push"
+require_pattern "$autodev_fixture" 'Classify pending checks when the review passes' \
+  "vp-autodev fixture must classify pending checks at the wait decision"
+require_pattern "$autodev_fixture" 'reply resumes it' \
+  "vp-autodev fixture must name the reply that resumes the merge"
 require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment' \
   "vp-autodev fixture must include every applicable reaction surface"
 require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \

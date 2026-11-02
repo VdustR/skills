@@ -87,7 +87,17 @@ Keep evidence for each decision from issue validation through delivery:
    comments), issue comments in the PR conversation, and reaction
    emoji on the main post or comments. Treat a changed emoji as new state, using
    that repository's convention instead of a universal mapping. Re-check that a
-   positive signal applies to the current head.
+   positive signal applies to the current head. When the last review or
+   feedback signal arrives while checks are still pending, classify each
+   pending check as blocking or informational under step 11 before deciding to
+   wait; an informational check is no reason to wait. Before ending a turn to
+   wait for a blocking check, name the event that will resume the work. A host
+   PR monitor may wake the session only for failures, conflicts, or new
+   comments, so a check that passes emits nothing. Host rules that forbid
+   self-polling stay binding. When no event covers the success path, do not end
+   the turn as if the work will continue: wait once, bounded, within the turn
+   for that check only where host rules permit it; otherwise tell the user that
+   nothing will resume the merge and which reply from them resumes it.
 8. Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
    a complete, independently paginated snapshot of PR conversation issue
    comments and review threads with all inline comments and replies; a partial
@@ -111,9 +121,12 @@ Keep evidence for each decision from issue validation through delivery:
    through `vp-pr-comment-resolver`. A repository-required review cannot be
    degraded for failure, quota, or delay; keep it blocked until recovery and
    completion, or until the user explicitly directs the next action.
-10. After the last mutation, including Ready, a reply, fix, push, or thread
-    resolution, reconcile again. Record the current head; re-read current-head
-    CI and checks; completely re-fetch PR conversation issue comments,
+10. After the last mutation, including Ready, a PR description edit, a reply,
+    fix, push, or thread resolution, reconcile again. When the repository
+    reruns workflows on description edits, finish description edits before the
+    final push so they do not cancel or restart its checks. Record the current
+    head; re-read current-head CI and checks, applying the step 7 wait rule to
+    any still pending; completely re-fetch PR conversation issue comments,
     submitted reviews, review threads and their nested replies, and reaction
     surfaces used by feedback that exists. A mutation invalidates the prior
     final snapshot. Report an automated reviewer that did not run as unobserved.
