@@ -40,6 +40,12 @@ Also evaluate these decision cases without performing external writes:
   host rules forbid self-polling. Separately, the repository reruns an
   advisory workflow whenever the PR description is edited, and a final fix
   also needs a description update.
+- Under the same monitor and host rules, the review bot has passed the current
+  head, no thread is unresolved, and the only pending check is
+  branch-protection required. Separately, a non-required check that repository
+  convention waits for is also still pending. Separately again, the review bot
+  leaves a real inline finding on the current head after auto-merge was
+  enabled.
 
 ## Technical premise cases
 
@@ -137,6 +143,12 @@ every repeated exploratory run needs a new question or changed evidence.
   no monitor event, so tell the user nothing will resume the merge and which
   reply resumes it rather than ending the turn as if work will continue. Do
   not poll. Edit the description before the final push.
+- Enable auto-merge when only branch-protection required checks remain pending
+  and every other blocking signal is final and passing on the current head;
+  name auto-merge as the resume event and keep the monitor on. Do not enable it
+  while the non-required blocking check is pending; tell the user instead. For
+  the bot finding, disable auto-merge before fixing it, because a push with
+  write access does not cancel auto-merge.
 - Exercise the document's decisions and state the verification method; do not
   describe syntax or fixture-content checks as an agent trial.
 
@@ -161,6 +173,8 @@ every repeated exploratory run needs a new question or changed evidence.
   than branch protection alone decides whether a check blocks the merge
 - a turn that ends to wait on a blocking check names its resume event, and a
   success path with no event is reported to the user instead of left silent
+- auto-merge resumes an authorized merge only when required checks are the
+  only pending gate, and is disabled before a finding or new push is handled
 - reviewer silence is recorded as unobserved without automatically invoking or
   waiting for the reviewer
 - partial reads cannot establish that feedback is handled on either GitHub

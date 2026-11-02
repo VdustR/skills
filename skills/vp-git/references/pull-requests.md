@@ -34,7 +34,8 @@ Before merging, also wait until the checks the repository runs have finished
 and passed for the current head, unless repository convention shows a check is
 non-blocking. A pending check is not a pass. GitHub auto-merge waits only for
 branch-protection requirements, so it merges at once in a repository without
-them and cannot stand in for that wait.
+them and cannot stand in for that wait on any check it does not require. Enable
+it only when the required checks are the only pending gate.
 
 After merging, synchronize the local checkout non-destructively and verify the
 remote and local state independently.
