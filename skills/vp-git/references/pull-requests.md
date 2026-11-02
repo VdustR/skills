@@ -21,7 +21,10 @@ when they clarify the effect. Keep relevant verification and material risks,
 migrations, or unresolved limits in the body, within the repository template.
 Name where reviewer attention is needed when there is a specific decision or
 risk. Do not hide approval-critical information behind a link or collapsed
-section.
+section. Put approval-critical risks before a large diagram, screenshot, or
+other visual that would push them below it. Check the saved page's reading
+order at the destination; being present in the body is not enough if the
+reviewer must scroll past a tall visual to discover the risk.
 
 Select supporting detail by the question it answers:
 
