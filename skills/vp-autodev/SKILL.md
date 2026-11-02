@@ -96,8 +96,18 @@ Keep evidence for each decision from issue validation through delivery:
    comments, so a check that passes emits nothing. Host rules that forbid
    self-polling stay binding. When no event covers the success path, do not end
    the turn as if the work will continue: wait once, bounded, within the turn
-   for that check only where host rules permit it; otherwise tell the user that
-   nothing will resume the merge and which reply from them resumes it.
+   for that check only where host rules permit it. Otherwise, when step 11
+   authorizes the merge and every blocking signal still pending on the current
+   head is a branch-protection required check, enable the platform's
+   auto-merge, through the host's PR tool when it offers one, and name it as
+   the resume event. Every other blocking signal must already be final and
+   passing on that head: review markers for that SHA, every check the
+   repository treats as blocking, and no unresolved thread. Keep the failure
+   and comment monitor on. A real finding, a failed check, or a new push
+   reopens the merge decision: disable auto-merge before handling it, because a
+   push from someone with write access does not cancel it. When that condition
+   does not hold, tell the user that nothing will resume the merge and which
+   reply from them resumes it.
 8. Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
    a complete, independently paginated snapshot of PR conversation issue
    comments and review threads with all inline comments and replies; a partial
@@ -146,7 +156,8 @@ Keep evidence for each decision from issue validation through delivery:
    repository convention, such as a check documented as informational or an
    optional job that earlier merges did not wait for, and record that reason.
    GitHub auto-merge waits only for branch-protection requirements and merges
-   at once when there are none, so it cannot hold a merge for any other check.
+   at once when there are none, so it cannot hold a merge for any other check;
+   step 7 enables it only when those requirements are all that remain.
    If a blocking check runs well past its usual duration in that repository,
    rerun it once through the repository's mechanism; if it still does not
    finish, report it as the missing gate instead of merging.
