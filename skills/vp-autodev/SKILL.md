@@ -73,7 +73,9 @@ Keep evidence for each decision from issue validation through delivery:
    report. Verify cleanup, completion state, retry behavior, and observability
    affected by the change. An error or alert disappearing alone does not prove
    repair; distinguish verified recovery from mitigation and unresolved causes.
-6. Create a Draft PR as part of the requested delivery workflow. Review the
+6. Create a Draft PR as part of the requested delivery workflow. Follow
+   `vp-git`'s `references/pull-requests.md` for a self-contained description,
+   design reasoning, clear writing, and supporting issue-artifact links. Review the
    full diff, commits, and PR text as a maintainer before requesting human or
    automated review. Keep it Draft while material design, verification, or
    feedback remains unresolved; otherwise complete the Draft-to-Ready

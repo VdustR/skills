@@ -123,7 +123,7 @@ Handle commits, repository setup, gitignore files, cleanup, and PR lifecycle dec
 
 ### vp-github
 
-GitHub platform behavior: attaching media and files to issues and PRs, markdown rendering rules, and which credential reaches which endpoint.
+GitHub platform behavior: issue artifacts and destination decisions, media and file attachments, Markdown rendering, and credential boundaries.
 
 ### vp-guided-focus
 

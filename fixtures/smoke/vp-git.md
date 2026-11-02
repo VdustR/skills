@@ -62,3 +62,32 @@ Stacked-change requests are out of scope here and route to vp-stacked-pr.
 - a dirty worktree is not removed;
 - a vague cleanup request does not authorize destructive deletions;
 - commit conventions come from repository evidence, not a default template.
+
+## Pull Request Reading Scenarios
+
+Use `$vp-git` to prepare a PR description for a retry-policy change with three
+conditional outcomes, a queue migration risk, and a long investigation on its
+linked issue. The repository supplies a PR template. Then prepare a description
+for a one-line typo correction with no linked issue. Only drafting is authorized.
+
+Expected decisions, to exercise as manual walkthroughs or independent trials:
+
+- Follow `references/pull-requests.md` and the repository template.
+- Apply `vp-clear-writing`; use `vp-design-reasoning` to model the conditional
+  behavior and a decision tree if it makes the outcomes easier to trace.
+- Keep the trigger, changed behavior, verification limits, and queue migration
+  risk in the PR body even if the research artifact is unavailable.
+- Route publication and rendering through `vp-github`; link an issue-owned
+  artifact rather than assuming artifacts can belong to the PR.
+- Use concise prose for the typo; do not force a diagram, HTML, or new issue.
+- Preserve existing authoritative documents and label evidence by relevant
+  revision/version. A plan or diagram is not implementation verification.
+- Read the description without its supporting links and check that the reviewer
+  can understand the change and risks. Label this a manual reading check,
+  not measured reviewer usability or proof of Mermaid rendering.
+- Honor drafting-only authority: do not publish, edit an artifact, create a PR,
+  or change its lifecycle just to demonstrate the recommended format.
+
+Regression coverage: self-contained approval context; optional representation;
+existing templates and narrow authority; artifact fallback without lost risks;
+no claimed renderer or usability proof from a source-only check.
