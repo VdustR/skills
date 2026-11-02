@@ -5,8 +5,8 @@ a product-wide support table. Distinguish an agent acting on itself from an
 external operator controlling a client. Verify current tools, permissions, exact
 target, and readback before use.
 
-Version-specific observations below were recorded on November 1, 2026. Recheck
-when the relevant client, permissions, tools, or target context changes.
+Version-specific observations below were recorded on November 1 and 2, 2026.
+Recheck when the relevant client, permissions, tools, or target context changes.
 
 ## Codex
 
@@ -44,12 +44,46 @@ provides `renameSession` and `getSessionInfo`, scoped by session ID and project
 directory. Use a verified registered companion when available; do not infer
 its installation or manually rewrite transcript records.
 
+The Claude desktop app's Code tab exposes an agent-callable rename tool. On
+November 2, 2026, in app 4.4212.0, `mcp__ccd_session_mgmt__set_session_title`
+with `session_id: "self"` renamed the current session from the app-generated
+`Session name modification test` to `Session 改名能力測試`, and
+`mcp__ccd_session_mgmt__get_session` with `self` read back the new title. Both
+tools were deferred in those sessions, so load their schemas through tool search
+before calling them. The tool description states the consent policy: the app
+replaces a title it generated without asking and asks the user before replacing
+a title the user set. In bypass-permissions mode it replaces a user-set title
+without asking; in an unattended session it declines. A subagent cannot rename
+the session it runs in. This verifies the app's own rename and readback for the
+current session, not what a CLI or Remote Control view of the same session shows.
+
+The app's check therefore does not protect a user-chosen title in every mode,
+and `get_session` returned no field that identifies who set the title. Before
+renaming, keep a title the conversation shows the user chose or kept, and keep
+a title that changed since the agent last read it when nothing explains the
+change.
+
+In the desktop app, a `custom-title` transcript record does not mean the user
+renamed the session. The app writes its own titles as `custom-title` records,
+the record type a manual rename writes, and the records carry no timestamp. One
+desktop session on November 2, 2026 held seven identical `custom-title` records
+for a title the user never edited. A check that treats a newly appearing
+`custom-title` record as an intervening user edit therefore refuses every
+desktop rename. On that date, the personal integration below refused seven
+desktop sessions this way, each with `The name changed after the hook ran;
+preserving that change.` These observations cover the desktop app; they do not
+establish how the CLI writes the same record type.
+
 The personal [Claude session-naming integration](https://github.com/VdustR/dotfiles/tree/main/home/.claude/session-naming)
 uses native `SessionStart` and `UserPromptSubmit` hooks to bind the current
-session and load this workflow independently of description matching. Its
-`session-name.ts set 'Title'` command uses the SDK and checks readback;
-`protect` records an explicit request to retain a managed name. Native hooks
-can refresh the already-persisted title through
+session and load this workflow independently of description matching. The hooks
+decide when naming applies; the rename route depends on the surface. Its
+`session-name.ts set 'Title'` command renames through the SDK and checks SDK
+readback, which suits a surface with no agent-callable rename tool, such as the
+CLI probe above. When the desktop app exposes its rename tool, rename and read
+back through that tool instead of the SDK command. `protect` records an
+explicit request to retain a managed name. Native hooks can refresh the
+already-persisted title through
 [`hookSpecificOutput.sessionTitle`](https://code.claude.com/docs/en/hooks#userpromptsubmit-decision-control).
 SDK persistence, a running CLI's rendered title, the desktop sidebar, and Remote
 Control propagation are separate verification boundaries. Do not promise an
