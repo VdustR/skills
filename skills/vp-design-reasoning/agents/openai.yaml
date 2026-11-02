@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Design Reasoning"
   short_description: "Model concepts, workflows, architecture, and interactions"
-  default_prompt: "Use $vp-design-reasoning to clarify the problem and invariants, build a bounded model, compare preventive mechanisms and their boundaries where relevant, exercise scenarios, and verify design decisions at the appropriate level."
+  default_prompt: "Use $vp-design-reasoning to clarify the problem and invariants, build useful working tables or diagrams with clear-writing guidance, expose gaps through scenarios, compare relevant options and preventive boundaries, and verify design decisions at the appropriate level."

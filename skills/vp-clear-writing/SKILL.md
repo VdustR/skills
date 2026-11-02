@@ -122,6 +122,15 @@ Preserve explicit format constraints and focused edits; a single fact or simple
 sentence does not need a decorative diagram. A diagram must not invent missing
 behavior or imply that a proposed system has been tested.
 
+Tables, diagrams, and pseudocode can also help form an explanation before its
+conclusion is settled. If constructing one exposes an unresolved concept, rule,
+handoff, or state transition, use
+[vp-design-reasoning](https://github.com/VdustR/skills/tree/main/skills/vp-design-reasoning)
+to investigate that part of the model. Reuse the working representation and
+evidence; do not invent a missing relationship for a smoother explanation or
+restart completed analysis. Choose which views belong in the final text by the
+reader's need and requested format.
+
 ## Preserve meaning and evidence
 
 - Keep conditions, causes, sequence, limitations, and uncertainty that affect
@@ -228,6 +237,7 @@ requested or helps assess a material change.
 - [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr)
   when selecting the content and scope of a concise summary.
 - [`vp-design-reasoning`](https://github.com/VdustR/skills/tree/main/skills/vp-design-reasoning)
-  when the underlying concepts, workflow, states, or architecture need investigation.
+  when building an explanation exposes concepts, rules, flows, or states that
+  need investigation.
 - [`vp-stack-selection`](https://github.com/VdustR/skills/tree/main/skills/vp-stack-selection)
   when a visual requires selecting an application renderer or technology stack.
