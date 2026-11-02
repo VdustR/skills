@@ -76,7 +76,9 @@ Expected decisions, to exercise as manual walkthroughs or independent trials:
 - Apply `vp-clear-writing`; use `vp-design-reasoning` to model the conditional
   behavior and a decision tree if it makes the outcomes easier to trace.
 - Keep the trigger, changed behavior, verification limits, and queue migration
-  risk in the PR body even if the research artifact is unavailable.
+  risk in the PR body even if the research artifact is unavailable. Put the
+  migration risk before a tall decision tree, then check the saved page's reading
+  order rather than accepting its mere presence after the diagram.
 - Route publication and rendering through `vp-github`; link an issue-owned
   artifact rather than assuming artifacts can belong to the PR.
 - Use concise prose for the typo; do not force a diagram, HTML, or new issue.

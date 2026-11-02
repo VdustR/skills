@@ -92,8 +92,13 @@ Expected decisions, to exercise as manual walkthroughs or independent trials:
 - Never use a PR as the artifact owner or invent `gh pr artifact`.
 - List and view before editing artifact 2, preserve its type, and read back its
   saved content, URL, and version. Read old versions without restoring them.
-- After partial creation or a timeout, read back successful items before retry;
-  retry only missing work and avoid duplicate documents or media.
+- A confirmed missing-file failure during create's local content preflight
+  stops the whole batch before any create request; fix the input before retry.
+- If a valid document is saved before a second document's oversized name is
+  rejected remotely, the nonzero exit does not undo the first write.
+- After remote partial creation, a timeout, or uncertain failure stage, read
+  back successful items before retry; retry only missing work and avoid
+  duplicate documents or media.
 - Use HTML only when interaction answers a reader question, keep a text
   explanation, and verify destination behavior before claiming it works.
 - Stop publication of private customer logs to the public issue pending a

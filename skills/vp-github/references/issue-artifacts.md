@@ -90,8 +90,13 @@ history grants no authority to restore or delete it.
 
 Use `--attach` on artifact create/edit for referenced images and videos when
 supported; follow the media checks in `attachments.md`. A batch or attachment
-operation may partly succeed and still fail overall. After an error or timeout,
-list and read back the affected artifacts before retrying. Reconcile successful
+operation may partly succeed and still fail overall. For `create`, a confirmed
+local content-preflight failure, such as a missing input file, stops the whole
+batch before any create request. Fix that input before retrying. Once requests
+start, one item can succeed while a later item is rejected, such as for an
+oversized name. A nonzero exit alone does not establish that nothing was saved.
+After a remote failure, timeout, or failure whose stage is uncertain, list and
+read back the affected artifacts before retrying. Reconcile successful
 items and retry only missing work; do not duplicate an artifact or append the
 same media again. Use current `download --help` for local export and verify the
 resulting files. Use `delete` only with deletion authority for the exact target.
