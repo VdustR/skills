@@ -3,8 +3,9 @@
 ## Route by file and CLI capability
 
 GitHub CLI v2.99.0 introduced a supported `--attach` path for images and videos.
-For issue-bound Markdown, HTML, or links, first consider the issue-artifact
-workflow in `issue-artifacts.md`. Other ordinary file attachments still require
+Markdown, HTML, or links on an issue the user authored or took over can go in
+an issue artifact instead; see `issue-artifacts.md`. Other ordinary file
+attachments still require
 GitHub's web upload flow or a link-based fallback.
 
 | File and target | Path | Needs |

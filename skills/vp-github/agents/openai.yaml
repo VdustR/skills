@@ -1,4 +1,4 @@
 interface:
   display_name: "VP GitHub"
   short_description: "Manage GitHub artifacts, attachments, and rendering"
-  default_prompt: "Use $vp-github to choose and verify the right GitHub body, issue artifact, attachment, or link for this content."
+  default_prompt: "Use $vp-github to choose and verify the right GitHub body, attachment, link, or owned-issue artifact for this content."

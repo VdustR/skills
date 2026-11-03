@@ -5,29 +5,31 @@ on an **issue**. They are separate from ordinary attachments and GitHub Actions
 artifacts. Use `gh run download` for Actions output. The feature and CLI are in
 public preview; confirm the current host, command, and repository capability.
 
-## Choose the destination
+## When to use them
 
-Keep the problem, resulting behavior, important verification, and material risks
-in the issue or PR body. Apply this tree to each supporting item. A linked
-artifact must not become a prerequisite for understanding whether a PR is safe.
+Artifacts are an option for an issue the user owns: one the active account
+authored, or one the user has explicitly taken over. On anyone else's issue,
+use an ordinary comment or link; do not add artifacts to it. Artifacts belong
+to issues only, so PR workflows do not use them, and an issue is never created
+just to hold one. The CLI rejects a PR number, and `gh pr artifact` does not
+exist.
+
+Keep the problem, conclusion, and material risks in the issue body. Apply this
+tree to each supporting item on an owned issue:
 
 ```mermaid
 flowchart TD
-    A[Supporting information] --> B{Needed to understand or approve the change?}
-    B -->|Yes| C[Keep the essential point in the body]
-    B -->|No| D{Already maintained at a suitable destination?}
-    C --> D
-    D -->|Yes| E[Link the authoritative source with a descriptive label]
-    D -->|No| F{Image, video, or downloadable binary?}
-    F -->|Yes| G[Use the attachment workflow or an authorized file link]
-    F -->|No| H{Substantial research, plan, HTML document, or collected links?}
-    H -->|No| I[Keep concise supporting text in the body]
-    H -->|Yes| J{Relevant issue and artifact support available?}
-    J -->|Yes| K[Create or update an issue artifact and link it from the PR]
-    J -->|No| L[Use body details or an authorized repository document]
+    A[Supporting information] --> B{Already maintained at a suitable destination?}
+    B -->|Yes| C[Link the authoritative source with a descriptive label]
+    B -->|No| D{Image, video, or downloadable binary?}
+    D -->|Yes| E[Use the attachment workflow or an authorized file link]
+    D -->|No| F{Substantial research, plan, HTML document, or collected links?}
+    F -->|No| G[Keep concise text in the body or a comment]
+    F -->|Yes| H{Artifact command available?}
+    H -->|Yes| I[Create or update an issue artifact and summarize it in the body]
+    H -->|No| J[Use body details or a comment]
 ```
 
-- Do not create an issue solely to move a short PR explanation elsewhere.
 - An existing design document remains authoritative where its workflow maintains
   it. Link it rather than create a competing copy. A link artifact is useful
   when an issue needs a maintained collection of related resources.
@@ -36,10 +38,6 @@ flowchart TD
   Choose HTML when interaction answers a real reader question; include a text
   explanation of the result and limitations. Do not infer HTML execution,
   network, sandbox, or accessibility guarantees from the existence of a preview.
-- Issue artifacts cannot be attached directly to PRs. Link the relevant issue's
-  artifact URL from the PR. Without a relevant issue or available preview, use
-  the fallback in the tree; do not invent `gh pr artifact` or pass a PR number
-  to `gh issue artifact`.
 
 ## Check before writing
 
@@ -49,8 +47,8 @@ only generic issue help. Media `--attach` support does not imply artifact
 support. A temporary official CLI can avoid a global upgrade when authorized;
 verify its source and checksum. Otherwise use the existing body/link workflow.
 
-Verify the active account, repository, issue identity, intended audience, and
-write authority. First list the issue's artifacts. A command existing locally
+Verify the active account, repository, issue identity and ownership, intended
+audience, and write authority. First list the issue's artifacts. A command existing locally
 does not prove the target supports the preview. An authorization or access
 failure requires resolving that boundary, not silently publishing elsewhere.
 Keep private context out of a public issue or artifact, including HTML source

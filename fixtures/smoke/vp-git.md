@@ -76,20 +76,20 @@ Expected decisions, to exercise as manual walkthroughs or independent trials:
 - Apply `vp-clear-writing`; use `vp-design-reasoning` to model the conditional
   behavior and a decision tree if it makes the outcomes easier to trace.
 - Keep the trigger, changed behavior, verification limits, and queue migration
-  risk in the PR body even if the research artifact is unavailable. Put the
+  risk in the PR body even if the linked issue is unavailable. Put the
   migration risk before a tall decision tree, then check the saved page's reading
   order rather than accepting its mere presence after the diagram.
-- Route publication and rendering through `vp-github`; link an issue-owned
-  artifact rather than assuming artifacts can belong to the PR.
+- Link the existing issue and its maintained investigation with a descriptive
+  label. Do not create an issue or issue artifact to hold PR detail.
 - Use concise prose for the typo; do not force a diagram, HTML, or new issue.
 - Preserve existing authoritative documents and label evidence by relevant
   revision/version. A plan or diagram is not implementation verification.
 - Read the description without its supporting links and check that the reviewer
   can understand the change and risks. Label this a manual reading check,
   not measured reviewer usability or proof of Mermaid rendering.
-- Honor drafting-only authority: do not publish, edit an artifact, create a PR,
+- Honor drafting-only authority: do not publish, edit an issue, create a PR,
   or change its lifecycle just to demonstrate the recommended format.
 
 Regression coverage: self-contained approval context; optional representation;
-existing templates and narrow authority; artifact fallback without lost risks;
+existing templates and narrow authority; no issue artifacts in the PR workflow;
 no claimed renderer or usability proof from a source-only check.

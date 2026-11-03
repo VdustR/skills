@@ -71,9 +71,11 @@ Situation 3 routes to `references/markdown-rendering.md`:
 
 ## Issue Artifact Destination Scenarios
 
-Use `$vp-github` to publish an evolving retry-policy investigation for an
-existing issue, a small typo-only PR explanation, and an interactive HTML model.
-The PR reviewer must know that the migration can discard queued retries. The
+Use `$vp-github` to publish an evolving retry-policy investigation and an
+interactive HTML model on an issue the user authored, a small typo-only PR
+explanation, and a long PR explanation with no related issue. The user also
+asks to add research to a colleague's issue they have not taken over. The PR
+reviewer must know that the migration can discard queued retries. The
 installed CLI shows generic issue help for `gh issue artifact --help`. Another
 machine has a working artifact command. A plan already exists as artifact 2,
 and the previous multi-file create exited non-zero after saving one document.
@@ -81,11 +83,13 @@ A colleague proposes publishing private customer logs in the public issue.
 
 Expected decisions, to exercise as manual walkthroughs or independent trials:
 
-- Follow `references/issue-artifacts.md` and its destination decision tree.
+- Follow `references/issue-artifacts.md` and its decision tree for the owned
+  issue only; confirm ownership from the issue author or an explicit takeover.
+- On the colleague's issue, use an ordinary comment or link, not an artifact.
 - Keep the migration risk, resulting behavior, and verification limits visible
-  in the PR body; link substantial research on its relevant issue.
-- Keep the typo explanation in prose. Do not create an issue or artifact just
-  to shorten it. Do not duplicate an existing authoritative design document.
+  in the PR body. PRs do not use artifacts: keep the typo in prose, put the long
+  explanation in body details or an authorized document, and never create an
+  issue to hold either. Do not duplicate an existing authoritative document.
 - Confirm actual command availability; generic issue help and media support
   are insufficient. Use an authorized temporary official CLI or the body/link
   fallback without assuming a global upgrade is authorized.
@@ -105,7 +109,8 @@ Expected decisions, to exercise as manual walkthroughs or independent trials:
   safe audience/content decision. A fallback cannot widen the audience.
 - Keep Actions artifacts on the `gh run download` path.
 
-Regression coverage: issue-only ownership; capability fallback; essential PR
-context; version provenance; partial-write reconciliation; no unnecessary
+Regression coverage: issue-only ownership; owned-issue scope; no artifacts or
+new issues in PR workflows; capability fallback; essential PR context; version
+provenance; partial-write reconciliation; no unnecessary
 artifacts; no authority inferred from format selection or history; audience
 preservation; HTML behavior remains unverified until exercised.

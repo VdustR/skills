@@ -36,14 +36,10 @@ Select supporting detail by the question it answers:
 - Keep a small change in prose when a visual adds no information. Do not add
   a diagram, HTML artifact, or fixed section count to every PR.
 
-Route artifact placement, publication, and rendering through `vp-github` and its
-[issue-artifact destination tree](https://github.com/VdustR/skills/blob/main/skills/vp-github/references/issue-artifacts.md).
-Keep detailed research or evolving plans on a relevant issue as artifacts when
-supported, and link them from the PR with a label that explains their purpose.
-Issue artifacts are issue-only; do not assume PR support or create an issue
-solely to shorten a small PR. Existing maintained documents stay authoritative.
-Media evidence uses the attachment workflow. A committed document, ordinary
-link, or optional `<details>` section can serve when artifacts are unavailable;
+Route media publication and rendering through `vp-github`. Link existing
+maintained documents with a label that explains their purpose; they stay
+authoritative. Do not create an issue to hold PR detail. Long supporting detail
+can go in an optional `<details>` section or an authorized committed document;
 keep publication within the authorized audience and scope.
 
 State what each evidence item establishes, its relevant revision/version, and

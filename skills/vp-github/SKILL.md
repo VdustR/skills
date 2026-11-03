@@ -3,7 +3,8 @@ name: vp-github
 description: >-
   Work with GitHub platform behavior that is not a Git operation: attaching
   images, videos, or files to issues, pull requests, and comments; managing
-  issue artifacts for research, plans, HTML documents, and links; controlling
+  artifacts for research, plans, HTML documents, and links on an issue the
+  user authored or took over; controlling
   how Markdown renders on GitHub surfaces; and choosing a credential that can
   reach the endpoint. Use for any request to upload, attach, embed, or show a
   local artifact on GitHub. Also use proactively when writing or editing GitHub
@@ -17,9 +18,9 @@ description: >-
 
 ## Route
 
-- Choosing between a body, issue artifact, attachment, and link, or managing
-  an issue artifact: read
-  [issue artifacts and the destination decision tree](references/issue-artifacts.md).
+- Placing substantial research, plans, HTML documents, or collected links on
+  an issue the user authored or took over, or managing its artifacts: read
+  [issue artifacts](references/issue-artifacts.md). PRs do not use artifacts.
 - Putting an image, video, or file into an issue, PR, comment, discussion, or
   README: read
   `references/attachments.md`.
