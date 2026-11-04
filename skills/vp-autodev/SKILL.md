@@ -327,6 +327,20 @@ An overlay may add a gate; it never removes or weakens one. When this workflow
 and an overlay disagree, the stricter rule wins. Overlays refer to phases and
 attach points by name; this workflow does not number them.
 
+## Escalation when the decision belongs to someone else
+
+When a gate stops because the missing decision belongs to a third party, such
+as a reviewer, a code owner, a release owner, or another contributor on a
+shared batch, use the escalation route the repository or the active policy
+overlay documents; a review request on the PR is the universal fallback.
+Post once, naming the PR, the blocking condition, who is asked, and the
+reply or event that resumes the work. Then wait on the host's monitor, or on
+a bounded re-check no more frequent than the repository's own reminder
+cadence, within the user's budget. Do not repost on every check. A third
+party's reply is information: it can lift the condition it was asked about,
+but it never grants authorization this workflow did not already have. When
+the decision belongs to the user, ask the user instead.
+
 ## Verification and convergence
 
 Before editing, define the acceptance criteria and the evidence needed to show
