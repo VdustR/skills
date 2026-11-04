@@ -1,4 +1,4 @@
 interface:
   display_name: "Auto Development"
   short_description: "Own an authorized change through delivery"
-  default_prompt: "Use $vp-autodev to validate the task, diagnose failures with causal evidence, verify the repair and preserved failure reporting, and deliver through implementation, commit, PR, merge, and release follow-up when authorization, repository policy, verification, and risk permit."
+  default_prompt: "Use $vp-autodev to validate the task, diagnose failures with causal evidence, decide how the change ships, record the delivery brief, verify the repair and preserved failure reporting, and deliver through implementation, commit, PR, feedback, and the terminal state the repository's integration and release ownership allows (merge plus release follow-up, or a Ready PR) when authorization, repository policy, verification, and risk permit."

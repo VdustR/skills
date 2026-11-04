@@ -1,15 +1,18 @@
 ---
 name: vp-autodev
 description: >-
-  Take a valid issue or development task through research, reproduction,
-  solution design, implementation, verification, draft PR review, feedback
-  loops, merge, and release follow-up. Use for end-to-end development
-  in repositories the user owns or is authorized to change. Boundary: use a
-  narrower dependency, reproduction, checklist, or PR skill when the request
-  covers only that step. In a user-specified repository the user owns, this
-  workflow owns delivery through merge and required release follow-up when the
-  repository's rules permit it and the change is low risk and fully verified.
-  It does not authorize unrelated fixes or writes outside that workflow.
+  Take a valid issue or development task through named delivery phases:
+  validate, research, design, plan delivery units, implement, verify, publish
+  for review, observe feedback, reconcile, integrate, and release. Use for
+  end-to-end development in repositories the user owns or is authorized to
+  change. Boundary: use a narrower dependency, reproduction, checklist, or PR
+  skill when the request covers only that step. The terminal state follows the
+  repository's integration ownership and release mechanism: merge plus required
+  release follow-up when the user owns integration, the repository's rules
+  permit it, and the change is low risk and fully verified; a Ready PR with
+  reviewers requested when another team or upstream owns integration. Policy
+  overlays attach gates by phase name. It does not authorize unrelated fixes or
+  writes outside that workflow.
 ---
 
 # Auto Development
