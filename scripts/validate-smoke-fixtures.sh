@@ -183,6 +183,18 @@ require_pattern "$autodev_skill" 'never grants authorization' \
   "vp-autodev must treat a third party's reply as information, not authorization"
 require_pattern "$autodev_skill" 'is part of delivery' \
   "vp-autodev must allow a documented re-trigger of a gating bot verdict"
+require_pattern "$autodev_skill" 'Pick the resume mechanism in this' \
+  "vp-autodev must order the resume mechanisms"
+require_pattern "$autodev_skill" 'expires without the event is a missing gate' \
+  "vp-autodev must treat an expired wait as a missing gate"
+require_pattern "$autodev_fixture" 'expired wait is not a pass' \
+  "vp-autodev fixture must cover an expired wait"
+require_pattern "$autodev_skill" 'Host prerequisites are the mechanisms' \
+  "vp-autodev must ask for host prerequisites before the first edit"
+require_pattern "$autodev_fixture" 'host prerequisite' \
+  "vp-autodev fixture must cover a host prerequisite the user must issue"
+require_pattern "$autodev_skill" 'A host-tracked goal' \
+  "vp-autodev must treat a host-tracked goal as a resume event"
 require_pattern "$autodev_fixture" 'Ready PR with reviewers requested' \
   "vp-autodev fixture must cover the not-owned repository terminal state"
 require_pattern "$autodev_fixture" 'release conditions before the merge' \

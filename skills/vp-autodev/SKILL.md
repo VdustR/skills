@@ -159,17 +159,37 @@ name the event that will resume the work. A host PR monitor may wake the
 session only for failures, conflicts, or new comments, so
 a check that passes emits nothing. Host rules that forbid self-polling stay
 binding. When no event covers the success path, do not end
-the turn as if the work will continue: wait once, bounded, within the turn
-for that check only where host rules permit it. Otherwise, when the integrate
-phase authorizes the merge and every blocking signal still pending on the
-current head is a branch-protection required check, enable the platform's
-auto-merge, through the host's PR tool when it offers one, and name it as
-the resume event. Every other blocking signal must already be final and
-passing on that head: review markers for that SHA, every non-required check
-the repository treats as blocking, and no unresolved thread. When that
-condition does not hold, tell the user that nothing will resume the merge
-and which reply from them resumes it. After enabling auto-merge, keep the
-failure and comment monitor on. A real finding, a failed check, or a new
+the turn as if the work will continue. Pick the resume mechanism in this
+order, record it in the brief, and name it before ending the turn:
+
+1. A host event that fires on the awaited transition. A host-tracked goal
+   whose completion conditions are the terminal state from the brief counts
+   as one, because the host keeps the session on it until they are met; set
+   it when the host offers one and its usage conditions permit.
+2. A host-provided self-wake that the host permits for external work it
+   cannot track: a scheduled wake-up, or a background wait that notifies
+   once when the condition holds. Match its delay or interval to the check's
+   usual duration in that repository, never a tight poll, and bound it by
+   the user's budget. A self-wake the user directed, including a loop the
+   user invoked, is permitted by that direction. When the host grants it
+   only through a command or switch the user must issue themselves, that
+   command was requested up front under the delivery brief; do not infer
+   it from the auto-development request.
+3. A bounded wait within the turn, where host rules permit it.
+
+On resume, re-read the head and every signal before acting; a wait that
+expires without the event is a missing gate to report, not a pass. When the
+integrate phase authorizes the merge and every blocking signal still pending
+on the current head is a branch-protection required check, also enable the
+platform's auto-merge, through the host's PR tool when it offers one, and
+name it as the resume event for the merge itself; the phases after integrate
+still need a wake from the list above. Every other blocking signal must
+already be final and passing on that head: review markers for that SHA,
+every non-required check the repository treats as blocking, and no
+unresolved thread. When that condition does not hold and no wake is
+permitted, tell the user that nothing will resume the merge and which reply
+from them resumes it. After enabling auto-merge, keep the failure and
+comment monitor on. A real finding, a failed check, or a new
 push reopens the merge decision: disable auto-merge before handling it,
 because a push from someone with write access does not cancel it.
 
@@ -276,9 +296,19 @@ criteria; base branch; how review and integration are gated in this
 repository (branch protection, code owners, review automation and its
 documented re-trigger, protected paths, size caps); deploy triggers for the
 touched paths; release mechanism and integration ownership; the
-delivery-unit decision; and open questions with the phase each is deferred
-to. Fill every row from the repository's own evidence. Later phases act on
-the brief, and policy overlays add rows to it.
+delivery-unit decision; host prerequisites; and open questions with the
+phase each is deferred to. Fill every row from the repository's own
+evidence. Later phases act on the brief, and policy overlays add rows to it.
+
+Host prerequisites are the mechanisms this run will need that the host
+grants only through the user's own command or switch: a loop or scheduled
+wake-up command, a goal the host tracks when creating it needs the user's
+request, a monitor or auto-merge switch, a permission. An auto-development
+request does not stand in for them. Identify them before
+the first edit from the host's rules and the terminal state, and ask the
+user for them once, in one message with any other up-front decision, so the
+run does not stall at a later phase. A prerequisite the user declines turns
+the phase that needs it into a stop that names the reply which resumes it.
 
 ## Cross-repository delivery
 

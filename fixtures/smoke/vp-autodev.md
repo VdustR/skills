@@ -87,6 +87,38 @@ because the operational impact is material; do not enable auto-merge. In case
 rollback to the user before any leg starts, including the safe frontend leg,
 and order the irreversible leg last after the frontend leg is verified.
 
+## Resume cases
+
+Evaluate these without performing external writes:
+
+1. The merge is authorized, the only pending signal is the required check,
+   auto-merge is enabled, and a release step must run after the merge. The
+   host monitor wakes only on failures, conflicts, and comments, and the host
+   offers a scheduled wake-up it permits for external work it cannot track.
+2. The same state, but the host forbids every self-wake for this purpose and
+   offers no merge event.
+3. A background wait was started for the required check and expired without
+   the check finishing.
+4. The host grants its scheduled wake-up only inside a loop the user must
+   start with their own command, and the run will need a wake after the
+   merge for the release step. Nothing has been edited yet.
+5. The host offers a goal it tracks until its completion conditions are met,
+   but creating one requires an explicit user request. The terminal state is
+   merge plus a verified publish.
+
+Expected decisions: in case 1 enable auto-merge for the merge, schedule one
+wake-up matched to the check's usual duration for the release step, name it
+as the resume event, and re-read the head on resume. In case 2 enable
+auto-merge and tell the user that nothing will resume the release step and
+which reply resumes it. In case 3 report the unfinished check as the missing
+gate; an expired wait is not a pass. In case 4 record the loop command as a
+host prerequisite in the brief and ask the user to issue it before the first
+edit, together with any other up-front decision, instead of inferring it from
+the auto-development request or discovering the gap after the merge. In case
+5 ask for the goal up front in the same message, and once set, give it the
+terminal state as its completion conditions; the host-tracked goal then counts
+as the host event that resumes the run.
+
 ## Technical premise cases
 
 Evaluate these before implementing a feature or repeating an expensive run:
@@ -213,6 +245,13 @@ every repeated exploratory run needs a new question or changed evidence.
   than branch protection alone decides whether a check blocks the merge
 - a turn that ends to wait on a blocking check names its resume event, and a
   success path with no event is reported to the user instead of left silent
+- the resume mechanism is chosen in order: a host event, a permitted host
+  self-wake matched to the check's usual duration, a bounded in-turn wait;
+  a wait that expires without the event is a missing gate, not a pass
+- a host mechanism only the user can enable is asked for before the first
+  edit as a host prerequisite, not inferred from the auto-development request
+- a host-tracked goal gets the terminal state as its completion conditions and
+  counts as the host event that resumes the run
 - auto-merge resumes an authorized merge only when required checks are the
   only pending gate, and is disabled before a finding or new push is handled
 - reviewer silence is recorded as unobserved without automatically invoking or
