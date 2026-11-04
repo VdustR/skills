@@ -306,7 +306,11 @@ decision or evidence.
 
 Do not treat CI success as proof that the issue is fixed. Do not treat silence
 from a bot as a completed review, but do not wait for or summon the bot solely
-to turn that silence into a signal.
+to turn that silence into a signal. This has one carve-out: when repository
+policy makes an automated reviewer's verdict an integration gate and documents
+how to re-trigger it, re-triggering after adding the evidence the verdict
+asked for is part of delivery, not a request for a new review. Record the
+verdict, the evidence added, and the re-trigger in the delivery brief.
 
 ## Policy overlays
 
