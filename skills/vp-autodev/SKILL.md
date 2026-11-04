@@ -159,17 +159,31 @@ name the event that will resume the work. A host PR monitor may wake the
 session only for failures, conflicts, or new comments, so
 a check that passes emits nothing. Host rules that forbid self-polling stay
 binding. When no event covers the success path, do not end
-the turn as if the work will continue: wait once, bounded, within the turn
-for that check only where host rules permit it. Otherwise, when the integrate
-phase authorizes the merge and every blocking signal still pending on the
-current head is a branch-protection required check, enable the platform's
-auto-merge, through the host's PR tool when it offers one, and name it as
-the resume event. Every other blocking signal must already be final and
-passing on that head: review markers for that SHA, every non-required check
-the repository treats as blocking, and no unresolved thread. When that
-condition does not hold, tell the user that nothing will resume the merge
-and which reply from them resumes it. After enabling auto-merge, keep the
-failure and comment monitor on. A real finding, a failed check, or a new
+the turn as if the work will continue. Pick the resume mechanism in this
+order, record it in the brief, and name it before ending the turn:
+
+1. A host event that fires on the awaited transition.
+2. A host-provided self-wake that the host permits for external work it
+   cannot track: a scheduled wake-up, or a background wait that notifies
+   once when the condition holds. Match its delay or interval to the check's
+   usual duration in that repository, never a tight poll, and bound it by
+   the user's budget. A self-wake the user directed, including a loop the
+   user invoked, is permitted by that direction.
+3. A bounded wait within the turn, where host rules permit it.
+
+On resume, re-read the head and every signal before acting; a wait that
+expires without the event is a missing gate to report, not a pass. When the
+integrate phase authorizes the merge and every blocking signal still pending
+on the current head is a branch-protection required check, also enable the
+platform's auto-merge, through the host's PR tool when it offers one, and
+name it as the resume event for the merge itself; the phases after integrate
+still need a wake from the list above. Every other blocking signal must
+already be final and passing on that head: review markers for that SHA,
+every non-required check the repository treats as blocking, and no
+unresolved thread. When that condition does not hold and no wake is
+permitted, tell the user that nothing will resume the merge and which reply
+from them resumes it. After enabling auto-merge, keep the failure and
+comment monitor on. A real finding, a failed check, or a new
 push reopens the merge decision: disable auto-merge before handling it,
 because a push from someone with write access does not cancel it.
 
