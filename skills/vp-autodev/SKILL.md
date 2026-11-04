@@ -86,7 +86,20 @@ choosing the handling boundary or classification rule.
 ### Plan delivery units
 
 Decide how the change ships before the first edit: as one unit or as an
-ordered sequence of units. Record the decision and its reason.
+ordered sequence of units. Neither is the default. Split when units are
+independently deployable and valuable, when review routing differs between
+parts, or when the repository documents a size or review cap. Do not split
+when the parts only make sense merged together within minutes, when splitting
+would require compatibility layers or flags invented solely to pass a size
+gate, when a reviewer must judge the whole design at once, or when each merge
+triggers a costly deploy or release in that repository. The reasons, the
+invariants, and the record format are in
+[references/delivery-units.md](references/delivery-units.md).
+
+Whatever the decision: every unit stands alone on the base branch; files are
+never renamed, moved, or restructured to escape a review control; a sequence
+with dependent units goes through `vp-stacked-pr`; and the decision and its
+reason are recorded before the first edit.
 
 ### Implement
 
