@@ -162,7 +162,10 @@ binding. When no event covers the success path, do not end
 the turn as if the work will continue. Pick the resume mechanism in this
 order, record it in the brief, and name it before ending the turn:
 
-1. A host event that fires on the awaited transition.
+1. A host event that fires on the awaited transition. A host-tracked goal
+   whose completion conditions are the terminal state from the brief counts
+   as one, because the host keeps the session on it until they are met; set
+   it when the host offers one and its usage conditions permit.
 2. A host-provided self-wake that the host permits for external work it
    cannot track: a scheduled wake-up, or a background wait that notifies
    once when the condition holds. Match its delay or interval to the check's
@@ -299,8 +302,9 @@ evidence. Later phases act on the brief, and policy overlays add rows to it.
 
 Host prerequisites are the mechanisms this run will need that the host
 grants only through the user's own command or switch: a loop or scheduled
-wake-up command, a monitor or auto-merge switch, a permission. An
-auto-development request does not stand in for them. Identify them before
+wake-up command, a goal the host tracks when creating it needs the user's
+request, a monitor or auto-merge switch, a permission. An auto-development
+request does not stand in for them. Identify them before
 the first edit from the host's rules and the terminal state, and ask the
 user for them once, in one message with any other up-front decision, so the
 run does not stall at a later phase. A prerequisite the user declines turns

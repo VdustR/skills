@@ -19,7 +19,7 @@ Policy overlays add rows; they do not remove or blank any row below.
 | Deploy triggers for the touched paths | Which workflows deploy, what event triggers them, and whether their path filters cover the touched paths | Workflow files on the base branch |
 | Release mechanism and ownership | The cells from [release-ownership.md](release-ownership.md): who owns integration, how the repository releases, where the release conditions are evaluated, and the terminal state | Protection settings, contribution rules, release procedures, deploy workflows |
 | Delivery units | The decision from [delivery-units.md](delivery-units.md): one unit or an ordered sequence, one row per unit with its review route and dependencies, and the reason | Plan delivery units phase, repository caps and routing rules |
-| Host prerequisites | Each host mechanism the run will need that only the user can enable (a loop or scheduled wake-up command, a monitor or auto-merge switch, a permission), whether it was requested, and the user's answer | Host rules, tool descriptions, the terminal state |
+| Host prerequisites | Each host mechanism the run will need that only the user can enable (a loop or scheduled wake-up command, a host-tracked goal, a monitor or auto-merge switch, a permission), whether it was requested, and the user's answer | Host rules, tool descriptions, the terminal state |
 | Open questions | Each question that could change a later decision, and the phase it is deferred to | Any phase |
 
 A row that cannot be filled from evidence is an open question. An open
