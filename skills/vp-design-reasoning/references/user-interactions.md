@@ -71,6 +71,29 @@ detail where it can be found. Do not bury consequences in tooltips or hide
 essential actions behind hover. Prefer a clearer control or sequence over
 adding paragraphs to explain a confusing interaction.
 
+### Make supporting copy earn its place
+
+Do not add a subtitle, helper sentence, or explanatory paragraph to every
+control by default. For each one, identify the question it answers and what
+new information it adds beyond the label, grouping, and visible state. Remove
+copy that only restates those cues. First improve an ambiguous label, grouping,
+control, or sequence rather than adding prose to compensate for it.
+
+For example, "Autosave" does not need "Enable this to save automatically."
+If saving happens only when leaving a field, or applies only to this device,
+that verified distinction may need to remain explicit. Retain information
+that changes a decision or enables correct use: prerequisites, input formats,
+scope, timing, cost, privacy, irreversible effects, and recovery. Put it where
+it is needed before input or commitment; keep optional detail discoverable
+through accessible help or progressive disclosure. Do not move essential
+information into a tooltip merely to reduce visible text.
+
+Do not replace clear labels with unexplained icons, remove accessible names,
+or delete useful status and error feedback to make the screen look cleaner.
+Judge redundancy against the intended audience's knowledge and the actual
+contract, not word count. Keep this information decision here; use Impeccable
+for visual treatment and `vp-clear-writing` for wording.
+
 ## Design for content and available space
 
 Before constraining variable content, choose its sizing bounds, wrapping or
@@ -120,6 +143,11 @@ between intent, presented information, and action outcomes. After changes,
 exercise the relevant paths against the implementation, including failure and
 recovery. Review copy with
 [vp-clear-writing](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing).
+
+For a supporting-copy change, check both a redundant explanation to remove and
+a necessary instruction or consequence to retain. Record whether the
+new-information test was applied separately from whether the result is shorter;
+fewer words alone do not establish a better interaction.
 
 Use the state map to select meaningful verification. Cover distinct behavior
 and high-consequence paths rather than every redundant Cartesian combination.
