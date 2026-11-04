@@ -2,8 +2,9 @@
 
 Interaction sources reviewed on October 15, 2026; broader modeling sources
 reviewed on October 17, 2026; pstack principle sources reviewed on October 27,
-2026. These sources informed the workflow; they are not additional runtime
-dependencies. Recheck current upstream guidance before adopting a later change.
+2026; supporting-copy guidance reviewed on November 4, 2026. These sources
+informed the workflow; they are not additional runtime dependencies. Recheck
+current upstream guidance before adopting a later change.
 Recommendations below are this skill's synthesis, not a claim of endorsement or
 universal agreement.
 
@@ -34,6 +35,12 @@ every recommendation into one checklist.
 - [GOV.UK: Map and understand a user's whole problem](https://www.gov.uk/service-manual/design/map-a-users-whole-problem)
   informs intent and journey coverage across entry, completion, and return.
   Understanding the wider journey does not authorize rebuilding all of it.
+- [GOV.UK: Text input, hint text](https://design-system.service.gov.uk/components/text-input/#hint-text)
+  supports short help that answers a practical question, such as where to find
+  information or how it will be used, while retaining labels. Combine this with
+  Impeccable's clarify guidance on answering an implicit question rather than
+  restating a control. The supporting-copy test is this skill's synthesis; do
+  not impose GOV.UK-specific punctuation or page structure on other products.
 - [W3C: Understanding SC 3.2.2, On Input](https://www.w3.org/WAI/WCAG22/Understanding/on-input.html)
   addresses unexpected changes of context when a control's setting changes.
   It does not prohibit every automatic content update.

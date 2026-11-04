@@ -212,3 +212,68 @@ changes were performed.
 - Rendering or syntax checks establish neither model correctness nor runtime
   behavior. Record walkthroughs and independent trials separately; a successful
   trial does not establish reliable behavior across all models or tasks.
+
+## Supporting Copy Scenarios
+
+Use these as independent copy reviews with fixed behavior. Do not build a UI,
+change service contracts, or perform live actions.
+
+25. Simplify settings copy for ordinary users. "Autosave" has the helper
+    "Enable this to save automatically." The service actually saves only when
+    leaving an edited field. "Email notifications" has "Receive notifications
+    by email." Both controls already have persistent labels and visible states.
+26. Review an upload form for first-time users. "Upload CSV" has the helper
+    "Upload a CSV file here." It accepts UTF-8 files up to 5 MB with required
+    columns `email` and `name`, but that information appears only after failure.
+    A nearby heading says "Manage data" with "Manage your data here" below it.
+27. Simplify workspace access and deletion copy. The control "Share" publishes
+    the workspace to anyone with the link; its helper states that consequence.
+    "Delete workspace" has a truthful warning that it permanently deletes all
+    records for every member with no recovery. Someone proposes moving both
+    messages to hover-only tooltips and replacing the labels with icons.
+    Only copy review using supplied examples is authorized.
+28. Review an expert API tool. "Timeout" has "Configure the timeout" as helper
+    text but omits its unit and scope: seconds per request, not a session limit.
+    An error names the failed request and supported recovery; a note says
+    "This layout demonstrates clear error handling." A proposal removes all
+    secondary text, error details, and accessible names for a cleaner screen.
+
+## Expected Supporting Copy Behavior
+
+- For each secondary text candidate, identify its implicit question and the
+  information added beyond the label, grouping, and state. Remove restatements
+  rather than using a word-count target or stripping every description.
+- In case 25, remove the repeated autosave and email explanations, but make
+  verified save timing clear where it matters. Do not invent continuous saving
+  or a successful-save state. A clearer label may carry the needed distinction.
+- In case 26, remove the repeated upload sentence and heading description.
+  Make format, size, and column requirements available before submission.
+  Optional examples may use accessible disclosure; required input facts cannot
+  be hidden solely to shorten the form.
+- In case 27, first make the sharing label accurately describe link access.
+  Keep scope and irreversible consequences visible before commitment. Reject
+  hover-only essential help and unexplained icon replacements; preserve
+  accessible names. Do not infer a confirmation dialog, undo, or authority to
+  share or delete a real workspace from this copy review.
+- In case 28, remove the timeout restatement and design commentary. Preserve
+  or incorporate seconds and per-request scope, audience-relevant diagnostics,
+  actionable errors, and accessible names. Do not treat technical precision as
+  clutter or expand this into a frontend rebuild.
+- Preserve Impeccable composition for frontend work and shared evidence, while
+  keeping these copy/specification reviews within their requested scope.
+
+## Supporting Copy Verification
+
+Exercise the settings/upload pair and the access/expert-tool pair separately.
+For each case, record two judgments: whether the new-information test was
+applied to specific text and whether the resulting copy removes redundancy
+while retaining necessary information. A shorter result can pass the latter
+by accident without establishing the decision mechanism.
+
+The previous instructions already protected decision-critical information,
+but could leave every paraphrased helper in place because they did not require
+checking what each sentence adds. These cases target that gap as well as the
+nearby risk of indiscriminate deletion. Static fixture checks only establish
+that this material exists. Manual walkthroughs, executable checks, and
+independent agent trials must be reported separately; none alone proves
+usability for the intended audience.
