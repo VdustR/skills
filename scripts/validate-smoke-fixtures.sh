@@ -189,6 +189,10 @@ require_pattern "$autodev_skill" 'expires without the event is a missing gate' \
   "vp-autodev must treat an expired wait as a missing gate"
 require_pattern "$autodev_fixture" 'expired wait is not a pass' \
   "vp-autodev fixture must cover an expired wait"
+require_pattern "$autodev_skill" 'Host prerequisites are the mechanisms' \
+  "vp-autodev must ask for host prerequisites before the first edit"
+require_pattern "$autodev_fixture" 'host prerequisite' \
+  "vp-autodev fixture must cover a host prerequisite the user must issue"
 require_pattern "$autodev_fixture" 'Ready PR with reviewers requested' \
   "vp-autodev fixture must cover the not-owned repository terminal state"
 require_pattern "$autodev_fixture" 'release conditions before the merge' \

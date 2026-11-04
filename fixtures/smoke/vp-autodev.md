@@ -99,13 +99,19 @@ Evaluate these without performing external writes:
    offers no merge event.
 3. A background wait was started for the required check and expired without
    the check finishing.
+4. The host grants its scheduled wake-up only inside a loop the user must
+   start with their own command, and the run will need a wake after the
+   merge for the release step. Nothing has been edited yet.
 
 Expected decisions: in case 1 enable auto-merge for the merge, schedule one
 wake-up matched to the check's usual duration for the release step, name it
 as the resume event, and re-read the head on resume. In case 2 enable
 auto-merge and tell the user that nothing will resume the release step and
 which reply resumes it. In case 3 report the unfinished check as the missing
-gate; an expired wait is not a pass.
+gate; an expired wait is not a pass. In case 4 record the loop command as a
+host prerequisite in the brief and ask the user to issue it before the first
+edit, together with any other up-front decision, instead of inferring it from
+the auto-development request or discovering the gap after the merge.
 
 ## Technical premise cases
 
@@ -236,6 +242,8 @@ every repeated exploratory run needs a new question or changed evidence.
 - the resume mechanism is chosen in order: a host event, a permitted host
   self-wake matched to the check's usual duration, a bounded in-turn wait;
   a wait that expires without the event is a missing gate, not a pass
+- a host mechanism only the user can enable is asked for before the first
+  edit as a host prerequisite, not inferred from the auto-development request
 - auto-merge resumes an authorized merge only when required checks are the
   only pending gate, and is disabled before a finding or new push is handled
 - reviewer silence is recorded as unobserved without automatically invoking or

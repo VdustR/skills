@@ -168,7 +168,10 @@ order, record it in the brief, and name it before ending the turn:
    once when the condition holds. Match its delay or interval to the check's
    usual duration in that repository, never a tight poll, and bound it by
    the user's budget. A self-wake the user directed, including a loop the
-   user invoked, is permitted by that direction.
+   user invoked, is permitted by that direction. When the host grants it
+   only through a command or switch the user must issue themselves, that
+   command was requested up front under the delivery brief; do not infer
+   it from the auto-development request.
 3. A bounded wait within the turn, where host rules permit it.
 
 On resume, re-read the head and every signal before acting; a wait that
@@ -290,9 +293,18 @@ criteria; base branch; how review and integration are gated in this
 repository (branch protection, code owners, review automation and its
 documented re-trigger, protected paths, size caps); deploy triggers for the
 touched paths; release mechanism and integration ownership; the
-delivery-unit decision; and open questions with the phase each is deferred
-to. Fill every row from the repository's own evidence. Later phases act on
-the brief, and policy overlays add rows to it.
+delivery-unit decision; host prerequisites; and open questions with the
+phase each is deferred to. Fill every row from the repository's own
+evidence. Later phases act on the brief, and policy overlays add rows to it.
+
+Host prerequisites are the mechanisms this run will need that the host
+grants only through the user's own command or switch: a loop or scheduled
+wake-up command, a monitor or auto-merge switch, a permission. An
+auto-development request does not stand in for them. Identify them before
+the first edit from the host's rules and the terminal state, and ask the
+user for them once, in one message with any other up-front decision, so the
+run does not stall at a later phase. A prerequisite the user declines turns
+the phase that needs it into a stop that names the reply which resumes it.
 
 ## Cross-repository delivery
 
