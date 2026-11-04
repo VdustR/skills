@@ -47,6 +47,59 @@ Also evaluate these decision cases without performing external writes:
   leaves a real inline finding on the current head after auto-merge was
   enabled.
 
+## Confirmation and follow-up cases
+
+Evaluate these without performing external writes:
+
+1. Before the first edit, an API premise that determines the design is
+   unconfirmed. A teammate has not answered a necessary product decision.
+   Both have tracking issues and the change is otherwise small.
+2. A confirmed unrelated defect is safe to leave open. There is no selected
+   session-TODO route and the agent proposes opening an issue after merge.
+3. The user selects a session TODO to create an issue before bye for a
+   confirmed non-blocking follow-up. The owner, exact action, completion
+   evidence, and reason it cannot affect implementation or merge are recorded
+   in linked working notes. CI and every delivery gate pass; the TODO is open.
+4. The issue service denies a write that requires the user's decision. The
+   agent proposes silently changing the record to a session TODO instead.
+5. The pre-implementation checklist has two resolved items. Before merge a
+   newly discovered non-blocker is added and tracked. Separately, one baseline
+   row is removed or its scope/deferral reason changes without a new row.
+6. The same checklist, decisions, and acceptance conditions remain; planned
+   CI has now passed. No new question or change was found.
+7. All CI is green, but a required decision is still unconfirmed at merge.
+   An issue exists and the agent has completed a retro about the late discovery.
+8. A session TODO was to verify required behavior. An issue now exists, but
+   the verification is unfinished and no responsibility transfer was accepted.
+9. A linked issue exists for a confirmed non-blocker. No session TODO or
+   in-scope acceptance work remains; the agent proposes making the issue's
+   existence alone block closeout indefinitely.
+10. An instruction change passes every static repository check. Its author
+    claims these cases establish independent agent behavior without a trial.
+
+Expected decisions:
+
+- Case 1 stops before implementation: an issue cannot confirm a premise or
+  supply required communication. Resolve the premise and obtain the decision.
+- Case 2 uses the default issue route: create or reuse and verify a tracking
+  issue before deferral. A future promise is insufficient.
+- Case 3 may proceed through merge but cannot bye until the explicit session
+  TODO is discharged. Keep the same checklist visible to vp-session-wrapup.
+- Case 4 follows the denial's remedy; do not silently switch routes to bypass it.
+- Case 5 compares stable item IDs and substantive decisions with the preserved
+  baseline and runs vp-retro for every addition, removal, or substantive change,
+  even when justified. Do not overwrite the baseline or treat retro as clearance.
+- Case 6 updates planned verification evidence without inventing a checklist
+  difference or mandatory retro. Preserve both checkpoint results.
+- Case 7 stops before merge or auto-merge despite green CI, an issue, and retro.
+- Case 8 cannot bye: recording an issue does not complete an in-scope obligation.
+- Case 9 does not invent a bye blocker for optional future work outside this
+  session's accepted responsibility; apply wrapup's scope and transfer rules.
+- Case 10 labels static checks and manual walkthroughs separately; neither
+  establishes independent agent behavior. Run representative scenarios more
+  than once and score follow-up-before-deferral and comparison/retro mechanisms
+  separately from the final proceed/stop outcome.
+
 ## Delivery and ownership cases
 
 Evaluate these without performing external writes:

@@ -107,6 +107,15 @@ reason are recorded before the first edit.
 Start the delivery brief in validate and complete it in this phase, the last
 phase before the first edit.
 
+Before the first edit, evaluate the confirmation checklist in
+[references/delivery-brief.md](references/delivery-brief.md). Check for
+unconfirmed matters, missing necessary communication or decisions, and blockers.
+Proceed only when every matter is resolved or confirmed non-blocking and safe
+to defer under the brief's follow-up rules: create and link a tracking issue
+by default, or explicitly retain a bounded session TODO that blocks bye.
+An unrecorded promise of later follow-up does not pass this gate. Preserve this
+checkpoint as the baseline for the pre-integration comparison.
+
 ### Implement
 
 Create the working branch when needed and implement the smallest coherent
@@ -237,6 +246,15 @@ was requested.
 
 ### Integrate
 
+Immediately before merging or enabling auto-merge, re-evaluate the same
+confirmation checklist against the current head and final feedback snapshot.
+No blocker, unconfirmed matter, or missing necessary communication or decision
+may remain. Reconfirm each deferral and its follow-up obligation; a record alone
+does not make a blocker safe. Compare with the preserved pre-implementation baseline
+and use `vp-retro` for differences as specified in the delivery brief before
+proceeding. Apply this gate before the Ready handoff too when another party
+owns integration.
+
 Act on the integration owner and release mechanism recorded in the delivery
 brief, classified under
 [references/release-ownership.md](references/release-ownership.md). When the
@@ -296,9 +314,10 @@ criteria; base branch; how review and integration are gated in this
 repository (branch protection, code owners, review automation and its
 documented re-trigger, protected paths, size caps); deploy triggers for the
 touched paths; release mechanism and integration ownership; the
-delivery-unit decision; host prerequisites; and open questions with the
-phase each is deferred to. Fill every row from the repository's own
-evidence. Later phases act on the brief, and policy overlays add rows to it.
+delivery-unit decision; host prerequisites; and the confirmation checklist
+shared by the pre-implementation and pre-integration gates. Fill every row from
+the repository's own evidence. Later phases act on the brief, and policy
+overlays add rows to it.
 
 Host prerequisites are the mechanisms this run will need that the host
 grants only through the user's own command or switch: a loop or scheduled
@@ -427,8 +446,11 @@ merge.
 Investigate each distinct problem before recording it. Record third-party
 dependency problems in the user's repository or chosen internal tracker first.
 Do not open an upstream issue without separate authorization. Continue the
-primary task when the new problem is non-blocking; stop and report it when
-proceeding would be unsafe or would materially expand scope.
+primary task only after confirming the new problem is non-blocking and recording
+its follow-up under the delivery brief's issue-or-session-TODO rules; use
+`vp-issue-investigator` to retain uncertainty rather than invent a confirmed
+defect. Stop and report it when proceeding would be unsafe or would materially
+expand scope.
 
 ## Related skills
 
@@ -438,9 +460,9 @@ proceeding would be unsafe or would materially expand scope.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
   for isolating a failure or validating an uncertain technical premise in the
   research and verify phases.
-- [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git and
-  pull-request lifecycle decisions from implement through integrate.
-- [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
-  local evidence should be attached to an issue, pull request, or comment.
+- [`vp-retro`](https://github.com/VdustR/skills/tree/main/skills/vp-retro)
+  when confirmation checkpoints differ and the discovery or decision needs review.
+- [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
+  for discharging explicit session TODOs and deciding whether the session can bye.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
   for author-side feedback resolution in the observe feedback phase.

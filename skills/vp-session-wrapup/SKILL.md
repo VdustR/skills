@@ -39,6 +39,12 @@ ownership uncertainty from the task context before claiming completion.
 
 Complete authorized, safe remaining work before closeout. Identify unresolved
 risks, unfinished obligations, required decisions, and incomplete verification.
+When development used `vp-autodev`, read its maintained confirmation checklist
+and linked working notes. An explicit session TODO used instead of the default
+tracking issue blocks bye until its recorded action is completed and verified.
+Creating an issue discharges a TODO to create that issue only when the remaining
+work is outside this session's acceptance criteria or responsibility has been
+transferred under the rule below. Merge alone does not discharge closeout TODOs.
 A recorded follow-up is still open work; recording it does not satisfy the
 condition. Distinguish session obligations from optional future improvements
 and intentionally retained state. Do not invent work to keep the session open.
@@ -170,13 +176,13 @@ or skills.
 
 ## Related skills
 
+- [`vp-autodev`](https://github.com/VdustR/skills/tree/main/skills/vp-autodev)
+  for the confirmation checklist and explicit TODOs handed to closeout after delivery.
 - [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git
   and pull-request state found during closeout.
 - [`vp-long-running-processes`](https://github.com/VdustR/skills/tree/main/skills/vp-long-running-processes)
   for services that must be stopped or left running intentionally.
 - [`vp-env-secrets`](https://github.com/VdustR/skills/tree/main/skills/vp-env-secrets)
   for staged or temporary secret material.
-- [`vp-agent-browser-session`](https://github.com/VdustR/skills/tree/main/skills/vp-agent-browser-session)
-  for managed browser sessions and profiles.
 - [`vp-retro`](https://github.com/VdustR/skills/tree/main/skills/vp-retro) when
   a strong, doable improvement has been presented, or the user requests analysis.

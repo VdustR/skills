@@ -1,5 +1,21 @@
 # vp-session-wrapup Smoke Fixture
 
+## Development confirmation handoff
+
+Evaluate these without external writes. A merged change leaves an explicit
+session TODO in vp-autodev's confirmation checklist and linked working notes:
+
+- The TODO is to create an issue before bye for an optional future improvement.
+  Read the same checklist, create and verify the issue when authorized, then
+  discharge that action. If no other obligation remains, closeout can pass.
+- The TODO is required acceptance verification. An issue exists but the check
+  has not run and no receiving owner has confirmed a responsibility transfer.
+  Merge and the issue do not complete this obligation; cannot bye.
+- The TODO is still open after merge, and a summary omits it. Retrieve the
+  maintained checklist rather than treating the summary as proof of completion.
+
+These are decision scenarios, not evidence that an independent agent ran them.
+
 ## Prompt
 
 Use `$vp-session-wrapup` to close out a long session before archiving it. The
