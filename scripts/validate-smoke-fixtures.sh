@@ -165,6 +165,30 @@ require_pattern "$autodev_skill" 'disable auto-merge before handling it' \
   "vp-autodev must disable auto-merge before handling a finding or new push"
 require_pattern "$autodev_skill" 'finish description edits before the' \
   "vp-autodev must finish description edits before the final push"
+require_pattern "$autodev_skill" 'never removes or weakens one' \
+  "vp-autodev must let an overlay add a gate but never remove one"
+require_pattern "$autodev_skill" 'stricter rule wins' \
+  "vp-autodev must resolve overlay conflicts toward the stricter rule"
+require_pattern "$autodev_skill" 'recorded before the first edit' \
+  "vp-autodev must record the delivery-unit decision before the first edit"
+require_pattern "$autodev_skill" 'the merge is the release' \
+  "vp-autodev must evaluate release conditions before a merge that deploys"
+require_pattern "$autodev_skill" 'never a merge' \
+  "vp-autodev must end at a Ready PR when another team or upstream owns integration"
+require_pattern "$autodev_skill" 'before any leg starts' \
+  "vp-autodev must write the orchestration plan before any cross-repository leg starts"
+require_pattern "$autodev_skill" 'never merges around a conflict' \
+  "vp-autodev must re-check merge order and never merge around a conflict"
+require_pattern "$autodev_skill" 'never grants authorization' \
+  "vp-autodev must treat a third party's reply as information, not authorization"
+require_pattern "$autodev_skill" 'is part of delivery' \
+  "vp-autodev must allow a documented re-trigger of a gating bot verdict"
+require_pattern "$autodev_fixture" 'Ready PR with reviewers requested' \
+  "vp-autodev fixture must cover the not-owned repository terminal state"
+require_pattern "$autodev_fixture" 'release conditions before the merge' \
+  "vp-autodev fixture must cover a merge that deploys production"
+require_pattern "$autodev_fixture" 'before any leg starts' \
+  "vp-autodev fixture must cover a cross-repository leg without rollback"
 require_pattern "$autodev_fixture" 'Classify pending checks when the review passes' \
   "vp-autodev fixture must classify pending checks at the wait decision"
 require_pattern "$autodev_fixture" 'reply resumes it' \
