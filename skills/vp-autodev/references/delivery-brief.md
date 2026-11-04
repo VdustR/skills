@@ -25,3 +25,9 @@ A row that cannot be filled from evidence is an open question. An open
 question that affects the design stops the work before design; one that
 affects only a later phase is recorded with that phase and answered there,
 after the independent work is done.
+
+## Cross-repository work
+
+When the change spans repositories, the brief has one section per repository,
+each filled from that repository, plus the orchestration plan and readiness
+check from [cross-repository.md](cross-repository.md).
