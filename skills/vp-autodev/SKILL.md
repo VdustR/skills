@@ -26,149 +26,207 @@ action, required evidence applies to the current head, verification is
 complete, feedback is handled, and remaining risk is low. Ask only when a
 safety gate in this workflow requires a human decision.
 
-## Workflow
+## Phases
 
-Keep evidence for each decision from issue validation through delivery:
+The workflow is a sequence of named phases. Refer to a phase by its name, never
+by a position; names stay stable when phases are added or reordered.
 
-1. Start from a current issue disposition and acceptance criteria. Use
-   `vp-issue-investigator` first when the problem is still suspected, stale, or
-   unverified. Propose or make external corrections only when authorized.
-2. Research the problem and the technical premises needed for the next design
-   decision. Before implementation or an expensive validation run, use
-   `vp-minimal-repro` when uncertain library, API, service, runtime, OS, or
-   device behavior could change that decision, even without a known failure.
-   Reuse applicable evidence first; otherwise run the smallest authorized check
-   at the real interface. State the question, relevant conditions, observable
-   result, and what it can and cannot establish. For a known failure, verify it
-   at the strongest practical level and distinguish observation from cause.
-   Do not add an experiment to a clear, low-risk change with no material unknown.
-   Before choosing a failure fix, trace the relevant producer, caller, lifecycle,
-   and ownership boundaries, including cleanup and reporting. Separate the
-   symptom, supported causes, and mitigation; use discriminating evidence rather
-   than assuming one root cause. Issue confirmation does not require a known
-   cause. Urgent, authorized mitigation may precede complete diagnosis; retain
-   evidence and report what remains unresolved.
-3. Design a focused solution and review the design before coding. Check that it
-   addresses the problem using validated premises, fits repository conventions,
-   and avoids foreseeable regressions. Record material alternatives, trade-offs,
-   and the reason for the selected approach.
-   Check whether the proposal repairs behavior or only hides its symptom, and
-   preserve unrelated failure propagation and reporting. For cancellation or
-   error-filtering changes, read
-   [references/failure-diagnosis.md](references/failure-diagnosis.md) before
-   choosing the handling boundary or classification rule.
-4. Create the working branch when needed and implement the smallest coherent
-   change. Preserve unrelated user work and avoid opportunistic fixes. Commit
-   and push the verified change as part of the delivery workflow.
-5. Verify the change against the reproduction or established premises and
-   relevant tests, checks, builds, or real behavior. Before repeating an
-   expensive or end-to-end run, name the new question, changed condition, or
-   invalidated evidence; use `vp-minimal-repro` to isolate an uncertain premise
-   rather than rebuild the feature to rediscover it. Reuse observations while
-   their versions, environment, relevant code, and conditions still apply.
-   Preserve required repository checks and integration, physical-device, or
-   human acceptance for claims the isolated check cannot establish. Compare
-   before and after evidence where applicable and retain unverified cases.
-   Exercise the repaired path and nearby failures that must still propagate or
-   report. Verify cleanup, completion state, retry behavior, and observability
-   affected by the change. An error or alert disappearing alone does not prove
-   repair; distinguish verified recovery from mitigation and unresolved causes.
-6. Create a Draft PR as part of the requested delivery workflow. Follow
-   `vp-git`'s `references/pull-requests.md` for a self-contained description,
-   design reasoning, clear writing, and supporting links. Review the
-   full diff, commits, and PR text as a maintainer before requesting human or
-   automated review. Keep it Draft while material design, verification, or
-   feedback remains unresolved; otherwise complete the Draft-to-Ready
-   transition. Treat Ready as a new mutation that may trigger review automation,
-   not as evidence that the pre-Ready feedback snapshot remains final.
-   When local screenshots, recordings, diagrams, or other files materially show
-   the result, route their publication in the PR through `vp-github` even if the
-   development request did not separately say to upload them.
-7. Record the current head commit, then monitor all repository-defined signals:
-   CI, check runs, bot comments, pull request review comments (inline code
-   comments), issue comments in the PR conversation, and reaction
-   emoji on the main post or comments. Treat a changed emoji as new state, using
-   that repository's convention instead of a universal mapping. Re-check that a
-   positive signal applies to the current head. When the last review or
-   feedback signal arrives while checks are still pending, classify each
-   pending check as blocking or informational under step 11 before deciding to
-   wait; an informational check is no reason to wait. Before ending a turn to
-   wait for a blocking check, name the event that will resume the work. A host
-   PR monitor may wake the session only for failures, conflicts, or new
-   comments, so a check that passes emits nothing. Host rules that forbid
-   self-polling stay binding. When no event covers the success path, do not end
-   the turn as if the work will continue: wait once, bounded, within the turn
-   for that check only where host rules permit it. Otherwise, when step 11
-   authorizes the merge and every blocking signal still pending on the current
-   head is a branch-protection required check, enable the platform's
-   auto-merge, through the host's PR tool when it offers one, and name it as
-   the resume event. Every other blocking signal must already be final and
-   passing on that head: review markers for that SHA, every non-required check
-   the repository treats as blocking, and no unresolved thread. When that
-   condition does not hold, tell the user that nothing will resume the merge
-   and which reply from them resumes it. After enabling auto-merge, keep the
-   failure and comment monitor on. A real finding, a failed check, or a new
-   push reopens the merge decision: disable auto-merge before handling it,
-   because a push from someone with write access does not cancel it.
-8. Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
-   a complete, independently paginated snapshot of PR conversation issue
-   comments and review threads with all inline comments and replies; a partial
-   read cannot establish that feedback is handled. Then repeat verification and
-   monitoring. When all pre-Ready gates pass, advance to Ready.
-9. After Ready, perform the passive automated-review observation described in
-   `references/automated-review-observation.md`. Invoking Codex or another
-   automated reviewer is not a default step in this workflow. Invoke one when
-   the user or a repository procedure explicitly asks for that action; an
-   installed integration, historical bot activity, or a documented trigger
-   command does not make invocation automatic. Do not wait for an automated
-   reviewer that has not started, and do not make a missing terminal signal a
-   standalone merge blocker. For a repository-defined optional review that was
-   requested or started, make a reasonable repository-supported retrigger
-   attempt before temporarily proceeding without it. Repeated failures,
-   exhausted quota, or excessive delay may justify proceeding when required
-   evidence is otherwise complete. Use about one hour as a default reference
-   for unattended work, not a fixed deadline; adapt the retry and observation
-   window to repository conventions, progress, risk, and cost. Record the
-   evidence and rationale. Route every actionable item that actually appears
-   through `vp-pr-comment-resolver`. A repository-required review cannot be
-   degraded for failure, quota, or delay; keep it blocked until recovery and
-   completion, or until the user explicitly directs the next action.
-10. After the last mutation, including Ready, a PR description edit, a reply,
-    fix, push, or thread resolution, reconcile again. When the repository
-    reruns workflows on description edits, finish description edits before the
-    final push so they do not cancel or restart its checks. Record the current
-    head; re-read current-head CI and checks, applying the step 7 wait rule to
-    any still pending; completely re-fetch PR conversation issue comments,
-    submitted reviews, review threads and their nested replies, and reaction
-    surfaces used by feedback that exists. A mutation invalidates the prior
-    final snapshot. Report an automated reviewer that did not run as unobserved.
-    Do not convert an optional reviewer into an indefinite wait loop; apply the
-    documented retry and degradation judgment when that review was requested.
-11. For a user-specified repository the user owns, merge when repository policy
-   permits it, required evidence is green, feedback is handled, the change is
-   fully verified, and the remaining risk is low. Treat the request to auto
-   develop the change as authorization for this in-scope merge. Ask before
-   merging when ownership is unclear, policy requires a human decision, risk is
-   material, verification is incomplete, or the merge would expand scope.
-   CI is green only when the checks the repository runs on the current head
-   have finished and passed. A pending check is not passing evidence, and
-   branch protection's required checks are a floor, not the whole gate: a
-   repository without required checks still expects its CI to finish. Decide
-   whether a particular pending or failing check blocks the merge from
-   repository convention, such as a check documented as informational or an
-   optional job that earlier merges did not wait for, and record that reason.
-   GitHub auto-merge waits only for branch-protection requirements and merges
-   at once when there are none, so it cannot hold a merge for any other check;
-   step 7 enables it only when those requirements are all that remain.
-   If a blocking check runs well past its usual duration in that repository,
-   rerun it once through the repository's mechanism; if it still does not
-   finish, report it as the missing gate instead of merging.
-12. After merge, determine from repository policy and release mechanics whether
-    a release is required. Under the same ownership, policy, verification, and
-    low-risk conditions, run the in-scope release workflow and verify the
-    published result. Ask before a release with material operational impact,
-    ambiguous versioning or release policy, incomplete verification, or scope
-    beyond the requested change. Otherwise, record why no release is needed.
+| Phase | Outcome |
+|-------|---------|
+| validate | A current issue disposition and acceptance criteria |
+| research | Validated technical premises for the next design decision |
+| design | A reviewed solution with recorded alternatives |
+| plan delivery units | A recorded decision on how the change ships |
+| implement | The verified change committed and pushed |
+| verify | Evidence that the change repairs the behavior and preserves the rest |
+| publish for review | A self-contained PR, Draft until its gates pass, then Ready |
+| observe feedback | Every repository-defined signal read against the current head |
+| reconcile | A complete final snapshot after the last mutation |
+| integrate | The change merged, or the bounded terminal state this repository allows |
+| release | The published result verified, or a recorded reason no release is needed |
+
+Keep evidence for each decision from validate through release.
+
+### Validate
+
+Start from a current issue disposition and acceptance criteria. Use
+`vp-issue-investigator` first when the problem is still suspected, stale, or
+unverified. Propose or make external corrections only when authorized.
+
+### Research
+
+Research the problem and the technical premises needed for the next design
+decision. Before implementation or an expensive validation run, use
+`vp-minimal-repro` when uncertain library, API, service, runtime, OS, or
+device behavior could change that decision, even without a known failure.
+Reuse applicable evidence first; otherwise run the smallest authorized check
+at the real interface. State the question, relevant conditions, observable
+result, and what it can and cannot establish. For a known failure, verify it
+at the strongest practical level and distinguish observation from cause.
+Do not add an experiment to a clear, low-risk change with no material unknown.
+Before choosing a failure fix, trace the relevant producer, caller, lifecycle,
+and ownership boundaries, including cleanup and reporting. Separate the
+symptom, supported causes, and mitigation; use discriminating evidence rather
+than assuming one root cause. Issue confirmation does not require a known
+cause. Urgent, authorized mitigation may precede complete diagnosis; retain
+evidence and report what remains unresolved.
+
+### Design
+
+Design a focused solution and review the design before coding. Check that it
+addresses the problem using validated premises, fits repository conventions,
+and avoids foreseeable regressions. Record material alternatives, trade-offs,
+and the reason for the selected approach.
+Check whether the proposal repairs behavior or only hides its symptom, and
+preserve unrelated failure propagation and reporting. For cancellation or
+error-filtering changes, read
+[references/failure-diagnosis.md](references/failure-diagnosis.md) before
+choosing the handling boundary or classification rule.
+
+### Plan delivery units
+
+Decide how the change ships before the first edit: as one unit or as an
+ordered sequence of units. Record the decision and its reason.
+
+### Implement
+
+Create the working branch when needed and implement the smallest coherent
+change. Preserve unrelated user work and avoid opportunistic fixes. Commit
+and push the verified change as part of the delivery workflow.
+
+### Verify
+
+Verify the change against the reproduction or established premises and
+relevant tests, checks, builds, or real behavior. Before repeating an
+expensive or end-to-end run, name the new question, changed condition, or
+invalidated evidence; use `vp-minimal-repro` to isolate an uncertain premise
+rather than rebuild the feature to rediscover it. Reuse observations while
+their versions, environment, relevant code, and conditions still apply.
+Preserve required repository checks and integration, physical-device, or
+human acceptance for claims the isolated check cannot establish. Compare
+before and after evidence where applicable and retain unverified cases.
+Exercise the repaired path and nearby failures that must still propagate or
+report. Verify cleanup, completion state, retry behavior, and observability
+affected by the change. An error or alert disappearing alone does not prove
+repair; distinguish verified recovery from mitigation and unresolved causes.
+
+### Publish for review
+
+Create a Draft PR as part of the requested delivery workflow. Follow
+`vp-git`'s `references/pull-requests.md` for a self-contained description,
+design reasoning, clear writing, and supporting issue-artifact links. Review the
+full diff, commits, and PR text as a maintainer before requesting human or
+automated review. Keep it Draft while material design, verification, or
+feedback remains unresolved; otherwise complete the Draft-to-Ready
+transition. Treat Ready as a new mutation that may trigger review automation,
+not as evidence that the pre-Ready feedback snapshot remains final.
+When local screenshots, recordings, diagrams, or other files materially show
+the result, route their publication in the PR through `vp-github` even if the
+development request did not separately say to upload them.
+
+### Observe feedback
+
+Record the current head commit, then monitor all repository-defined signals:
+CI, check runs, bot comments, pull request review comments (inline code
+comments), issue comments in the PR conversation, and reaction
+emoji on the main post or comments. Treat a changed emoji as new state, using
+that repository's convention instead of a universal mapping. Re-check that a
+positive signal applies to the current head. When the last review or
+feedback signal arrives while checks are still pending, classify each
+pending check as blocking or informational under the integrate phase before
+deciding to wait; an informational check is no reason to wait. Before
+ending a turn to wait for a blocking check,
+name the event that will resume the work. A host PR monitor may wake the
+session only for failures, conflicts, or new comments, so
+a check that passes emits nothing. Host rules that forbid self-polling stay
+binding. When no event covers the success path, do not end
+the turn as if the work will continue: wait once, bounded, within the turn
+for that check only where host rules permit it. Otherwise, when the integrate
+phase authorizes the merge and every blocking signal still pending on the
+current head is a branch-protection required check, enable the platform's
+auto-merge, through the host's PR tool when it offers one, and name it as
+the resume event. Every other blocking signal must already be final and
+passing on that head: review markers for that SHA, every non-required check
+the repository treats as blocking, and no unresolved thread. When that
+condition does not hold, tell the user that nothing will resume the merge
+and which reply from them resumes it. After enabling auto-merge, keep the
+failure and comment monitor on. A real finding, a failed check, or a new
+push reopens the merge decision: disable auto-merge before handling it,
+because a push from someone with write access does not cancel it.
+
+Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
+a complete, independently paginated snapshot of PR conversation issue
+comments and review threads with all inline comments and replies; a partial
+read cannot establish that feedback is handled. Then repeat verification and
+monitoring. When all pre-Ready gates pass, advance to Ready.
+
+After Ready, perform the passive automated-review observation described in
+`references/automated-review-observation.md`. Invoking Codex or another
+automated reviewer is not a default step in this workflow. Invoke one when
+the user or a repository procedure explicitly asks for that action; an
+installed integration, historical bot activity, or a documented trigger
+command does not make invocation automatic. Do not wait for an automated
+reviewer that has not started, and do not make a missing terminal signal a
+standalone merge blocker. For a repository-defined optional review that was
+requested or started, make a reasonable repository-supported retrigger
+attempt before temporarily proceeding without it. Repeated failures,
+exhausted quota, or excessive delay may justify proceeding when required
+evidence is otherwise complete. Use about one hour as a default reference
+for unattended work, not a fixed deadline; adapt the retry and observation
+window to repository conventions, progress, risk, and cost. Record the
+evidence and rationale. Route every actionable item that actually appears
+through `vp-pr-comment-resolver`. A repository-required review cannot be
+degraded for failure, quota, or delay; keep it blocked until recovery and
+completion, or until the user explicitly directs the next action.
+
+### Reconcile
+
+After the last mutation, including Ready, a PR description edit, a reply,
+fix, push, or thread resolution, reconcile again. When the repository
+reruns workflows on description edits, finish description edits before the
+final push so they do not cancel or restart its checks. Record the current
+head; re-read current-head CI and checks, applying the observe-feedback wait
+rule to any still pending; completely re-fetch PR conversation issue
+comments, submitted reviews, review threads and their nested replies, and
+reaction surfaces used by feedback that exists. A mutation invalidates the
+prior final snapshot. Report an automated reviewer that did not run as
+unobserved. Do not convert an optional reviewer into an indefinite wait
+loop; apply the documented retry and degradation judgment when that review
+was requested.
+
+### Integrate
+
+For a user-specified repository the user owns, merge when repository policy
+permits it, required evidence is green, feedback is handled, the change is
+fully verified, and the remaining risk is low. Treat the request to auto
+develop the change as authorization for this in-scope merge. Ask before
+merging when ownership is unclear, policy requires a human decision, risk is
+material, verification is incomplete, or the merge would expand scope.
+CI is green only when the checks the repository runs on the current head
+have finished and passed. A pending check is not passing evidence, and
+branch protection's required checks are a floor, not the whole gate: a
+repository without required checks still expects its CI to finish. Decide
+whether a particular pending or failing check blocks the merge from
+repository convention, such as a check documented as informational or an
+optional job that earlier merges did not wait for, and record that reason.
+GitHub auto-merge waits only for branch-protection requirements and merges
+at once when there are none, so it cannot hold a merge for any other check;
+the observe-feedback phase enables it only when those requirements are all
+that remain.
+If a blocking check runs well past its usual duration in that repository,
+rerun it once through the repository's mechanism; if it still does not
+finish, report it as the missing gate instead of merging.
+
+### Release
+
+After merge, determine from repository policy and release mechanics whether
+a release is required. Under the same ownership, policy, verification, and
+low-risk conditions, run the in-scope release workflow and verify the
+published result. Ask before a release with material operational impact,
+ambiguous versioning or release policy, incomplete verification, or scope
+beyond the requested change. Otherwise, record why no release is needed.
+
+## Terminal state
 
 Successful completion reaches merge plus required release follow-up. Local
 changes, a Draft PR, or a Ready PR are not successful terminal states when the
@@ -179,6 +237,25 @@ decision or evidence.
 Do not treat CI success as proof that the issue is fixed. Do not treat silence
 from a bot as a completed review, but do not wait for or summon the bot solely
 to turn that silence into a signal.
+
+## Policy overlays
+
+A policy overlay is a skill or repository rule set that attaches gates to this
+workflow without restating it. An overlay may attach a gate at these points,
+each named by the phase it precedes or wraps:
+
+| Attach point | Position in this workflow |
+|--------------|---------------------------|
+| before design | after validate and research, before design starts |
+| before implementation | after plan delivery units, before the first edit |
+| before ready | inside publish for review, before the Draft-to-Ready transition |
+| before integrate | after reconcile, before the merge decision |
+| before release | after integrate, before the release decision |
+| on block | whenever any gate in this workflow or an overlay stops the work |
+
+An overlay may add a gate; it never removes or weakens one. When this workflow
+and an overlay disagree, the stricter rule wins. Overlays refer to phases and
+attach points by name; this workflow does not number them.
 
 ## Verification and convergence
 
@@ -223,13 +300,14 @@ proceeding would be unsafe or would materially expand scope.
 ## Related skills
 
 - [`vp-issue-investigator`](https://github.com/VdustR/skills/tree/main/skills/vp-issue-investigator)
-  for validating and recording a distinct problem found during development.
+  for validating and recording a distinct problem found during development
+  (validate phase).
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)
-  for isolating a failure or validating an uncertain technical premise before
-  implementation or expensive revalidation.
+  for isolating a failure or validating an uncertain technical premise in the
+  research and verify phases.
 - [`vp-git`](https://github.com/VdustR/skills/tree/main/skills/vp-git) for Git and
-  pull-request lifecycle decisions.
+  pull-request lifecycle decisions from implement through integrate.
 - [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
   local evidence should be attached to an issue, pull request, or comment.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
-  for author-side feedback resolution.
+  for author-side feedback resolution in the observe-feedback phase.
