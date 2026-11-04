@@ -209,12 +209,20 @@ was requested.
 
 ### Integrate
 
-For a user-specified repository the user owns, merge when repository policy
-permits it, required evidence is green, feedback is handled, the change is
-fully verified, and the remaining risk is low. Treat the request to auto
-develop the change as authorization for this in-scope merge. Ask before
-merging when ownership is unclear, policy requires a human decision, risk is
-material, verification is incomplete, or the merge would expand scope.
+Act on the integration owner and release mechanism recorded in the delivery
+brief, classified under
+[references/release-ownership.md](references/release-ownership.md). When the
+user owns integration, merge when repository policy permits it, required
+evidence is green, feedback is handled, the change is fully verified, and the
+remaining risk is low. Treat the request to auto develop the change as
+authorization for this in-scope merge. Ask before merging when ownership is
+unclear, policy requires a human decision, risk is material, verification is
+incomplete, or the merge would expand scope. When a merge itself deploys to
+production for the touched paths, the merge is the release: evaluate the
+release conditions before it, and read the deploy workflows' triggers and
+path filters rather than assuming. When another team or an upstream
+maintainer owns integration, the terminal state is a Ready PR with reviewers
+requested and feedback handled, never a merge.
 CI is green only when the checks the repository runs on the current head
 have finished and passed. A pending check is not passing evidence, and
 branch protection's required checks are a floor, not the whole gate: a
@@ -232,16 +240,27 @@ finish, report it as the missing gate instead of merging.
 
 ### Release
 
-After merge, determine from repository policy and release mechanics whether
-a release is required. Under the same ownership, policy, verification, and
-low-risk conditions, run the in-scope release workflow and verify the
-published result. Ask before a release with material operational impact,
-ambiguous versioning or release policy, incomplete verification, or scope
-beyond the requested change. Otherwise, record why no release is needed.
+After merge, act on the release mechanism recorded in the delivery brief.
+Under the same ownership, policy, verification, and low-risk conditions, run
+the in-scope release workflow and verify the published result. Ask before a
+release with material operational impact, ambiguous versioning or release
+policy, incomplete verification, or scope beyond the requested change. These
+conditions apply whatever the mechanism; the classification only decides
+where they are evaluated. For a merge that deploys, they were evaluated
+before the merge, and the release is complete only when the deploy workflow
+finished and the result is verified. For a shared batch, the change is done
+when merged to base and on the batch; releasing the batch is a separate
+decision that needs the other contributors' acknowledgement unless repository
+policy says otherwise. For a versioned release step, that step is the release
+decision. When another party releases, report the merged state and name the
+release owner. Otherwise, record why no release is needed.
 
 ## Terminal state
 
-Successful completion reaches merge plus required release follow-up. Local
+Successful completion reaches the terminal state the delivery brief derives
+from integration ownership and release mechanism: merge plus required release
+follow-up when the user owns integration, or a Ready PR with reviewers
+requested and feedback handled when another team or upstream owns it. Local
 changes, a Draft PR, or a Ready PR are not successful terminal states when the
 documented low-risk conditions permit further progress. When a safety gate
 prevents progress, report the bounded terminal state and the exact missing
