@@ -84,7 +84,7 @@ case 4 read the deploy trigger and path filter, treat the merge as the release,
 evaluate the release conditions before the merge, and stop at a Ready PR
 because the operational impact is material; do not enable auto-merge. In case
 5 write the orchestration plan before any leg starts, put the leg without
-rollback to the user before anything starts (including the safe frontend leg),
+rollback to the user before any leg starts, including the safe frontend leg,
 and order the irreversible leg last after the frontend leg is verified.
 
 ## Technical premise cases

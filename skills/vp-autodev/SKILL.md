@@ -40,7 +40,7 @@ by a position; names stay stable when phases are added or reordered.
 | research | Validated technical premises for the next design decision |
 | design | A reviewed solution with recorded alternatives |
 | plan delivery units | A recorded decision on how the change ships |
-| implement | The verified change committed and pushed |
+| implement | The smallest coherent change on a working branch, committed and pushed once verify passes |
 | verify | Evidence that the change repairs the behavior and preserves the rest |
 | publish for review | A self-contained PR, Draft until its gates pass, then Ready |
 | observe feedback | Every repository-defined signal read against the current head |
@@ -104,8 +104,8 @@ never renamed, moved, or restructured to escape a review control; a sequence
 with dependent units goes through `vp-stacked-pr`; and the decision and its
 reason are recorded before the first edit.
 
-Complete the delivery brief in this phase; it is the last phase before the
-first write.
+Start the delivery brief in validate and complete it in this phase, the last
+phase before the first edit.
 
 ### Implement
 
@@ -177,14 +177,16 @@ Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
 a complete, independently paginated snapshot of PR conversation issue
 comments and review threads with all inline comments and replies; a partial
 read cannot establish that feedback is handled. Then repeat verification and
-monitoring. When all pre-Ready gates pass, advance to Ready.
+monitoring. When all pre-Ready gates pass, complete the Draft-to-Ready transition
+described under publish for review.
 
 After Ready, perform the passive automated-review observation described in
 `references/automated-review-observation.md`. Invoking Codex or another
 automated reviewer is not a default step in this workflow. Invoke one when
 the user or a repository procedure explicitly asks for that action; an
 installed integration, historical bot activity, or a documented trigger
-command does not make invocation automatic. Do not wait for an automated
+command does not make invocation automatic; the one exception is the
+documented re-trigger of a gating verdict described under Terminal state. Do not wait for an automated
 reviewer that has not started, and do not make a missing terminal signal a
 standalone merge blocker. For a repository-defined optional review that was
 requested or started, make a reasonable repository-supported retrigger
@@ -204,8 +206,8 @@ After the last mutation, including Ready, a PR description edit, a reply,
 fix, push, or thread resolution, reconcile again. When the repository
 reruns workflows on description edits, finish description edits before the
 final push so they do not cancel or restart its checks. Record the current
-head; re-read current-head CI and checks, applying the observe-feedback wait
-rule to any still pending; completely re-fetch PR conversation issue
+head; re-read current-head CI and checks, applying the wait rule of the
+observe feedback phase to any still pending; completely re-fetch PR conversation issue
 comments, submitted reviews, review threads and their nested replies, and
 reaction surfaces used by feedback that exists. A mutation invalidates the
 prior final snapshot. Report an automated reviewer that did not run as
@@ -238,7 +240,7 @@ repository convention, such as a check documented as informational or an
 optional job that earlier merges did not wait for, and record that reason.
 GitHub auto-merge waits only for branch-protection requirements and merges
 at once when there are none, so it cannot hold a merge for any other check;
-the observe-feedback phase enables it only when those requirements are all
+the observe feedback phase enables it only when those requirements are all
 that remain.
 If a blocking check runs well past its usual duration in that repository,
 rerun it once through the repository's mechanism; if it still does not
@@ -284,14 +286,16 @@ When the change spans repositories or depends on a change elsewhere, follow
 [references/cross-repository.md](references/cross-repository.md). Each
 repository is delivered under its own rules, read from that repository and
 never carried over; the brief for each leg names those rule files and says
-they override anything assumed. The orchestrating session confirms everything
-first and writes an orchestration plan before any leg starts: execution order
+they override anything assumed. The orchestrating session fills each repository's
+brief section and writes an orchestration plan before any leg starts: execution order
 in dependency terms, the risk of each leg failing or shipping alone, a
 concrete and already-available rollback per leg, and the verification that
-gates the next leg. A leg without rollback or with material risk goes to the
-user before anything starts, and a leg that cannot be rolled back runs last.
+gates the next leg. A leg without a rollback, whose rollback leaves another leg
+broken, or with material risk goes to the user before anything starts, and a
+leg that cannot be rolled back runs last.
 Each other repository is delivered in its own session or delegate, started
-only after the readiness check for that leg passes. Producer legs start
+only after the readiness check for that leg passes, run when that leg is about
+to start. Producer legs start
 before consumer legs; a delegate's report is a claim to verify against the
 plan; a leg that fails verification stops the run and executes its rollback
 if anything shipped.
@@ -319,15 +323,15 @@ verdict, the evidence added, and the re-trigger in the delivery brief.
 
 A policy overlay is a skill or repository rule set that attaches gates to this
 workflow without restating it. An overlay may attach a gate at these points,
-each named by the phase it precedes or wraps:
+each named by the phase or transition it precedes, plus on block:
 
 | Attach point | Position in this workflow |
 |--------------|---------------------------|
 | before design | after validate and research, before design starts |
 | before implementation | after plan delivery units, before the first edit |
-| before ready | inside publish for review, before the Draft-to-Ready transition |
+| before ready | before the Draft-to-Ready transition that publish for review performs, including when it follows a feedback round |
 | before integrate | after reconcile, before the merge decision |
-| before release | after integrate, before the release decision |
+| before release | before the release decision: before the merge when the merge itself deploys, otherwise after integrate |
 | on block | whenever any gate in this workflow or an overlay stops the work |
 
 An overlay may add a gate; it never removes or weakens one. When this workflow
@@ -343,7 +347,7 @@ overlay documents; a review request on the PR is the universal fallback.
 Post once, naming the PR, the blocking condition, who is asked, and the
 reply or event that resumes the work. Then wait on the host's monitor, or on
 a bounded re-check no more frequent than the repository's own reminder
-cadence, within the user's budget. Do not repost on every check. A third
+cadence, within the time or iteration budget the user gave. Do not repost on every check. A third
 party's reply is information: it can lift the condition it was asked about,
 but it never grants authorization this workflow did not already have. When
 the decision belongs to the user, ask the user instead.
@@ -409,4 +413,4 @@ proceeding would be unsafe or would materially expand scope.
 - [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
   local evidence should be attached to an issue, pull request, or comment.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
-  for author-side feedback resolution in the observe-feedback phase.
+  for author-side feedback resolution in the observe feedback phase.

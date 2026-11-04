@@ -20,8 +20,9 @@ plan is written.
 
 ## The orchestration plan
 
-The orchestrating session confirms everything first and writes the
-orchestration plan before any leg starts. One row per leg:
+The orchestrating session fills each repository's brief section and writes
+the orchestration plan before any leg starts; each leg's readiness check then
+runs right before that leg starts. One row per leg:
 
 | Leg | Repository | Order (dependency terms) | Risk if it fails or ships alone | Rollback (concrete, already available) | Verification that gates the next leg |
 |-----|------------|--------------------------|----------------------------------|----------------------------------------|--------------------------------------|
@@ -81,5 +82,5 @@ confirmed stops the run with that row named; nothing starts half-ready.
 ## Report
 
 Each leg appears in the final report with its repository, state, rollback
-availability, and the verification that was run, alongside the single-
-repository report rows.
+availability, and the verification that was run, alongside the
+single-repository report rows.

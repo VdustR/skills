@@ -1,7 +1,7 @@
 # Delivery Units
 
 A delivery unit is one reviewable, mergeable change: usually one pull request.
-The plan-delivery-units phase decides whether the change ships as one unit or
+The plan delivery units phase decides whether the change ships as one unit or
 as an ordered sequence of units. Neither answer is the default. Decide from the
 reasons below, record the decision and its reason before the first edit, and
 keep that record in the delivery brief.
