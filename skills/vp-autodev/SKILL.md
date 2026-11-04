@@ -101,6 +101,9 @@ never renamed, moved, or restructured to escape a review control; a sequence
 with dependent units goes through `vp-stacked-pr`; and the decision and its
 reason are recorded before the first edit.
 
+Complete the delivery brief in this phase; it is the last phase before the
+first write.
+
 ### Implement
 
 Create the working branch when needed and implement the smallest coherent
@@ -254,6 +257,18 @@ decision that needs the other contributors' acknowledgement unless repository
 policy says otherwise. For a versioned release step, that step is the release
 decision. When another party releases, report the merged state and name the
 release owner. Otherwise, record why no release is needed.
+
+## Delivery brief
+
+Before the first edit, record the delivery brief described in
+[references/delivery-brief.md](references/delivery-brief.md): acceptance
+criteria; base branch; how review and integration are gated in this
+repository (branch protection, code owners, review automation and its
+documented re-trigger, protected paths, size caps); deploy triggers for the
+touched paths; release mechanism and integration ownership; the
+delivery-unit decision; and open questions with the phase each is deferred
+to. Fill every row from the repository's own evidence. Later phases act on
+the brief, and policy overlays add rows to it.
 
 ## Terminal state
 
