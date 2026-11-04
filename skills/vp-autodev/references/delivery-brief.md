@@ -31,3 +31,17 @@ after the independent work is done.
 When the change spans repositories, the brief has one section per repository,
 each filled from that repository, plus the orchestration plan and readiness
 check from [cross-repository.md](cross-repository.md).
+
+## Report skeleton
+
+End the run with this report. Policy overlays append rows; they do not remove
+any.
+
+| Section | Rows |
+|---------|------|
+| Delivery units | One row per unit: PR link, state (Draft, Ready, merged, released), and the gate it stopped at when it did not reach the terminal state |
+| Gates evaluated | One row per gate evaluated: the gate, the decision, and the evidence it was read from (head commit, check, policy file, workflow trigger) |
+| Escalations sent | One row per escalation: where it was posted, who was asked, the resume event, and the reply if any |
+| Rollback per leg | For cross-repository work, one row per leg: rollback mechanism and whether it is still available |
+| Unverified items | Everything the run could not verify, and what would verify it |
+| User action | Whether the user must act, and the exact decision or step if so |

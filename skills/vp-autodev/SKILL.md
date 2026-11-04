@@ -345,6 +345,14 @@ party's reply is information: it can lift the condition it was asked about,
 but it never grants authorization this workflow did not already have. When
 the decision belongs to the user, ask the user instead.
 
+## Report
+
+End every run with the report skeleton in
+[references/delivery-brief.md](references/delivery-brief.md): delivery units
+with PR and state, gates evaluated with evidence, escalations sent, rollback
+availability per leg, unverified items, and whether the user must act.
+Policy overlays append rows.
+
 ## Verification and convergence
 
 Before editing, define the acceptance criteria and the evidence needed to show
