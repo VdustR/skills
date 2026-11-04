@@ -240,6 +240,11 @@ that remain.
 If a blocking check runs well past its usual duration in that repository,
 rerun it once through the repository's mechanism; if it still does not
 finish, report it as the missing gate instead of merging.
+A unit whose correctness depends on merge order relative to other open PRs,
+such as sequentially numbered migrations or versioned artifacts, re-checks
+that order against the base branch and the other open PRs immediately before
+merging, and never merges around a conflict: an order conflict is fixed in
+the unit, or the merge waits, and is reported either way.
 
 ### Release
 
