@@ -1,6 +1,6 @@
 ---
 name: vp-pixel-art
-description: Create, reconstruct, adapt, edit or visually review genuine pixel art on a deliberate native grid, from a brief or reference, including sprites, scenes, icons and constrained platform styles. Use for authored pixels and palette/platform requirements, not CSS pixel spacing or raster art that only looks pixelated.
+description: Create, reconstruct, adapt, edit or visually review genuine pixel art on a deliberate native grid, from a brief or reference, including sprites, scenes, icons, seamless textures, Wang tiles and constrained platform styles. Use for authored pixels and palette/platform requirements, not CSS pixel spacing or raster art that only looks pixelated.
 ---
 
 # Pixel artwork
@@ -15,9 +15,13 @@ Read [review gates](references/review-gates.md) for the task's acceptance contra
 
 Inspect an existing asset/source before modifying it. Record essential identity, detail roles, style, permitted adaptations, actual sizes/backgrounds and required consuming actions. Scale this contract to the task. Review mode is read-only unless fixes are requested. Preserve approved unusual styles and accepted versions.
 
+For repeating pixel textures or edge-matched tilesets, read [tiling and Wang tiles](references/tiling-and-wang-tiles.md) for construction, validation methods, acceptance baselines, and a controlled probe.
+
 ## Establish the target
 
 Declare native dimensions, aspect/pixel aspect, palette/alpha limits, minimum readable size, style and any animation/tile/export constraints. Distinguish a platform-inspired style from compatibility with real platform constraints. If claiming real hardware compatibility, verify the requested platform's relevant palette, tile, sprite, memory and display constraints against primary technical documentation; a palette count alone is insufficient.
+
+Establish the artwork's visual role. For a background, judge material readability and competition with the intended foreground at actual viewing scale; more detail or contrast is not automatically better. Preserve accepted alternatives unless the user requests a replacement, and distinguish a different style from an evidenced improvement.
 
 For a reference, allocate identity-bearing features to actual pixels before polishing. Record what will be simplified, rearranged or omitted and why; preserve required object/function/action readings. Do not reduce a high-resolution source and call it deliberate pixel construction without inspecting and authoring the native result.
 
