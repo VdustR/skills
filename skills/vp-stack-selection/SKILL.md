@@ -27,6 +27,10 @@ explain a different choice with concrete technical reasons.
   not a reason to adopt one either.
 - Keep supported existing choices unless the requested change justifies replacing
   them. For a rewrite, compare retaining or incrementally adapting the current stack.
+- Prefer mise for Node.js and pnpm/Yarn versions when the backend fits. Use
+  Corepack for required Corepack behavior or a verified compatibility exception;
+  check selector precedence, integrity, command ownership, and CI through the
+  [toolchain reference](references/toolchain.md) before adoption.
 - Default to TypeScript over JavaScript for newly authored JS-ecosystem code,
   including Node.js utilities, build/release scripts, tests, and Electron code.
   Small size, direct execution, or avoiding a build step alone does not justify
@@ -78,6 +82,7 @@ flowchart TD
 | --- | --- |
 | Choosing languages or researching an unfamiliar domain | [Languages and ecosystem fit](references/languages.md) |
 | Selecting environments, hooks, workspaces, or release tooling | [Toolchain](references/toolchain.md) |
+| Selecting Node.js and pnpm/Yarn version ownership or evaluating Corepack | [Node.js package managers](references/node-package-managers.md) |
 | TypeScript libraries or web tooling are involved | [TypeScript](references/typescript.md) |
 | Choosing web frameworks, rendering, styles, or shared state | [Web](references/web.md) |
 | Selecting a renderer for Mermaid diagram source | [Diagram rendering](references/diagrams.md) |
