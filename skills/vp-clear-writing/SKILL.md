@@ -3,12 +3,14 @@ name: vp-clear-writing
 description: >-
   Write or revise clear, concrete prose across languages for user-facing replies,
   documents, code comments, review comments, and pull request descriptions.
+  Use for concise summaries, TL;DR blocks, executive summaries, and summary
+  rewrites as well as full prose.
   Make problems, solutions, and value understandable in a logical reading order.
   Proactively use useful diagrams, tables, or pseudocode to explain structure
   and behavior.
   Select relevant content and preserve meaning, necessary context, and
-  uncertainty while removing empty rhetoric. Boundary: use vp-tldr to select
-  summary content and the relevant workflow to investigate, verify, or publish it.
+  uncertainty while removing empty rhetoric. Boundary: writing does not
+  investigate, verify, or publish the underlying work; use the relevant workflow.
 ---
 
 # Clear Writing
@@ -73,8 +75,8 @@ sources and still-valid decisions; later wording alone does not make a source
 more reliable. Recover supported facts and evidence from older material when
 they still apply, replace superseded conclusions, and preserve consequential
 conflicts or unknowns. An old draft is context, not a requirement to repeat its
-claims. This selects the body of the requested text; `$vp-tldr` continues to own
-summary selection. Neither skill establishes missing facts through rewriting.
+claims. For summary selection, follow the summary reference below. Rewriting
+does not establish missing facts.
 
 ## Build an explanation the reader can follow
 
@@ -206,10 +208,13 @@ Let the context determine what the reader needs:
 - A pull request description explains the problem, resulting behavior, and
   relevant verification or limitations for a reader without the conversation.
 
-Use `$vp-tldr` when the task requires selecting or rewriting summary content;
-apply these writing principles to its result without adding a summary to every
-artifact. Read [references/examples.md](references/examples.md) when an example
-would help resolve a wording or context decision. Read
+When writing or rewriting a summary, TL;DR, executive summary, or an opening
+whose purpose is to summarize a larger source, read and apply
+[summary selection](references/summaries.md). Apply it only to the summary
+portion; a summary-only request does not authorize rewriting the body. Do not
+add a summary to every artifact or load summary guidance for ordinary prose
+edits that do not need one. Read [references/examples.md](references/examples.md)
+when an example would help resolve a wording or context decision. Read
 [references/english.md](references/english.md) for procedure wording, patterns
 that add nothing, and, for an English artifact, ambiguity checks.
 
@@ -234,8 +239,6 @@ requested or helps assess a material change.
 
 ## Related skills
 
-- [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr)
-  when selecting the content and scope of a concise summary.
 - [`vp-design-reasoning`](https://github.com/VdustR/skills/tree/main/skills/vp-design-reasoning)
   when building an explanation exposes concepts, rules, flows, or states that
   need investigation.

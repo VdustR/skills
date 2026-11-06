@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Clear Writing"
-  short_description: "Choose relevant content and write clear, concrete prose"
-  default_prompt: "Use $vp-clear-writing to write or revise this text around the reader's purpose and applicable sources. Use useful diagrams, tables, or pseudocode while forming and presenting the explanation; route unresolved model questions to design reasoning and preserve the editing scope, evidence, uncertainty, accessible explanation, and requested format."
+  short_description: "Write clear prose and select concise, useful summaries"
+  default_prompt: "Use $vp-clear-writing to write or revise this text around the reader's purpose and applicable sources. For summary writing or rewriting, read references/summaries.md and keep summary-only scope. Use useful diagrams, tables, or pseudocode while forming and presenting the explanation; route unresolved model questions to design reasoning and preserve the editing scope, evidence, uncertainty, accessible explanation, and requested format."

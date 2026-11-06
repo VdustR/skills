@@ -45,6 +45,7 @@ refute_frontmatter_pattern() {
 }
 
 required_skills=(
+  "vp-clear-writing"
   "vp-autodev"
   "vp-minimal-repro"
   "vp-skills"

@@ -10,8 +10,8 @@ Follow the user's requested structure and the repository's pull request
 template. Apply `vp-clear-writing` to the title and description. Use
 `vp-design-reasoning` when the change needs a model of behavior, a design
 trade-off, or a decision flow; share the same evidence rather than restarting
-research. Apply vp-tldr to the summary only when the user requests its TL;DR
-logic.
+research. For a requested summary, follow the summary reference in
+`vp-clear-writing` without expanding the edit to the surrounding body.
 
 ## Make the change readable
 

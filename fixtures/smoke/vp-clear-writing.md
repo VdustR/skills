@@ -2,9 +2,8 @@
 
 ## Prompt
 
-Use `$vp-clear-writing` for these independent requests. Use `$vp-tldr` only for
-the request that asks for a summary. Use the supplied facts without investigating
-or publishing anything.
+Use `$vp-clear-writing` for these independent requests. Use the supplied facts
+without investigating or publishing anything.
 
 1. Revise a Traditional Chinese developer reply: "請建立拉取請求，並在提交訊息裡
    說明修復。這不是小調整，而是全面解決登入問題。" Facts: the fix handles expired
@@ -19,7 +18,7 @@ or publishing anything.
    sections. Facts: expired tokens previously caused repeated rejected requests;
    the change asks users to sign in again; auth tests pass; deployment is
    unverified.
-5. Use `$vp-tldr` to summarize the preceding PR in English. Do not rewrite the
+5. Summarize the preceding PR in English. Do not rewrite the
    surrounding description or add an owner, timeline, or action absent from it.
 6. Revise "Only the local checks pass; production may still fail." Keep the
    meaningful contrast and uncertainty. Do not make it a verified production
@@ -71,8 +70,8 @@ or publishing anything.
   explanation to be shorter or select an unsupported remedy.
 - Explain why parameter order matters in the code comment without a TL;DR,
   status section, editing report, or next action.
-- Preserve the supplied PR template. Summary selection belongs to vp-tldr;
-  wording belongs to vp-clear-writing. Do not apply summaries to every output.
+- Preserve the supplied PR template. Read the summary reference for summary
+  selection and preserve summary-only scope. Do not apply summaries to every output.
 - Preserve a contrast or hedge when it changes the meaning, and explain
   unfamiliar terminology without inventing a translation.
 - The writing skill changes expression, not the task's permissions or scope.
@@ -115,3 +114,6 @@ comparison baselines, and preservation of relevant history, use
 
 For proactive visual explanations and destination-aware tool selection, use
 [Visual Explanation Decisions](vp-clear-writing-visuals.md).
+
+For summary routing after consolidation, use
+[Summary Selection and Scope](vp-clear-writing-summaries.md).
