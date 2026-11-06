@@ -60,8 +60,8 @@ request did not separately say to upload it.
 
 ## Related skills
 
-- [`vp-tldr`](https://github.com/VdustR/skills/tree/main/skills/vp-tldr) for the
-  opening summary.
+- [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
+  for selecting and writing the opening summary.
 - [`no-ai-slop`](https://github.com/petergyang/no-ai-slop/tree/main/skills/no-ai-slop)
   for editing the issue body.
 - [`vp-minimal-repro`](https://github.com/VdustR/skills/tree/main/skills/vp-minimal-repro)

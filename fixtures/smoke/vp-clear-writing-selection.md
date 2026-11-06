@@ -63,8 +63,8 @@ Do not add an editing report unless the request asks for one.
    daylight-saving changes remain untested. Revision notes say "The author has
    now addressed all reviewer requests"; no submitted review record is supplied.
    Keep each section to one or two sentences.
-10. Use vp-tldr with the writing skill to write only a Traditional Chinese
-    summary in two bullets for procurement staff. Current body: rental quotes
+10. Write only a Traditional Chinese summary in two bullets for procurement
+    staff. Current body: rental quotes
     now itemize transport charges; verified on one supplier's sandbox; live
     billing is unverified. Old summary says all invoices are correct and quotes
     are awaiting a design decision. The staff need to know what is supported.
@@ -134,8 +134,8 @@ Case-specific acceptance criteria:
    Exclude reviewer-compliance claims. Reject an added TL;DR or verified-review claim.
 10. Procurement summary: only two Traditional Chinese bullets; current itemized
     charges, one-supplier sandbox scope, and unverified live billing. Remove the
-    obsolete decision and all-invoices claim; do not rewrite the body. Summary
-    selection remains vp-tldr's responsibility.
+    obsolete decision and all-invoices claim; do not rewrite the body. Read the
+    summary reference for selection, without adding sections or changing the body.
 11. Irrigation options: Spanish table and recommendation sentence; retain both
     candidate schedules, staffing tradeoff, dry-soil risk, unmeasured moisture,
     and proposal status. Recommend conditionally from staffing evidence without

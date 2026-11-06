@@ -60,10 +60,17 @@ npx -y skills@1.5.3 remove vp-chrome-profiles -g -y
 Stacked-change guidance moved out of `vp-git` into `vp-stacked-pr`. Install both
 if you work with stacks.
 
-`vp-tldr` uses `vp-clear-writing` for shared writing guidance. Install both when
-selecting individual skills. Installing either skill does not make it an
-always-on writing policy; reference it from your agent instructions when that
-is the desired behavior.
+Summary selection formerly provided by `vp-tldr` is now an on-demand reference
+in `vp-clear-writing`. Replace `$vp-tldr` calls and instruction-file references
+with `$vp-clear-writing`, then remove the superseded installation explicitly:
+
+```bash
+npx -y skills@1.5.3 add VdustR/skills --skill vp-clear-writing -g --agent '*' -y
+npx -y skills@1.5.3 remove vp-tldr -g -y
+```
+
+Installing `vp-clear-writing` does not make it an always-on writing policy;
+reference it from your agent instructions when that is the desired behavior.
 
 ## Skills
 
@@ -84,7 +91,8 @@ Parse and verify GitHub PR/issue checklists, auto-checking items that pass verif
 ### vp-clear-writing
 
 Write clear, concrete prose across languages and formats while preserving meaning,
-necessary context, evidence, and customary domain terminology.
+necessary context, evidence, and customary domain terminology. Select and rewrite
+concise summaries with on-demand summary guidance.
 
 ### vp-cspell
 
@@ -199,10 +207,6 @@ illustrations, website art, and slide graphics from a brief or reference.
 ### vp-test-design
 
 Decide whether a change needs a test, write it first, and judge it by the behavior it protects.
-
-### vp-tldr
-
-Write a concise, reader-first summary for an artifact, message, or update while preserving uncertainty and required action.
 
 ### vp-tunnel
 
