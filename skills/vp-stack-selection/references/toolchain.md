@@ -36,7 +36,11 @@ exact tested releases rather than floating `latest` or `next` in reproducible CI
 Choose a Node.js version meeting build-tool and deployment requirements;
 consumer runtime support is a separate promise.
 
-When mise owns Node.js/pnpm, align `packageManager` and CI with those versions.
+Prefer mise to manage Node.js and pnpm/Yarn directly when the selected backend
+works on the target platforms. Corepack is optional; retain it for required
+dispatch/validation behavior or a verified backend limitation. Follow
+[Node.js package-manager ownership](node-package-managers.md) for opt-in
+`package.json` selection, precedence, checksums, shim conflicts, and CI checks.
 [Vite+](https://www.viteplus.dev/guide) also manages environments; use its local
 CLI without introducing a competing global version manager.
 

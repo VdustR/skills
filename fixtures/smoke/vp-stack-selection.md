@@ -46,6 +46,19 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | Offline machine lacks strictest/ts-reset, and dependency installation is not authorized | Report the missing required setup; preserve the prepared script and verification plan. Do not silently omit the packages or install them without authority. |
 | Node script project also publishes a reusable npm library | Keep resets scoped to the script checking project; publish JS/declarations and verify a consumer without the application reset. Do not runtime-import reset.d.ts. |
 
+### Node.js package-manager ownership
+
+| Case | Expected decision and mechanism |
+| --- | --- |
+| New Node.js/pnpm project; only needs reproducible version selection | Prefer direct mise; enable pnpm idiomatic selection when `package.json` owns the pin. Do not add Corepack just to read that field. |
+| Yarn project requires checksum verification; mise backend fails on the target | Retain working Corepack or verify another mise version/backend. Preserve the checksum; do not claim all Yarn backends are incompatible. |
+| `packageManager` pins pnpm 10.15.0; `devEngines.packageManager` pins 10.14.0; an explicit mise pin also exists | Resolve the conflict before adoption. Check mise's devEngines-first and explicit-pin precedence against Corepack's top-level descriptor; inspect the source, not only the version. |
+| Idiomatic selection disabled, declaration missing, or suffix malformed | Enable the intended reader or correct/configure the pin. Do not assume Corepack fallback, automatic enablement, or fail-closed malformed-suffix handling. |
+| Project relies on Corepack rejecting a Yarn command inside a pnpm project | Keep Corepack dispatch unless equivalent required behavior is verified. Direct binary selection is not that guard; do not generalize `--version` results to dependency installs. |
+| Corepack URL descriptor, devEngines onFail validation, Known Good Release, or offline pack/cache workflow is required | Preserve and verify that specific Corepack contract rather than declaring full equivalence with mise. |
+| CI has competing manager setup, existing Corepack shims, or Node.js 25+ | Choose one dispatcher, inspect actual command paths, align CI pins, and provision Corepack separately if retained on Node.js 25+. Do not uninstall global tools without authorization. |
+| Existing supported Corepack setup; no migration requested | Keep it. The new-project preference does not authorize migration or global settings changes. |
+
 ### Web, styling, and optional capabilities
 
 | Case | Expected decision |
@@ -131,10 +144,74 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 - Package versus workspace tooling and TS-only hooks.
 - Native Node first for fitting scripts, concrete tsx exceptions, strictest and
   ts-reset requirements on both paths, publication boundaries, and blocked setup.
+- Direct mise version ownership with opt-in readers, explicit precedence and
+  integrity checks; bounded Corepack dispatch/backend exceptions and CI ownership.
 - Selection evidence versus later adoption checks and authorization.
 
 Static fixture checks verify structure, not decisions. Report manual walkthroughs,
 syntax/parser checks, and independent agent trials separately.
+
+## Package-manager verification: 2026-11-06 (Asia/Taipei)
+
+The editing agent manually traced the eight package-manager scenarios twice,
+first in table order, then starting with the exceptions and existing setup.
+Each pass checked the recommendation separately from the required mechanism:
+all eight reached the expected decision and identified its stated mechanism.
+These are manual walkthroughs, not blind independent agent trials or evidence
+that an agent will automatically load the reference.
+
+The previous environment paragraph only said to prefer mise where supported
+and align Node.js/pnpm with `packageManager` and CI. It could reach the same
+recommendation while omitting the opt-in reader, selector conflict, ignored
+suffix, dispatcher guard, or backend compatibility check. Those omissions are
+the distinguishing mechanism failures; a correct tool name alone does not pass.
+The existing-setup case is a preservation control, not evidence of improvement.
+
+The executable external-behavior probe is
+`skills/vp-stack-selection/scripts/probe-node-package-managers.py`. Run:
+
+```sh
+python3 skills/vp-stack-selection/scripts/probe-node-package-managers.py
+```
+
+Prerequisites: macOS/Linux, Python 3 standard library, network access, and
+already installed mise, Node.js, and Corepack discoverable through `mise which`.
+It prints its evidence directory and keeps isolated config, installs, and caches
+there. It does not enable shims, change global settings, or install project
+dependencies. It runs each scenario twice, cold then warm. The deliberately
+invalid pnpm checksum uses a distinct version to avoid installed-cache bypass.
+
+Observed with mise `2026.10.25` on macOS arm64, Node.js `26.13.0`, and Corepack
+`0.36.0`:
+
+| Boundary | Observed result in both passes |
+| --- | --- |
+| Reader disabled versus enabled | No active pnpm selection versus 10.15.0 selected from `package.json`. |
+| Conflicting declarations | mise selected devEngines 10.14.0; Corepack executed top-level 10.15.0 with devEngines `onFail: ignore`. |
+| Explicit mise pin | 10.14.0 overrode top-level packageManager 10.15.0. |
+| No declaration / malformed suffix | No active pnpm selection; no parser error. |
+| pnpm integrity | Wrong 10.14.0 SHA-224 rejected with `Checksum mismatch`; correct 10.15.0 installed and executed. First valid install was cold; second reused the install. |
+| Yarn 4.9.2 integrity path | mise `http:yarn` install failed with `File name too long (os error 63)`; Corepack executed the same checksum declaration successfully. |
+| Wrong-manager dispatch | Direct Yarn 4.9.2 from `npm:@yarnpkg/cli-dist` ran `--version` in a pnpm-declared project; Corepack rejected it. |
+
+The Yarn hash is computed from the published CLI for this probe, so the probe
+tests descriptor handling/installation, not independent artifact provenance.
+Yarn installation status is reported separately from the assertions; passing
+the other assertions does not make that backend compatible.
+
+Reviewed the official Node.js guide, version-matched parser/settings/changelog,
+Corepack README, CI guide, and the checksum-fix PRs with issue comments, inline
+review comments, and reviews. The backend-persistence review identified existing
+install manifests as another affected path; the author fixed that path and
+distinguished it from lockfile restoration. This supports inspecting inherited
+backend state, not deleting installs automatically. The npm-option fix discussion
+added no separate adoption condition. Sources are linked in
+`skills/vp-stack-selection/references/node-package-managers.md`.
+
+Not exercised: actual dependency installs, shell activation, shim mutation,
+fresh Node.js installation, npm/Yarn 1 checksum paths, every hash algorithm,
+Yarn's default non-checksum backend, CI runners, Linux/Windows, URL/offline
+Corepack workflows, or newer mise releases. Those remain adoption checks.
 
 ## Manual source-language walkthrough: 2026-10-24 (Asia/Taipei)
 
