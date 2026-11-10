@@ -14,6 +14,7 @@ Policy overlays add rows; they do not remove or blank any row below.
 | Row | What to record | Evidence source |
 |-----|----------------|-----------------|
 | Acceptance criteria | The observable outcomes that show the change is done, and what remains out of scope | Issue disposition, user request, validate phase |
+| Selected endpoint | All pass, merge, or release (default), including any separately authorized follow-up | User request and endpoint table in SKILL.md |
 | Base branch | The branch the unit targets, and the branch the repository releases from when they differ | Repository instructions, default branch, documented branch model |
 | Review and integration gating | Branch protection and rulesets; code owners for the touched paths; review automation, what it accepts, and its documented re-trigger; protected paths; size or per-unit caps | Protection settings, code-owner files, workflow files, repository instructions |
 | Deploy triggers for the touched paths | Which workflows deploy, what event triggers them, and whether their path filters cover the touched paths | Workflow files on the base branch |

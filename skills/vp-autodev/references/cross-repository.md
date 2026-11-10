@@ -56,7 +56,7 @@ confirmed stops the run with that row named; nothing starts half-ready.
 | Item | Confirmed when |
 |------|----------------|
 | Session | The session or delegate can be created where that repository is reachable |
-| Authorization | The user's authorizing words and the scope they cover are relayed in the brief, with the terminal state for that repository (merge, Ready PR, or an earlier stop) and the reason |
+| Authorization | The user's authorizing words and the scope they cover are relayed in the brief, with the selected endpoint, any earlier stop required by ownership or policy, and the reason |
 | Push access | The account the delegate uses can push to that repository |
 | Gating known | Review and integration gating for that repository are recorded in its brief section |
 | Systems reachable | Every web system, connector, or service the leg needs is reachable and signed in |
