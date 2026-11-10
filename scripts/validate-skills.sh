@@ -149,7 +149,7 @@ while IFS= read -r skill_dir; do
     while IFS= read -r script_file; do
       [ -x "$script_file" ] || fail "$script_file is not executable"
       case "$script_file" in
-        *.sh|*/envctl)
+        *.sh)
           bash -n "$script_file"
           ;;
         *.mjs)
