@@ -349,7 +349,10 @@ gates the next leg. A leg without a rollback, whose rollback leaves another leg
 broken, or with material risk goes to the user before anything starts, and a
 leg that cannot be rolled back runs last.
 Each other repository is delivered in its own session or delegate. Run the
-readiness check immediately before starting that leg. After dispatch, apply the
+readiness check immediately before starting that leg. Record its delivery
+owner, user reporting contact, and any separate archive authorization in the
+[coordination brief](references/cross-repository.md#coordinate-by-assignment).
+After dispatch, apply the
 [grouping checkpoint](references/cross-repository.md#group-sessions-after-dispatch)
 when the child has a canonical session identity. Producer legs start before
 consumer legs. Verify each delegate's report against the plan. If a leg fails

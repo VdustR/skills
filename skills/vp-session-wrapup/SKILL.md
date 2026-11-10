@@ -5,7 +5,8 @@ description: >-
   leftover state such as scratch files, uncommitted or unpushed Git work,
   running services, staged secrets, and temporary configuration. Use when the
   user ends, wraps up, hands off, or archives a session, including a
-  conditional request to clean up whatever carries no risk. Boundary: use
+  conditional request to clean up whatever carries no risk or an authorized
+  request to archive a completed delegated session. Boundary: use
   vp-retro for workflow improvement analysis after identifying a strong,
   actionable improvement candidate.
 ---
@@ -149,6 +150,32 @@ proposal awaiting approval does not block BYE. With no qualifying candidate,
 briefly report that no actionable retro improvement was found and skip retro;
 do not manufacture a recommendation or make every goodbye a full audit.
 Recheck closeout only if the analysis exposes a genuine in-scope risk or TODO.
+
+## Archive a delegated session
+
+For a coordinator archiving a delegated session, verify separate user
+authorization covering the actor, exact target or unambiguous target scope,
+and any conditions. A dispatch, a reporting arrangement, a group, or a BYE
+verdict alone does not grant archive authority.
+
+1. Read the target's current state against its assignment. Verify that the
+   designated receiver accepted the required delivery with evidence, and
+   confirm any separate responsibility transfer with its receiving owner.
+   A completion report or sent handoff alone does not establish either.
+2. Confirm that unique results are recoverable, no required work or concrete
+   closeout risk remains, and nothing still requires the user's attention
+   under the archive authorization. Preserve the chat when acceptance,
+   recovery, or current state cannot be verified. Name the remaining owner
+   and what they must confirm.
+3. Recheck the target identity, relevant state, and current authorization
+   immediately before the archive write. Stop on intervening work, a user
+   hold, or stale evidence. Use a supported operation and read back archive
+   status for that exact target. If the write outcome is uncertain, read
+   current state before any retry.
+
+Report the target's archive status separately. The coordinator's own BYE
+status depends on its remaining obligations. Archiving itself requires
+authorization that covers that different target.
 
 ## Report
 
