@@ -179,6 +179,12 @@ and retain the phrase `BYE flow`.
     assigned work, required verification, and handoff are complete. Open with
     `You can run the BYE flow.` A later activation requires its own closeout
     checks before the completion verdict.
+28. The coordinator may archive the SDK worker chat when delivery is accepted
+    and the user has nothing to address. The worker posted a completion report
+    while the coordinator was offline. Keep the chat open until the coordinator
+    verifies acceptance and the remaining closeout conditions. Then archive only
+    the authorized child and read back its exact status. A new user hold stops
+    the write, and pending release work still blocks the coordinator's BYE.
 
 These scenarios cover conditional closure, recommendation-before-retro order,
 analysis versus edit authorization, the no-enhancement path, all five closeout

@@ -347,5 +347,10 @@ every repeated exploratory run needs a new question or changed evidence.
 - a unit whose correctness depends on merge order re-checks that order right
   before merging and never merges around a conflict
 - a third party's reply is information, not authorization
+- a question in a delegate chat gets a local reply without switching the
+  reporting contact. An explicit change for one leg switches only that leg's
+  reporting, and a switch back leaves delivery, acceptance, and archive
+  authority as recorded. An outstanding integration prerequisite still gates
+  the next leg, even if the user now works directly with the delegate
 - a documented re-trigger of a gating bot verdict, after adding the evidence it
   asked for, is part of delivery
