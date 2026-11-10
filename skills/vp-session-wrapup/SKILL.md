@@ -113,15 +113,23 @@ not hypothetical risk or the mere existence of retained state.
 | Unverified | Evidence is insufficient to establish completion, ownership, or safe closeout. | BYE readiness unverified; identify the missing evidence and how to obtain it. |
 | Ready to close | No unresolved session risk or TODO remains, including required verification and handoff. | BYE can complete, including when only confirmed transferred work, unrelated work, optional improvements, or intentionally retained safe state remains. |
 
-In a closeout report, answer whether the user can leave first. When the checks
-have passed, use `BYE 已完成，可以離開。` in Traditional Chinese. For blockers,
-use `BYE 受阻，目前還不能收尾。`. For insufficient evidence, use
-`目前尚無法確認 BYE 是否能完成。` Follow with the reason, any required action,
-and the next owner and resume condition. When answering a readiness question
-before closeout, use `BYE 可啟動。` only if the assigned work and handoff are
-verified. Recheck the closeout conditions on activation. Report archive status
-separately using verified readback or the remaining owner and condition.
-Requests to edit this workflow remain editing tasks.
+Lead with the applicable verdict using the canonical English sentences below.
+Translate the sentence naturally into the reply language and keep the phrase
+`BYE flow` verbatim.
+
+- Verified readiness before activation: `You can run the BYE flow.` Use this only
+  when the assigned work and handoff are verified.
+- Completed closeout: `The BYE flow is complete.` Use this only after authorized
+  activation and passing closeout checks. End the closeout without inviting the
+  user to run the BYE flow again.
+- Known blocker: `The BYE flow is blocked.`
+- Insufficient evidence: `BYE flow readiness is unverified.`
+
+Recheck the closeout conditions on activation. Follow the verdict with the
+reason, any required action, and the next owner and resume condition where
+applicable. Report archive status separately using verified readback or the
+remaining owner and condition. Requests to edit this workflow remain editing
+tasks.
 
 ### Ready-to-close retro
 
