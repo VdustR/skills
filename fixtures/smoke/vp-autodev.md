@@ -43,9 +43,9 @@ Also evaluate these decision cases without performing external writes:
 - Under the same monitor and host rules, the review bot has passed the current
   head, no thread is unresolved, and the only pending check is
   branch-protection required. Separately, a non-required check that repository
-  convention waits for is also still pending. Separately again, the review bot
-  leaves a real inline finding on the current head after auto-merge was
-  enabled.
+  convention waits for is also still pending. Separately again, the host
+  offers a PR tool such as `set_auto_merge`, and an auto-merge is found
+  already enabled on the PR.
 
 ## Confirmation and follow-up cases
 
@@ -91,7 +91,7 @@ Expected decisions:
   even when justified. Do not overwrite the baseline or treat retro as clearance.
 - Case 6 updates planned verification evidence without inventing a checklist
   difference or mandatory retro. Preserve both checkpoint results.
-- Case 7 stops before merge or auto-merge despite green CI, an issue, and retro.
+- Case 7 stops before merge despite green CI, an issue, and retro.
 - Case 8 cannot bye: recording an issue does not complete an in-scope obligation.
 - Case 9 does not invent a bye blocker for optional future work outside this
   session's accepted responsibility; apply wrapup's scope and transfer rules.
@@ -162,7 +162,7 @@ record the missing prerequisite, and continue repository delivery checks.
 Evaluate these without performing external writes:
 
 1. The merge is authorized, the only pending signal is the required check,
-   auto-merge is enabled, and a release step must run after the merge. The
+   and a release step must run after the merge. The
    host monitor wakes only on failures, conflicts, and comments, and the host
    offers a scheduled wake-up it permits for external work it cannot track.
 2. The same state, but the host forbids every self-wake for this purpose and
@@ -176,11 +176,12 @@ Evaluate these without performing external writes:
    but creating one requires an explicit user request. The terminal state is
    merge plus a verified publish.
 
-Expected decisions: in case 1 enable auto-merge for the merge, schedule one
-wake-up matched to the check's usual duration for the release step, name it
-as the resume event, and re-read the head on resume. In case 2 enable
-auto-merge and tell the user that nothing will resume the release step and
-which reply resumes it. In case 3 report the unfinished check as the missing
+Expected decisions: in case 1 do not enable auto-merge; schedule one wake-up
+matched to the check's usual duration, name it as the resume event, and on
+resume re-read the head, re-run the integrate gate, call merge, then continue
+to the release step. In case 2 do not enable auto-merge either; use a bounded
+in-turn wait if host rules permit one, otherwise end the turn and tell the
+user that nothing will resume the merge and which reply resumes it. In case 3 report the unfinished check as the missing
 gate; an expired wait is not a pass. In case 4 record the loop command as a
 host prerequisite in the brief and ask the user to issue it before the first
 edit, together with any other up-front decision, instead of inferring it from
@@ -285,12 +286,13 @@ every repeated exploratory run needs a new question or changed evidence.
   no monitor event, so tell the user nothing will resume the merge and which
   reply resumes it rather than ending the turn as if work will continue. Do
   not poll. Edit the description before the final push.
-- Enable auto-merge when only branch-protection required checks remain pending
-  and every other blocking signal is final and passing on the current head;
-  name auto-merge as the resume event and keep the monitor on. Do not enable it
-  while the non-required blocking check is pending; tell the user instead. For
-  the bot finding, disable auto-merge before fixing it, because a push with
-  write access does not cancel auto-merge.
+- Never enable auto-merge, even when only branch-protection required checks
+  remain pending and every other blocking signal is final and passing on the
+  current head, and even though the host PR tool offers `set_auto_merge`. With
+  no permitted wake, end the turn naming the reply that resumes the merge; on
+  that reply, re-read the head, re-run the integrate gate, then call merge.
+  Disable the auto-merge found already enabled before any further action and
+  report it.
 - Exercise the document's decisions and state the verification method; do not
   describe syntax or fixture-content checks as an agent trial.
 
@@ -322,8 +324,9 @@ every repeated exploratory run needs a new question or changed evidence.
   edit as a host prerequisite, not inferred from the auto-development request
 - a host-tracked goal gets the terminal state as its completion conditions and
   counts as the host event that resumes the run
-- auto-merge resumes an authorized merge only when required checks are the
-  only pending gate, and is disabled before a finding or new push is handled
+- platform auto-merge is never enabled, even when only required checks are
+  pending; the merge is an explicit call after the integrate gate re-runs, and
+  an auto-merge found enabled is disabled and reported
 - reviewer silence is recorded as unobserved without automatically invoking or
   waiting for the reviewer
 - partial reads cannot establish that feedback is handled on either GitHub

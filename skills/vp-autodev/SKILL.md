@@ -193,20 +193,23 @@ order, record it in the brief, and name it before ending the turn:
 3. A bounded wait within the turn, where host rules permit it.
 
 On resume, re-read the head and every signal before acting; a wait that
-expires without the event is a missing gate to report, not a pass. When the
-integrate phase authorizes the merge and every blocking signal still pending
-on the current head is a branch-protection required check, also enable the
-platform's auto-merge, through the host's PR tool when it offers one, and
-name it as the resume event for the merge itself; the phases after integrate
-still need a wake from the list above. Every other blocking signal must
-already be final and passing on that head: review markers for that SHA,
-every non-required check the repository treats as blocking, and no
-unresolved thread. When that condition does not hold and no wake is
-permitted, tell the user that nothing will resume the merge and which reply
-from them resumes it. After enabling auto-merge, keep the failure and
-comment monitor on. A real finding, a failed check, or a new
-push reopens the merge decision: disable auto-merge before handling it,
-because a push from someone with write access does not cancel it.
+expires without the event is a missing gate to report, not a pass.
+
+Never enable a platform auto-merge, by any route: the GitHub "Enable
+auto-merge" control, `gh pr merge --auto`, the API, or a host PR tool such as
+`set_auto_merge`. The merge is an explicit merge call this workflow makes
+after the integrate gate passes on the current head, never a merge the
+platform performs on its own later. This holds even when every remaining
+signal is a branch-protection required check, because the platform cannot
+re-run the integrate gate, see a finding that arrives after it is armed, or
+stop for a new push. When only pending checks stand between the PR and the
+merge, use the resume order above for the merge itself. When none of those
+mechanisms is permitted, end the turn and tell the user that
+nothing will resume the merge and which reply from them resumes it, for
+example "checks are green, merge". On resume, re-read the head and every
+signal, re-run the integrate gate, and only then call merge. If an
+auto-merge is found already enabled on a PR this workflow owns, disable it
+before any further action and report it.
 
 Route both GitHub feedback surfaces through `vp-pr-comment-resolver`. Require
 a complete, independently paginated snapshot of PR conversation issue
@@ -252,7 +255,7 @@ was requested.
 
 ### Integrate
 
-Immediately before merging or enabling auto-merge, re-evaluate the same
+Immediately before merging, re-evaluate the same
 confirmation checklist against the current head and final feedback snapshot.
 No blocker, unconfirmed matter, or missing necessary communication or decision
 may remain. Reconfirm each deferral and its follow-up obligation; a record alone
@@ -283,9 +286,9 @@ whether a particular pending or failing check blocks the merge from
 repository convention, such as a check documented as informational or an
 optional job that earlier merges did not wait for, and record that reason.
 GitHub auto-merge waits only for branch-protection requirements and merges
-at once when there are none, so it cannot hold a merge for any other check;
-the observe feedback phase enables it only when those requirements are all
-that remain.
+at once when there are none, so it cannot hold a merge for any other check,
+an unfinished review, or this gate; that is why this workflow never enables
+it and merges with an explicit call instead.
 If a blocking check runs well past its usual duration in that repository,
 rerun it once through the repository's mechanism; if it still does not
 finish, report it as the missing gate instead of merging.
@@ -328,7 +331,8 @@ overlays add rows to it.
 Host prerequisites are the mechanisms this run will need that the host
 grants only through the user's own command or switch: a loop or scheduled
 wake-up command, a goal the host tracks when creating it needs the user's
-request, a monitor or auto-merge switch, a permission. An auto-development
+request, a monitor switch, a permission. A platform auto-merge is never one:
+this workflow does not use it. An auto-development
 request does not stand in for them. Identify them before
 the first edit from the host's rules and the terminal state, and ask the
 user for them once, in one message with any other up-front decision, so the
