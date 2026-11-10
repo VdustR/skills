@@ -217,7 +217,8 @@ or skills.
   and pull-request state found during closeout.
 - [`vp-long-running-processes`](https://github.com/VdustR/skills/tree/main/skills/vp-long-running-processes)
   for services that must be stopped or left running intentionally.
-- [`vp-env-secrets`](https://github.com/VdustR/skills/tree/main/skills/vp-env-secrets)
-  for staged or temporary secret material.
+- [`fnox`](https://github.com/jdx/fnox/tree/main/skills/fnox) for secrets kept
+  in an OS keychain or another fnox provider, and for checking what a session
+  stored there.
 - [`vp-retro`](https://github.com/VdustR/skills/tree/main/skills/vp-retro) when
   a strong, doable improvement has been presented, or the user requests analysis.

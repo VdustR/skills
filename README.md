@@ -117,10 +117,6 @@ Clarify concepts, workflows, architecture, and user interactions through bounded
 models, scenario walkthroughs, trade-off analysis, and appropriate verification.
 Pair with Impeccable for frontend visual direction and craft.
 
-### vp-env-secrets
-
-Safely list, choose, load, stage, and persist sensitive `.env*` variables using `dotenvx`.
-
 ### vp-foreign-agent-skill-loader
 
 Index repository-local skills written for other agent systems without converting them.
