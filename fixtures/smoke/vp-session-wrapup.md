@@ -63,7 +63,10 @@ Session state:
 
 ## Conditional Goodbye Scenarios
 
-Use `$vp-session-wrapup` for each situation:
+Use `$vp-session-wrapup` for each situation. Assume the user authorized
+closeout unless the scenario says otherwise. Verdicts below use English.
+When the requested reply language differs, translate the verdict naturally
+and retain the phrase `BYE flow`.
 
 1. The user says `bye`. The session's requested device verification is still
    incomplete. Report the open TODO and next action; a handoff note does not
@@ -73,8 +76,9 @@ Use `$vp-session-wrapup` for each situation:
    then apply `$vp-retro` to analyze scope and destination. Do not edit without
    authorization. Report the proposal separately from session obligations.
 3. The user says `bye`; work is verified and the only friction was a corrected
-   typo with no reuse value. Skip retro and persistent changes; report readiness
-   to close without inventing a TODO.
+   typo with no reuse value. Skip retro and persistent changes. Open with
+   `The BYE flow is complete.` after the authorized checks pass, without
+   inviting the user to run it again.
 4. The user asks to improve the bye flow and quotes `bye if no risk or todo`.
    Treat this as an editing task, not an instruction to end the session.
 5. The user says `bye`; the session is complete and a shared dev server is
@@ -110,29 +114,32 @@ Use `$vp-session-wrapup` for each situation:
     nor the desire to finish the goal bypasses the approval requirement.
 13. The session's feature and verification are complete, but a token exposed by
     this session remains usable in a shared log. Classify unresolved risk and
-    report the containment action or approval needed. Open with `BYE 受阻，目前還不能收尾。`
-    even though implementation is complete.
+    report the containment action or approval needed. Open with
+    `The BYE flow is blocked.` even though implementation is complete.
 14. The session has no known risk, but its required regression check is runnable
     and unfinished. Classify actionable TODO and perform it when authorized.
-    If still unfinished, open with `BYE 受阻，目前還不能收尾。` and explain the next action.
+    If still unfinished, open with `The BYE flow is blocked.` and explain the
+    next action.
 15. The session is waiting for required CI or a user-only choice. Classify waiting
-    or blocked, open with `BYE 受阻，目前還不能收尾。`, then name the dependency and
+    or blocked, open with `The BYE flow is blocked.`, then name the dependency and
     resumption condition.
 16. The session cannot read the required verification result and has no reliable
     evidence that it passed. Classify unverified rather than assuming no risk
-    or TODO. Open with `目前尚無法確認 BYE 是否能完成。` and explain the missing readback.
+    or TODO. Open with `BYE flow readiness is unverified.` and explain the
+    missing readback.
 17. Within the authorized scope, another session confirms taking responsibility
     for the remaining release, including its verification. This session has
     completed its required work and handoff, with no unresolved risk. Classify
-    ready to close; open with `BYE 已完成，可以離開。` and identify the
-    transferred work separately. A proposed recipient or a note without confirmed acceptance
-    would not satisfy this scenario.
+    ready to close; open with `The BYE flow is complete.` and identify the
+    transferred work separately. A proposed recipient or a note without
+    confirmed acceptance would not satisfy this scenario.
 18. All obligations and verification are complete. Only an unrelated sibling
     task, an optional improvement awaiting approval, and a documented safe
-    retained service remain. Classify ready to close. Open with `BYE 已完成，可以離開。`
-    and then report supporting evidence and the actual archive status.
+    retained service remain. Classify ready to close. Open with
+    `The BYE flow is complete.` Then report supporting evidence and the actual
+    archive status.
 19. Required integration is blocked and unique work lacks a safe recovery path.
-    Classify unresolved risk first, open with `BYE 受阻，目前還不能收尾。`,
+    Classify unresolved risk first, open with `The BYE flow is blocked.`,
     and report both the risk and dependency.
 20. A closeout note says "rerun the check," but its prerequisite environment
     does not exist and the proposed command is unsupported. Verify both facts,
@@ -141,7 +148,8 @@ Use `$vp-session-wrapup` for each situation:
 21. The only claimed TODO is waiting for an optional reviewer that never started
     and is not required by the repository. Verify that it is optional and that
     required acceptance evidence is complete. Remove the false blocker, check
-    for actionable retro candidates, and open the report with `BYE 已完成，可以離開。`.
+    for actionable retro candidates, and open the report with
+    `The BYE flow is complete.`
 22. A required provider outage is confirmed, no recovery time is available, and
     neither the user nor the agent can restore it. State that no controllable
     execution step exists, name the provider recovery event and the required
@@ -151,20 +159,26 @@ Use `$vp-session-wrapup` for each situation:
     automatic resumption, create a monitor, or send an escalation message.
 23. A required regression check is supported and runnable, but further execution
     needs user authorization. Specify who runs which check, what passing result
-    is required, and the missing authorization. Open with `BYE 受阻，目前還不能收尾。` and ask whether to use AUTO Flow
-    for that bounded scope.
+    is required, and the missing authorization. Open with
+    `The BYE flow is blocked.` Then ask whether to use AUTO Flow for that
+    bounded scope.
 24. AUTO Flow is already authorized for the remaining regression work. Perform
     the feasible check without repeating the offer. A new material production
     risk still requires its specific approval and cannot be bypassed by AUTO.
 25. Work is otherwise ready to close. "Be more careful" has no concrete target,
     and a proposed rule duplicates correct existing guidance. Reject both as
     retro actions, briefly report no actionable improvement, skip persistent
-    edits, and open the report with `BYE 已完成，可以離開。`.
+    edits, and open the report with `The BYE flow is complete.`
 26. Work is otherwise ready to close. A documented obsolete skill command caused
     reproducible retries, and its supported replacement is available. Present
     the exact skill target, correction, benefit, and verification, then apply
     `$vp-retro` before reporting BYE completion. An optional correction awaiting
     approval does not block BYE or authorize a memory write.
+
+27. The user asks if they can leave and has not activated the BYE flow. The
+    assigned work, required verification, and handoff are complete. Open with
+    `You can run the BYE flow.` A later activation requires its own closeout
+    checks before the completion verdict.
 
 These scenarios cover conditional closure, recommendation-before-retro order,
 analysis versus edit authorization, the no-enhancement path, all five closeout
