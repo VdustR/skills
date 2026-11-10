@@ -160,10 +160,12 @@ require_pattern "$autodev_skill" 'a check that passes emits nothing' \
   "vp-autodev must state that a passing check wakes no monitor"
 require_pattern "$autodev_skill" 'nothing will resume the merge' \
   "vp-autodev must tell the user when no event resumes the merge"
-require_pattern "$autodev_skill" 'head is a branch-protection required check' \
-  "vp-autodev must limit the auto-merge resume path to pending required checks"
-require_pattern "$autodev_skill" 'disable auto-merge before handling it' \
-  "vp-autodev must disable auto-merge before handling a finding or new push"
+require_pattern "$autodev_skill" 'Never enable a platform auto-merge' \
+  "vp-autodev must forbid enabling platform auto-merge"
+require_pattern "$autodev_skill" 're-run the.*integrate gate, and only then call merge' \
+  "vp-autodev must merge with an explicit call after re-running the integrate gate"
+require_pattern "$autodev_skill" 'already enabled on a PR this workflow owns' \
+  "vp-autodev must disable and report an auto-merge found already enabled"
 require_pattern "$autodev_skill" 'finish description edits before the' \
   "vp-autodev must finish description edits before the final push"
 require_pattern "$autodev_skill" 'never removes or weakens one' \
@@ -206,10 +208,10 @@ require_pattern "$autodev_fixture" 'Classify pending checks when the review pass
   "vp-autodev fixture must classify pending checks at the wait decision"
 require_pattern "$autodev_fixture" 'reply resumes it' \
   "vp-autodev fixture must name the reply that resumes the merge"
-require_pattern "$autodev_fixture" 'only branch-protection required checks remain pending' \
-  "vp-autodev fixture must enable auto-merge only when required checks are the only pending gate"
-require_pattern "$autodev_fixture" 'disable auto-merge before fixing it' \
-  "vp-autodev fixture must disable auto-merge before a fix push"
+require_pattern "$autodev_fixture" 'Never enable auto-merge, even when only branch-protection required checks' \
+  "vp-autodev fixture must not enable auto-merge even when only required checks are pending"
+require_pattern "$autodev_fixture" 'end the turn naming the reply that resumes the merge' \
+  "vp-autodev fixture must name the reply that resumes the merge when no wake is permitted"
 require_pattern "$autodev_fixture" 'PR-level.*review-level.*inline-comment' \
   "vp-autodev fixture must include every applicable reaction surface"
 require_pattern "$autodev_fixture" 'current-head CI and feedback.*last mutation' \

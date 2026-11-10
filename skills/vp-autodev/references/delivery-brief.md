@@ -19,7 +19,7 @@ Policy overlays add rows; they do not remove or blank any row below.
 | Deploy triggers for the touched paths | Which workflows deploy, what event triggers them, and whether their path filters cover the touched paths | Workflow files on the base branch |
 | Release mechanism and ownership | The cells from [release-ownership.md](release-ownership.md): who owns integration, how the repository releases, where the release conditions are evaluated, and the terminal state | Protection settings, contribution rules, release procedures, deploy workflows |
 | Delivery units | The decision from [delivery-units.md](delivery-units.md): one unit or an ordered sequence, one row per unit with its review route and dependencies, and the reason | Plan delivery units phase, repository caps and routing rules |
-| Host prerequisites | Each host mechanism the run will need that only the user can enable (a loop or scheduled wake-up command, a host-tracked goal, a monitor or auto-merge switch, a permission), whether it was requested, and the user's answer | Host rules, tool descriptions, the terminal state |
+| Host prerequisites | Each host mechanism the run will need that only the user can enable (a loop or scheduled wake-up command, a host-tracked goal, a monitor switch, a permission; never a platform auto-merge, which this workflow does not use), whether it was requested, and the user's answer | Host rules, tool descriptions, the terminal state |
 | Confirmation checklist | One maintained list of questions, assumptions, risks, required communication, decisions, and discovered problems; preserve the pre-implementation baseline and the pre-integration comparison below | User request, repository evidence, all delivery phases and feedback |
 
 A row that cannot be filled from evidence is an open question in the
@@ -76,7 +76,7 @@ Record their acceptance conditions now and require the results at their gate.
 This does not permit deferring an unknown premise that determines what to build
 or a necessary human decision, nor waiving required verification through a follow-up.
 
-After final reconciliation, immediately before merge or enabling auto-merge,
+After final reconciliation, immediately before the explicit merge call,
 recheck the same checklist against the current head and feedback. For a
 handoff to another integration owner, do this before the Ready handoff.
 Confirm that no unresolved or blocking item or required communication remains,
