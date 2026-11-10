@@ -6,13 +6,10 @@ description: >-
   for review, observe feedback, reconcile, integrate, and release. Use for
   end-to-end development in repositories the user owns or is authorized to
   change. Boundary: use a narrower dependency, reproduction, checklist, or PR
-  skill when the request covers only that step. The terminal state follows the
-  repository's integration ownership and release mechanism: merge plus required
-  release follow-up when the user owns integration, the repository's rules
-  permit it, and the change is low risk and fully verified; a Ready PR with
-  reviewers requested when another team or upstream owns integration. Policy
-  overlays attach gates by phase name. It does not authorize unrelated fixes or
-  writes outside that workflow.
+  skill when the request covers only that step. AUTO supports to all pass, to
+  merge, and to release (the default). Repository policy, ownership, and
+  safety gates determine which transitions are allowed. It does not authorize
+  unrelated fixes or writes outside the selected endpoint.
 ---
 
 # AUTO Development
@@ -21,13 +18,22 @@ Take an owned-repository issue or development task through the authorized
 delivery lifecycle. Follow repository instructions and the user's preferred
 language, framework, Git, GitHub, review, and release skills.
 
-An explicit auto-development request authorizes these in-scope operations:
-branch creation, commit, push, Draft PR creation, the Draft-to-Ready transition,
-merge, and required release follow-up as one delivery workflow. Proceed without
-repeated authorization when ownership is clear, repository policy permits the
-action, required evidence applies to the current head, verification is
-complete, feedback is handled, and remaining risk is low. Ask only when a
-safety gate in this workflow requires a human decision.
+Select the endpoint before planning delivery. An explicit AUTO request
+authorizes in-scope branch creation, commit, push, Draft PR creation, and
+the Draft-to-Ready transition. It authorizes merge and release only through
+the selected endpoint, subject to repository policy, ownership, verification,
+and risk.
+
+| Request | Stop after verifying |
+|---------|----------------------|
+| AUTO to all pass | A Ready PR whose current head has passed all applicable PR CI and whose required and actionable feedback is handled. Stop before merge. |
+| AUTO to merge | A verified merge under repository rules. Skip any separate release step. |
+| AUTO to release, or AUTO without an endpoint | The repository-defined release outcome, including verification when this workflow owns publication. |
+
+The endpoint limits authorization. Repository rules can require more evidence
+or an earlier handoff. They cannot extend the user's endpoint. If merging
+automatically releases the touched paths, verify the trigger before merge and
+ask if that release effect falls outside the user's authorization.
 
 Report AUTO progress against the authorized endpoint. For a merge-and-sync
 request, report AUTO complete after verifying both results. On a blocker, name
@@ -165,12 +171,18 @@ CI, check runs, bot comments, pull request review comments (inline code
 comments), issue comments in the PR conversation, and reaction
 emoji on the main post or comments. Treat a changed emoji as new state, using
 that repository's convention instead of a universal mapping. Re-check that a
-positive signal applies to the current head. When the last review or
-feedback signal arrives while checks are still pending, classify each
-pending check as blocking or informational under the integrate phase before
-deciding to wait; an informational check is no reason to wait. Before
-ending a turn to wait for a blocking check,
-name the event that will resume the work. A host PR monitor may wake the
+positive signal applies to the current head. Keep the run in progress while
+expected CI or bot feedback is pending. For all pass, wait for every applicable
+PR CI check, including advisory checks that run. For merge and release, use
+the repository's evidenced exceptions under integrate. Pending CI is an
+active wait, not a reason to hand control back to the user or evidence that
+a gate passed. Fix in-scope failures and actionable feedback, verify, and
+repeat observation on the new head until the selected endpoint's gates pass.
+Use repository rules for successful skips or neutral outcomes. Persistent
+infrastructure failure, an unavailable required reviewer, or a missing
+permitted wait mechanism can still prevent progress. Before ending a turn to
+wait for a check required by the selected endpoint, name the event that will resume the work.
+A host PR monitor may wake the
 session only for failures, conflicts, or new comments, so
 a check that passes emits nothing. Host rules that forbid self-polling stay
 binding. When no event covers the success path, do not end
@@ -255,6 +267,9 @@ was requested.
 
 ### Integrate
 
+AUTO to all pass stops after reconciliation. Apply the confirmation gate
+below if the Ready PR is a handoff to another integration owner.
+
 Immediately before merging, re-evaluate the same
 confirmation checklist against the current head and final feedback snapshot.
 No blocker, unconfirmed matter, or missing necessary communication or decision
@@ -289,9 +304,9 @@ GitHub auto-merge waits only for branch-protection requirements and merges
 at once when there are none, so it cannot hold a merge for any other check,
 an unfinished review, or this gate; that is why this workflow never enables
 it and merges with an explicit call instead.
-If a blocking check runs well past its usual duration in that repository,
+If a check required by the selected endpoint runs well past its usual duration,
 rerun it once through the repository's mechanism; if it still does not
-finish, report it as the missing gate instead of merging.
+finish, report the missing evidence and keep the endpoint open.
 A unit whose correctness depends on merge order relative to other open PRs,
 such as sequentially numbered migrations or versioned artifacts, re-checks
 that order against the base branch and the other open PRs immediately before
@@ -300,7 +315,8 @@ the unit, or the merge waits, and is reported either way.
 
 ### Release
 
-After merge, act on the release mechanism recorded in the delivery brief.
+For AUTO to release, act on the release mechanism recorded in the delivery brief
+after merge.
 Under the same ownership, policy, verification, and low-risk conditions, run
 the in-scope release workflow and verify the published result. Ask before a
 release with material operational impact, ambiguous versioning or release
@@ -364,14 +380,14 @@ verification, stop the run and execute its rollback if anything shipped.
 
 ## Terminal state
 
-Successful completion reaches the terminal state the delivery brief derives
-from integration ownership and release mechanism: merge plus required release
-follow-up when the user owns integration, or a Ready PR with reviewers
-requested and feedback handled when another team or upstream owns it. Local
-changes, a Draft PR, or a Ready PR are not successful terminal states when the
-documented low-risk conditions permit further progress. When a safety gate
-prevents progress, report the bounded terminal state and the exact missing
-decision or evidence.
+Apply the selected endpoint after final reconciliation. For all pass, verify
+the Ready PR and its current-head evidence and stop. For merge or release,
+proceed only as far as the repository's integration ownership, release
+mechanism, and gates permit. When another party owns integration, a Ready PR
+with reviewers requested and feedback handled is the policy-bounded handoff.
+Report the selected endpoint, the state actually verified, and any remaining
+decision or evidence needed to reach that endpoint. Perform any separately
+authorized follow-up before reporting the full request complete.
 
 Do not treat CI success as proof that the issue is fixed. Do not treat silence
 from a bot as a completed review, but do not wait for or summon the bot solely

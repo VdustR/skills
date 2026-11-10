@@ -116,7 +116,7 @@ require_pattern "$autodev_fixture" 'branch creation.*commit.*push.*Draft PR' \
 require_pattern "$autodev_fixture" 'Draft-to-Ready|mark.*Ready' \
   "vp-autodev fixture must cover the Draft-to-Ready transition"
 require_pattern "$autodev_fixture" 'Ready PR.*not.*terminal|not.*stop.*Ready PR' \
-  "vp-autodev fixture must reject a Ready PR as a successful terminal state"
+  "vp-autodev default fixture must continue beyond a Ready PR when authorized"
 require_pattern "$autodev_fixture" 'merge.*release follow-up|release follow-up.*merge' \
   "vp-autodev fixture must cover merge and release follow-up"
 require_pattern "$autodev_skill" 'branch creation' \
@@ -127,11 +127,14 @@ require_pattern "$autodev_skill" 'Draft PR creation' \
   "vp-autodev must explicitly authorize Draft PR creation"
 require_pattern "$autodev_skill" 'Draft-to-Ready' \
   "vp-autodev must explicitly authorize the Draft-to-Ready transition"
-require_pattern "$autodev_skill" 'changes, a Draft PR, or a Ready PR' \
-  "vp-autodev must reject local, Draft, and Ready states as successful completion"
-if grep -Fq 'Stop when all required signals pass' "$autodev_skill"; then
-  fail "vp-autodev review success must advance to merge evaluation"
-fi
+require_pattern "$autodev_skill" 'AUTO to all pass.*Ready PR.*Stop before merge' \
+  "vp-autodev must stop at a verified Ready PR for all pass"
+require_pattern "$autodev_skill" 'AUTO to merge.*Skip any separate release step' \
+  "vp-autodev must stop before a separate release for merge"
+require_pattern "$autodev_skill" 'AUTO to release, or AUTO without an endpoint' \
+  "vp-autodev must default to the release endpoint"
+require_pattern "$autodev_fixture" 'advisory check is still running.*Keep waiting' \
+  "vp-autodev fixture must exercise active waiting for all pass"
 require_pattern "$autodev_fixture" 'Do not automatically post `@codex review`' \
   "vp-autodev fixture must keep Codex review invocation out of the default flow"
 require_pattern "$autodev_fixture" 'historical reviews.*summary comment' \

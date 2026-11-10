@@ -2,8 +2,9 @@
 
 The delivery brief classifies, from evidence read in the repository, who owns
 integration and how the repository releases. The classification decides where
-the release conditions are evaluated and what the terminal state of this
-workflow is. It never changes the conditions themselves.
+the release conditions are evaluated and how far repository policy permits
+this workflow to proceed. Apply the selected AUTO endpoint as an authorization
+ceiling.
 
 ## The release conditions
 
@@ -22,7 +23,7 @@ release, they are evaluated before that merge.
 
 | Owner | Evidence | Terminal state for this workflow |
 |-------|----------|----------------------------------|
-| The user | The user can merge in this repository and repository policy lets this change merge without another party's decision | Merged, then release follow-up as the mechanism below says |
+| The user | The user can merge in this repository and repository policy lets this change merge without another party's decision | Through the selected endpoint as the mechanism below permits |
 | Another team in the organization | Code owners, branch protection, or documented policy route the merge decision to a group the user is not in | A Ready PR with reviewers requested and feedback handled; never a merge |
 | An upstream maintainer | The repository belongs to a party outside the user's organization, or contribution rules say maintainers merge | A Ready PR with reviewers requested and feedback handled; never a merge |
 

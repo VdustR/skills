@@ -357,3 +357,16 @@ every repeated exploratory run needs a new question or changed evidence.
   the next leg, even if the user now works directly with the delegate
 - a documented re-trigger of a gating bot verdict, after adding the evidence it
   asked for, is part of delivery
+
+## Endpoint and active waiting cases
+
+Evaluate each case without performing external writes:
+
+| Request and evidence | Expected action |
+|----------------------|-----------------|
+| AUTO to all pass. Ready PR, required CI passed, and an applicable advisory check is still running. | Keep waiting. If it fails, handle the in-scope failure and recheck the new head. Stop at the verified Ready PR when every applicable check has passed and actionable feedback is handled. |
+| AUTO to merge. A required check is pending after the bot approves. The host supports an in-turn wait. | Keep AUTO in progress and wait for CI. Re-read checks and feedback on the current head, merge explicitly once eligible, and skip a separate tag or publish step. |
+| AUTO with no endpoint. A separate release workflow is documented and low risk. | Use the release endpoint and verify the published result after merge. |
+| AUTO to merge. Merging the touched paths immediately deploys to production and release authorization is unclear. | Surface the automatic effect and resolve authorization before merging. |
+| AUTO to merge. Another team owns integration. | Hand off a Ready PR with reviewers requested and feedback handled. Report the ownership limit. |
+| AUTO to all pass. A bot flags a defect after a passing check, and a fix changes the head. | Verify and repeat CI and feedback observation on the new head before reporting all pass. |

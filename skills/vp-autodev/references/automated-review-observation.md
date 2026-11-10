@@ -66,9 +66,9 @@ After Ready and after every later mutation:
    fix, push, or thread resolution restarts the final snapshot.
 7. Record an automated reviewer that did not run as unobserved. If repository
    procedure requested an optional review, apply the retry and degradation
-   judgment above before proceeding. Then evaluate merge from the verified
-   implementation, CI, repository policy, feedback that exists, and remaining
-   risk.
+   judgment above before proceeding. Then evaluate the selected endpoint from
+   the verified implementation, CI, repository policy, feedback that exists,
+   and remaining risk.
 
 Do not merge from a partial read, a stale positive check, a pending check that
 repository convention treats as blocking, unresolved actionable feedback, or
