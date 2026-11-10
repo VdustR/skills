@@ -117,10 +117,6 @@ Clarify concepts, workflows, architecture, and user interactions through bounded
 models, scenario walkthroughs, trade-off analysis, and appropriate verification.
 Pair with Impeccable for frontend visual direction and craft.
 
-### vp-env-secrets (deprecated)
-
-Retired in favor of [fnox](https://fnox.jdx.dev) and its official [`fnox` skill](https://github.com/jdx/fnox/tree/main/skills/fnox). The skill now only maps old `envctl` commands to fnox.
-
 ### vp-foreign-agent-skill-loader
 
 Index repository-local skills written for other agent systems without converting them.
