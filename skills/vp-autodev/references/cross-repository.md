@@ -79,6 +79,20 @@ confirmed stops the run with that row named; nothing starts half-ready.
   rollback that turned out unavailable) stops the run until the plan is
   rewritten and the affected readiness rows are reconfirmed.
 
+## Group sessions after dispatch
+
+When dispatch returns the canonical identity of a child session, the
+orchestrating session checks whether grouping is authorized and hands eligible
+sessions to [`vp-session-organization`](https://github.com/VdustR/skills/tree/main/skills/vp-session-organization).
+Use the verified parent-child relationship to scope the operation. Reuse a
+suitable group, preserve the user's existing organization, and read back both
+sessions' membership before reporting them as grouped.
+
+Report the grouping result separately from the repository leg's delivery
+status. For a child session whose identity is missing, or when grouping is
+unauthorized, unavailable, or unverified, record the reason and continue the
+repository delivery checks.
+
 ## Report
 
 Each leg appears in the final report with its repository, state, rollback
