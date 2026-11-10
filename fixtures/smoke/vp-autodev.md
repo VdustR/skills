@@ -140,6 +140,23 @@ because the operational impact is material; do not enable auto-merge. In case
 rollback to the user before any leg starts, including the safe frontend leg,
 and order the irreversible leg last after the frontend leg is verified.
 
+## Cross-repository session grouping cases
+
+Evaluate these without performing external writes:
+
+1. Dispatch returns a canonical child session identity. The relationship and
+   grouping authorization are verified. The parent already belongs to a
+   suitable group and the child is ungrouped.
+2. The same dispatch succeeds, but grouping is unavailable. Separately, a
+   move reports success and only the parent's membership is visible on readback.
+3. Dispatch returns only a title, or grouping lacks user authorization.
+
+Expected decisions: in case 1 the orchestrator routes grouping through
+`vp-session-organization`, reuses the parent's group, and verifies both
+memberships. In case 2 record unavailable or unverified grouping as applicable
+and continue repository delivery checks. In case 3 leave metadata alone,
+record the missing prerequisite, and continue repository delivery checks.
+
 ## Resume cases
 
 Evaluate these without performing external writes:

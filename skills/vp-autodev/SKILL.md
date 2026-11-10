@@ -348,12 +348,12 @@ concrete and already-available rollback per leg, and the verification that
 gates the next leg. A leg without a rollback, whose rollback leaves another leg
 broken, or with material risk goes to the user before anything starts, and a
 leg that cannot be rolled back runs last.
-Each other repository is delivered in its own session or delegate, started
-only after the readiness check for that leg passes, run when that leg is about
-to start. Producer legs start
-before consumer legs; a delegate's report is a claim to verify against the
-plan; a leg that fails verification stops the run and executes its rollback
-if anything shipped.
+Each other repository is delivered in its own session or delegate. Run the
+readiness check immediately before starting that leg. After dispatch, apply the
+[grouping checkpoint](references/cross-repository.md#group-sessions-after-dispatch)
+when the child has a canonical session identity. Producer legs start before
+consumer legs. Verify each delegate's report against the plan. If a leg fails
+verification, stop the run and execute its rollback if anything shipped.
 
 ## Terminal state
 
