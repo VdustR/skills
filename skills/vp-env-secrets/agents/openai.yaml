@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Env Secrets (Deprecated)"
+  short_description: "Deprecated: use fnox for secrets"
+  default_prompt: "Use $vp-env-secrets only to redirect secret handling to fnox; the envctl helper is retired."
