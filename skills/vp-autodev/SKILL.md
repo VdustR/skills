@@ -15,7 +15,7 @@ description: >-
   writes outside that workflow.
 ---
 
-# Auto Development
+# AUTO Development
 
 Take an owned-repository issue or development task through the authorized
 delivery lifecycle. Follow repository instructions and the user's preferred
@@ -28,6 +28,12 @@ repeated authorization when ownership is clear, repository policy permits the
 action, required evidence applies to the current head, verification is
 complete, feedback is handled, and remaining risk is low. Ask only when a
 safety gate in this workflow requires a human decision.
+
+Report AUTO progress against the authorized endpoint. For a merge-and-sync
+request, report AUTO complete after verifying both results. On a blocker, name
+the pending action, its owner, and what will allow work to resume. An AUTO
+completion report may state BYE readiness when supported by the evidence. Start
+closeout only under separate or previously granted closeout authorization.
 
 ## Phases
 
@@ -112,7 +118,7 @@ Before the first edit, evaluate the confirmation checklist in
 unconfirmed matters, missing necessary communication or decisions, and blockers.
 Proceed only when every matter is resolved or confirmed non-blocking and safe
 to defer under the brief's follow-up rules: create and link a tracking issue
-by default, or explicitly retain a bounded session TODO that blocks bye.
+by default, or explicitly retain a bounded session TODO that blocks BYE.
 An unrecorded promise of later follow-up does not pass this gate. Preserve this
 checkpoint as the baseline for the pre-integration comparison.
 
@@ -463,6 +469,6 @@ expand scope.
 - [`vp-retro`](https://github.com/VdustR/skills/tree/main/skills/vp-retro)
   when confirmation checkpoints differ and the discovery or decision needs review.
 - [`vp-session-wrapup`](https://github.com/VdustR/skills/tree/main/skills/vp-session-wrapup)
-  for discharging explicit session TODOs and deciding whether the session can bye.
+  for discharging explicit session TODOs and deciding whether the session can BYE.
 - [`vp-pr-comment-resolver`](https://github.com/VdustR/skills/tree/main/skills/vp-pr-comment-resolver)
   for author-side feedback resolution in the observe feedback phase.
