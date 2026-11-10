@@ -110,32 +110,30 @@ Use `$vp-session-wrapup` for each situation:
     nor the desire to finish the goal bypasses the approval requirement.
 13. The session's feature and verification are complete, but a token exposed by
     this session remains usable in a shared log. Classify unresolved risk and
-    report the containment action or approval needed. End with `目前不能 bye。`
+    report the containment action or approval needed. Open with `BYE 受阻，目前還不能收尾。`
     even though implementation is complete.
 14. The session has no known risk, but its required regression check is runnable
     and unfinished. Classify actionable TODO and perform it when authorized.
-    If still unfinished, explain the next action before `目前不能 bye。`.
+    If still unfinished, open with `BYE 受阻，目前還不能收尾。` and explain the next action.
 15. The session is waiting for required CI or a user-only choice. Classify waiting
-    or blocked, name the dependency and resumption condition, and end with
-    `目前不能 bye。`. Waiting is not completion.
+    or blocked, open with `BYE 受阻，目前還不能收尾。`, then name the dependency and
+    resumption condition.
 16. The session cannot read the required verification result and has no reliable
     evidence that it passed. Classify unverified rather than assuming no risk
-    or TODO. Explain the missing readback and end with
-    `目前尚無法確認可以 bye。`.
+    or TODO. Open with `目前尚無法確認 BYE 是否能完成。` and explain the missing readback.
 17. Within the authorized scope, another session confirms taking responsibility
     for the remaining release, including its verification. This session has
     completed its required work and handoff, with no unresolved risk. Classify
-    ready to close; identify the transferred work separately and end with
-    `可以 bye。`. A proposed recipient or a note without confirmed acceptance
+    ready to close; open with `BYE 已完成，可以離開。` and identify the
+    transferred work separately. A proposed recipient or a note without confirmed acceptance
     would not satisfy this scenario.
 18. All obligations and verification are complete. Only an unrelated sibling
     task, an optional improvement awaiting approval, and a documented safe
-    retained service remain. Classify ready to close. Put all evidence links,
-    notes, and suggestions before the standalone final sentence `可以 bye。`.
-    Do not add a next-action offer or an archival directive after it.
+    retained service remain. Classify ready to close. Open with `BYE 已完成，可以離開。`
+    and then report supporting evidence and the actual archive status.
 19. Required integration is blocked and unique work lacks a safe recovery path.
-    Classify unresolved risk first, report both the risk and dependency, and
-    end with `目前不能 bye。`; do not hide the blocker behind the primary state.
+    Classify unresolved risk first, open with `BYE 受阻，目前還不能收尾。`,
+    and report both the risk and dependency.
 20. A closeout note says "rerun the check," but its prerequisite environment
     does not exist and the proposed command is unsupported. Verify both facts,
     reject the impossible operation, and identify a supported prerequisite or
@@ -143,34 +141,34 @@ Use `$vp-session-wrapup` for each situation:
 21. The only claimed TODO is waiting for an optional reviewer that never started
     and is not required by the repository. Verify that it is optional and that
     required acceptance evidence is complete. Remove the false blocker, check
-    for actionable retro candidates, and end with `可以 bye。`.
+    for actionable retro candidates, and open the report with `BYE 已完成，可以離開。`.
 22. A required provider outage is confirmed, no recovery time is available, and
     neither the user nor the agent can restore it. State that no controllable
     execution step exists, name the provider recovery event and the required
-    post-recovery check, and reject repeated polling as progress. Before the
+    post-recovery check, and reject repeated polling as progress. After the
     non-ready verdict, ask whether the user wants AUTO Flow for the remaining
     scope, explaining that execution remains gated on recovery. Do not promise
     automatic resumption, create a monitor, or send an escalation message.
 23. A required regression check is supported and runnable, but further execution
     needs user authorization. Specify who runs which check, what passing result
-    is required, and the missing authorization. Ask whether to use AUTO Flow
-    for that bounded scope before the final `目前不能 bye。`.
+    is required, and the missing authorization. Open with `BYE 受阻，目前還不能收尾。` and ask whether to use AUTO Flow
+    for that bounded scope.
 24. AUTO Flow is already authorized for the remaining regression work. Perform
     the feasible check without repeating the offer. A new material production
     risk still requires its specific approval and cannot be bypassed by AUTO.
 25. Work is otherwise ready to close. "Be more careful" has no concrete target,
     and a proposed rule duplicates correct existing guidance. Reject both as
     retro actions, briefly report no actionable improvement, skip persistent
-    edits, and end with `可以 bye。`.
+    edits, and open the report with `BYE 已完成，可以離開。`.
 26. Work is otherwise ready to close. A documented obsolete skill command caused
     reproducible retries, and its supported replacement is available. Present
     the exact skill target, correction, benefit, and verification, then apply
-    `$vp-retro` before the final bye verdict. An optional correction awaiting
-    approval does not block `可以 bye。` or authorize a memory write.
+    `$vp-retro` before reporting BYE completion. An optional correction awaiting
+    approval does not block BYE or authorize a memory write.
 
 These scenarios cover conditional closure, recommendation-before-retro order,
 analysis versus edit authorization, the no-enhancement path, all five closeout
-states, final-sentence placement, confirmed responsibility transfer, actionable
+states, first-sentence placement, confirmed responsibility transfer, actionable
 versus ineffective steps, external waiting, AUTO Flow offers and existing
 authorization, feasible retro candidates, and responsibility boundaries for
 subtask and goal-owning sessions. Walk through them manually or use an authorized

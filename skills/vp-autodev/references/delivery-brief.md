@@ -49,8 +49,8 @@ a problem discovered during implementation:
 - **Session TODO (optional):** explicitly select this route for bounded work
   this session can own and complete before closeout. Record its owner, exact
   action, completion evidence, why it can wait past implementation or merge,
-  and that it blocks bye until discharged. This can include creating the
-  tracking issue before bye. The agent may select this for a clear, low-risk
+  and that it blocks BYE until discharged. This can include creating the
+  tracking issue before BYE. The agent may select this for a clear, low-risk
   local obligation within its authority; follow the user's choice otherwise.
   Preserve it in the session's durable working notes and link it here so
   `vp-session-wrapup` can find it after resumption.
@@ -82,7 +82,7 @@ handoff to another integration owner, do this before the Ready handoff.
 Confirm that no unresolved or blocking item or required communication remains,
 and revalidate the justification and follow-up for each deferral. A session
 TODO may remain after merge only when its completion cannot change the merge
-decision; it still blocks bye. Green CI cannot
+decision; it still blocks BYE. Green CI cannot
 substitute for this check. A later mutation or new finding reopens the affected
 items and invalidates the gate decision.
 
@@ -103,7 +103,7 @@ At closeout, hand the same checklist and remaining session TODOs to
 or by creating the promised issue and confirming the remaining work is outside
 this session's acceptance criteria or has a completed authorized responsibility
 transfer. Do not relabel an in-scope obligation as optional or close it merely
-because an issue exists. An unfinished TODO or unknown disposition blocks bye;
+because an issue exists. An unfinished TODO or unknown disposition blocks BYE;
 merge and session closeout are distinct decisions.
 
 ## Cross-repository work
@@ -121,7 +121,7 @@ any.
 |---------|------|
 | Delivery units | One row per unit: PR link, state (Draft, Ready, merged, released), and the gate it stopped at when it did not reach the terminal state |
 | Gates evaluated | One row per gate evaluated: the gate, the decision, and the evidence it was read from (head commit, check, policy file, workflow trigger) |
-| Confirmation comparison | Pre-implementation and pre-integration checkpoint references; differences and their retro outcome; issue links or explicit session TODOs for deferred items, including remaining bye blockers |
+| Confirmation comparison | Pre-implementation and pre-integration checkpoint references; differences and their retro outcome; issue links or explicit session TODOs for deferred items, including remaining BYE blockers |
 | Escalations sent | One row per escalation: where it was posted, who was asked, the resume event, and the reply if any |
 | Rollback per leg | For cross-repository work, one row per leg: rollback mechanism and whether it is still available |
 | Unverified items | Everything the run could not verify, and what would verify it |

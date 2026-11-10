@@ -15,10 +15,12 @@ description: >-
 Leave the session archivable: nothing important unrecorded, and nothing hidden
 still running, staged, or half-finished.
 
-## Conditional goodbye
+## Conditional BYE
 
-Interpret `bye` as `bye if no risk or todo for this session`. Quoted examples
-and requests to edit the bye workflow do not end the current session.
+For a clear closeout request, interpret `BYE` as `BYE if no risk or TODO remains
+for this session`. Honor explicit prerequisites and equivalent natural-language
+requests regardless of case. A social farewell, quoted example, or question
+about readiness or workflow rules does not authorize closeout.
 
 Establish this session's responsibility from its initial assignment and any
 explicit scope changes before deciding what counts as a TODO. A session assigned
@@ -41,7 +43,7 @@ Complete authorized, safe remaining work before closeout. Identify unresolved
 risks, unfinished obligations, required decisions, and incomplete verification.
 When development used `vp-autodev`, read its maintained confirmation checklist
 and linked working notes. An explicit session TODO used instead of the default
-tracking issue blocks bye until its recorded action is completed and verified.
+tracking issue blocks BYE until its recorded action is completed and verified.
 Creating an issue discharges a TODO to create that issue only when the remaining
 work is outside this session's acceptance criteria or responsibility has been
 transferred under the rule below. Merge alone does not discharge closeout TODOs.
@@ -63,7 +65,7 @@ other mutations still follow the applicable authorization rules.
 
 ### Validate blockers and actions
 
-Before concluding that the session cannot bye, verify each proposed blocker
+Before concluding that the session cannot BYE, verify each proposed blocker
 against current evidence and this session's acceptance criteria. Remove stale,
 irrelevant, optional, or already transferred items from the blocker list.
 For every remaining blocker, validate the next action before recommending it:
@@ -105,23 +107,21 @@ not hypothetical risk or the mere existence of retained state.
 
 | State | Condition | Decision |
 | --- | --- | --- |
-| Unresolved risk | Closing would leave a concrete risk, such as exposed credentials or unique work without a safe recovery path. | Cannot bye; identify the risk and the action or approval needed. |
-| Actionable TODO | Required work or verification remains within this session's responsibility and can proceed. | Cannot bye; continue authorized work or name the next action. |
-| Waiting or blocked | A session obligation requires another result, a user decision, permission, or an unavailable service. | Cannot bye; name the dependency, owner, and condition for resuming. |
-| Unverified | Evidence is insufficient to establish completion, ownership, or safe closeout. | Cannot confirm bye yet; identify the missing evidence and how to obtain it. |
-| Ready to close | No unresolved session risk or TODO remains, including required verification and handoff. | Can bye, including when only confirmed transferred work, unrelated work, optional improvements, or intentionally retained safe state remains. |
+| Unresolved risk | Closing would leave a concrete risk, such as exposed credentials or unique work without a safe recovery path. | BYE blocked; identify the risk and the action or approval needed. |
+| Actionable TODO | Required work or verification remains within this session's responsibility and can proceed. | BYE blocked; continue authorized work or name the next action. |
+| Waiting or blocked | A session obligation requires another result, a user decision, permission, or an unavailable service. | BYE blocked; name the dependency, owner, and condition for resuming. |
+| Unverified | Evidence is insufficient to establish completion, ownership, or safe closeout. | BYE readiness unverified; identify the missing evidence and how to obtain it. |
+| Ready to close | No unresolved session risk or TODO remains, including required verification and handoff. | BYE can complete, including when only confirmed transferred work, unrelated work, optional improvements, or intentionally retained safe state remains. |
 
-End every closeout report with one standalone sentence stating the decision in
-the user's language. When ready to close, explicitly say that the user can bye;
-in Traditional Chinese, use `可以 bye。` as the final sentence. Readiness phrasing
-such as "ready to close" alone is insufficient. For unresolved risk, actionable
-TODOs, or blockers, use `目前不能 bye。`; for insufficient evidence, use
-`目前尚無法確認可以 bye。` Explain reasons, validated actions or the lack of a
-controllable action, and any AUTO Flow question before that sentence.
-Place links, notes, and optional suggestions before it, with nothing after it.
-This decision reports readiness; it does not itself archive the session or
-authorize any mutation. Requests to edit this workflow remain editing tasks
-and do not require a closeout verdict.
+In a closeout report, answer whether the user can leave first. When the checks
+have passed, use `BYE 已完成，可以離開。` in Traditional Chinese. For blockers,
+use `BYE 受阻，目前還不能收尾。`. For insufficient evidence, use
+`目前尚無法確認 BYE 是否能完成。` Follow with the reason, any required action,
+and the next owner and resume condition. When answering a readiness question
+before closeout, use `BYE 可啟動。` only if the assigned work and handoff are
+verified. Recheck the closeout conditions on activation. Report archive status
+separately using verified readback or the remaining owner and condition.
+Requests to edit this workflow remain editing tasks.
 
 ### Ready-to-close retro
 
@@ -134,10 +134,10 @@ unsupported diagnoses, impossible fixes, and changes already covered correctly
 by existing guidance.
 
 Present qualifying candidates to the user first, then apply `$vp-retro` to
-classify them and refine the recommendation before the final bye verdict. This
+classify them and refine the recommendation before reporting BYE completion. This
 handoff does not itself authorize edits; preserve authorization already granted
 within its scope, including an applicable auto-development request. An optional
-proposal awaiting approval does not block bye. With no qualifying candidate,
+proposal awaiting approval does not block BYE. With no qualifying candidate,
 briefly report that no actionable retro improvement was found and skip retro;
 do not manufacture a recommendation or make every goodbye a full audit.
 Recheck closeout only if the analysis exposes a genuine in-scope risk or TODO.
