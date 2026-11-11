@@ -4,6 +4,19 @@ Use subtitles when the viewer needs an explanation of intent, a step boundary,
 or an accessible text track. A keycast says what input occurred; a subtitle says
 why the step matters or what changed.
 
+## Choose viewer copy separately from production notes
+
+Apply [vp-clear-writing](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
+to select audience content before turning notes into cues. Its authoring/content
+distinction applies to subtitles, UI labels, and other overlays too.
+
+For a fictional promo, populate the scene with concrete invented values before
+capture. A production note such as "no live send" or "fake password" does not
+automatically become a caption. Never capture real credentials for such a scene.
+For an evidence recording, preserve a test-environment qualifier when removing
+it would imply a production result. Do not edit a failed action into a success.
+Keep claims within the demonstrated behavior and retain required music credits.
+
 ## Produce two outputs from one cue list
 
 Keep one cue list as the source of truth. Render it into the captured frame for a

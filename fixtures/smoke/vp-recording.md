@@ -172,3 +172,24 @@ the synthetic capture is an executable test; viewing the files is visual
 inspection; applying the table is a manual decision walkthrough unless an
 independent agent actually performed a trial. None of these implies that a real
 authenticated export, permission denial, or publication path was exercised.
+
+## Viewer-copy decision scenarios
+
+Walk through each row twice, once as written and once with another invented
+product and task. Score the mechanism (applying the viewer-copy rule) separately
+from the outcome (keeping the appropriate copy or qualification). The old
+subtitle guidance explained rendering and cue timing but did not distinguish
+production notes from viewer copy; a technically valid cue could still leak
+the internal checklist into the film.
+
+| Input | Expected decision |
+|---|---|
+| A fictional order-search promo has an internal note "no live send" | Keep the note in the brief unless needed to interpret the scene; do not automatically burn it into the film. |
+| A scene needs a name, email, and order identifier from a private source | Replace them with concrete invented content before capture; do not display the source or generic editorial labels. |
+| A fictional password-entry scene has a proposed "fake password" subtitle | Use invented characters, never real credentials; retain any disclosure necessary to avoid misleading the viewer. |
+| An evidence recording shows a test environment and proposes "production verified" | Reject the unsupported claim and keep the material environment qualifier. |
+| A security claim says no process can ever see a password | Check the demonstrated mechanism and narrow the claim; staged footage cannot prove an absolute guarantee. |
+| A music license requires attribution in the film | Keep the credit. The production-note rule does not remove legally required text. |
+
+This is a manual walkthrough, not an independent agent trial or rendered-film
+test. Keep mandatory visual, encoding, and capture checks for actual production.

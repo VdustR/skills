@@ -1,0 +1,4 @@
+interface:
+  display_name: "VP Product Demo Film"
+  short_description: "Tell a product story through tasks, actions, and outcomes"
+  default_prompt: "Use $vp-product-demo-film to establish the audience and product value, check a rough story cut, choreograph the task, and deliver a verified reproducible local film."

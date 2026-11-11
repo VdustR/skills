@@ -54,6 +54,7 @@ required_skills=(
   "vp-stacked-pr"
   "vp-stack-selection"
   "vp-recording"
+  "vp-product-demo-film"
   "vp-github"
   "vp-agent-browser-session"
   "vp-session-organization"
