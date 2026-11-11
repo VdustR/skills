@@ -29,8 +29,10 @@ the draft's supported claims, useful structure, purpose, and appropriate voice;
 make the minimum effective edit. When asked to reorganize or rebuild a document,
 let the reader's needs and current sources determine its content and order
 rather than preserving the old draft. Explicit language, length, format,
-template, and scope requirements still apply. Do not invent facts or opinions
-to make the writing more specific.
+template, and scope requirements still apply. Do not invent factual claims or
+attribute opinions to real people to make the writing more specific. When the
+task calls for fiction or sample data, create details within that scope without
+presenting them as real identities, events, endorsements, or verified results.
 
 Put the answer, finding, decision, or required action early when that helps the
 reader. Supply the premise needed to understand it. If the reader is confused,
@@ -57,6 +59,32 @@ that help the reader understand, decide, or act. Omit drafting history,
 withdrawn suggestions, resolved misunderstandings, and statements included only
 to demonstrate that the author followed feedback. Explain the resulting behavior
 or decision directly instead of narrating how its description was corrected.
+
+Treat instructions about creating the artifact as constraints to satisfy, not
+automatically as content to repeat. A tone request should shape the prose;
+using fictional data should produce suitable example values. For each note,
+ask who needs it and what it helps them understand, decide, do, or experience.
+Include an authoring requirement when the audience needs to carry it out, as
+in an editor's checklist; otherwise let it guide the work without announcing
+compliance. Apply this to replies, documents, examples, interface copy, and
+creative work, including captions, labels, and other secondary text.
+
+Place disclosures where they serve the reader. Keep material limitations,
+required attribution, and information needed to interpret evidence or act
+correctly. Put production details in a delivery note only when its recipient
+needs them; do not automatically move every discarded sentence there. Never
+hide a qualification needed to understand a claim in a separate note. Choose
+the amount and placement by the audience and purpose, not a blanket rule to
+remove disclaimers or label every fictional element.
+
+In worked examples and fiction, use plausible invented details when authorized,
+with enough context to distinguish illustration from evidence. Do not replace
+the content with authoring labels such as "fictional name". Preserve deliberate
+placeholders in templates and instructions where readers must supply values.
+An established example context can cover its details without repeated labels;
+when that context would be lost in standalone reuse, retain the needed
+qualification with the excerpt. See [context and wording examples](references/examples.md)
+for paired cases where the same instruction belongs in different places.
 
 History belongs when the reader requests it or it explains causality, options,
 tradeoffs, evidence, risk, or action. A decision record may need a rejected
@@ -105,7 +133,8 @@ Keep implementation details beside the behavior or constraint they explain.
 Move supporting detail later when it interrupts the main reasoning, but retain
 conditions and limitations beside claims they qualify. Use a concrete example
 when an abstract description leaves the trigger, behavior, or benefit unclear;
-label illustrative examples and do not present them as observed evidence.
+establish their illustrative status where readers need it, and do not present
+them as observed evidence.
 
 These are reasoning checks, not mandatory headings or a fixed narrative order.
 Use only the connections relevant to the requested artifact. A one-line reply
@@ -232,6 +261,10 @@ necessary context, and any action or limitation.
 
 Check content selection separately from wording: does each retained point serve
 this reader, and did any necessary history, condition, or uncertainty disappear?
+Check secondary text too: does a label, aside, caption, or closing note inform
+the reader, or merely announce an authoring constraint? Could the same meaning
+be conveyed by satisfying that constraint in the content itself? Keep context
+and disclosures that the reader needs, including in excerpts used on their own.
 Confirm that claims reflect the applicable sources and comparison baseline,
 terms are customary and consistent, and the form and extent of editing fit the
 request. Return the requested output; add an editing explanation only when it is

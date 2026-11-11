@@ -117,3 +117,7 @@ For proactive visual explanations and destination-aware tool selection, use
 
 For summary routing after consolidation, use
 [Summary Selection and Scope](vp-clear-writing-summaries.md).
+
+For authoring constraints, fictional details, placeholders, and meaningful
+disclosures across formats, use
+[Author Instructions and Audience Content](vp-clear-writing-audience.md).
