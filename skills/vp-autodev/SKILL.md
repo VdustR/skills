@@ -201,7 +201,15 @@ order, record it in the brief, and name it before ending the turn:
    user invoked, is permitted by that direction. When the host grants it
    only through a command or switch the user must issue themselves, that
    command was requested up front under the delivery brief; do not infer
-   it from the auto-development request.
+   it from the auto-development request. Whenever the user must issue that
+   command, at the up-front ask or at a turn that ends on the wait, give it
+   ready to paste: the host's exact invocation, taken from the host's own
+   command listing, alone in a fenced code block without a shell language
+   tag, so no interface runs it as a shell command. The prompt fires later
+   with only its own text, so make it self-contained: the repository and
+   PR, the head the gate was checked on, the signals to re-read, the action
+   when they pass (for example the merge pinned to that head), the action
+   on a failure or a new head, and the condition that stops the loop.
 3. A bounded wait within the turn, where host rules permit it.
 
 On resume, re-read the head and every signal before acting; a wait that
@@ -218,7 +226,9 @@ stop for a new push. When only pending checks stand between the PR and the
 merge, use the resume order above for the merge itself. When none of those
 mechanisms is permitted, end the turn and tell the user that
 nothing will resume the merge and which reply from them resumes it, for
-example "checks are green, merge". On resume, re-read the head and every
+example "checks are green, merge". A bare request to reply is the last
+resort: when the host has a user-issued loop or wake command, end with that
+command ready to paste, as described in the resume order. On resume, re-read the head and every
 signal, re-run the integrate gate, and only then call merge. If an
 auto-merge is found already enabled on a PR this workflow owns, disable it
 before any further action and report it.
@@ -353,7 +363,8 @@ request does not stand in for them. Identify them before
 the first edit from the host's rules and the terminal state, and ask the
 user for them once, in one message with any other up-front decision, so the
 run does not stall at a later phase. A prerequisite the user declines turns
-the phase that needs it into a stop that names the reply which resumes it.
+the phase that needs it into a stop that names the reply which resumes it
+and repeats the command ready to paste, so the user can still start it.
 
 ## Cross-repository delivery
 
