@@ -167,6 +167,10 @@ Handle GitHub PR review comments with verification, focused fixes, and thread re
 
 Follow up on GitHub PR review conversations from the reviewer side.
 
+### vp-product-demo-film
+
+Create a story-driven product film, from a rough story cut through coordinated actions, reactions, and verified local delivery.
+
 ### vp-recording
 
 Capture a still screenshot or a demo video: a screenshot of a running interface, a scripted browser walkthrough, a frame-accurate render of generated motion, or a macOS window capture.

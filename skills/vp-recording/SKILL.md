@@ -11,14 +11,20 @@ description: >-
   disk. The browser paths, still and video, and the render path are
   cross-platform, though a still behind a login needs a display when the isolated
   capture path requires interactive sign-in; capturing a native window, still or video, is macOS only.
-  Boundary: use vp-minimal-repro for a re-runnable reproduction that needs no
-  image, and vp-github to attach the result to an issue or pull request.
+  Boundary: use vp-product-demo-film for narrative product-film planning,
+  vp-minimal-repro for a re-runnable reproduction that needs no image, and
+  vp-github to attach the result to an issue or pull request.
 ---
 
 # Capture
 
 Pick the producer by what is being captured and whether it moves. Every path ends
 at a file on disk, which is what a destination such as vp-github takes as input.
+
+For a story-driven product film, use `vp-product-demo-film` to establish the
+story and choreography before choosing capture or render mechanics here.
+For captions or other visible copy, apply the viewer-copy guidance in
+`references/subtitles.md`; production notes are not automatically film content.
 
 | Capturing | Path | Unattended |
 |---|---|---|
@@ -205,6 +211,10 @@ does not provide a reliable way to recall a capture of the wrong window.
 
 ## Related skills
 
+- [`vp-product-demo-film`](https://github.com/VdustR/skills/tree/main/skills/vp-product-demo-film)
+  when the recording needs a product story and coordinated editorial beats.
+- [`vp-clear-writing`](https://github.com/VdustR/skills/tree/main/skills/vp-clear-writing)
+  when choosing which text belongs in captions and other overlays.
 - [`vp-github`](https://github.com/VdustR/skills/tree/main/skills/vp-github) when
   the finished image or recording must appear in an issue or pull request.
 - [`vp-agent-browser-session`](https://github.com/VdustR/skills/tree/main/skills/vp-agent-browser-session)
