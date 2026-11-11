@@ -183,6 +183,65 @@ the display; refund handling has not been tested."
 Rewriting the sentence about feedback more elegantly would still include the
 wrong content. The managers need behavior and evidence, not the drafting record.
 
+## Let authoring instructions shape the result
+
+Fictional brief: write a warm invitation to a Sunday book swap, 2–4 p.m. in the
+community room, with up to three books per guest. Avoid sales language and omit
+the organizer's phone number.
+
+Weak: "Here is a warm, non-promotional invitation. The organizer's phone number
+has been omitted for privacy. Join our book swap on Sunday."
+
+Clear: "Bring up to three books to swap this Sunday, 2–4 p.m., in the community
+room. Come find your next read and meet your neighbors."
+
+The tone and privacy requirements guide the invitation. If the requested output
+were an editor's checklist, "Keep the tone warm, avoid sales language, and omit
+the organizer's phone number" would belong because the editor must do those
+things. A rule's origin does not decide whether it is useful to the reader.
+
+## Use example values or placeholders according to the purpose
+
+Fictional brief: write a worked API example with an invented customer name and
+an email at example.com. No actual request has run.
+
+Weak: `{"name":"(fictional name)","email":"(not a real email)"}`
+
+Clear introduction: "Example customer data:"
+
+```json
+{"name":"Mira Chen","email":"mira@example.com"}
+```
+
+The introduction establishes the example; the fields can contain plausible
+sample values. Do not claim an account exists or the request succeeded. For a
+reusable template that asks readers to supply their own data, placeholders such
+as `<CUSTOMER_NAME>` and `<CUSTOMER_EMAIL>` are useful and should remain with
+replacement instructions. If someone requests a real customer testimonial,
+fictional details cannot fill the missing evidence.
+
+## Keep disclosures where the audience needs them
+
+Fictional brief: a billing practice page resembles the live product, but clicking
+its button never sends an invoice. An internal note says production was not used
+while building it.
+
+Weak banner: "Built without accessing production."
+
+Clear banner: "Practice mode. No invoice will be sent."
+
+The second banner tells users what their action will do. In a verification
+report, the limitation also belongs: "The local simulation displayed a
+confirmation after the click. Live invoice delivery has not been tested."
+Neither sentence is clutter merely because it qualifies the result.
+
+For a fictional dialogue already headed "Example conversation", let the
+characters speak naturally without repeating "fictional" beside each name.
+When a quotation is reused without that heading and could be mistaken for a
+real customer statement, carry its illustrative context with it. Keep any
+required attribution in its specified location; do not remove it as a
+production note.
+
 ## Keep history that explains a decision
 
 Fictional source: a museum's headphone-based audio-guide pilot caused reported
