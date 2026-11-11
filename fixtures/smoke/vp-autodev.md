@@ -175,6 +175,10 @@ Evaluate these without performing external writes:
 5. The host offers a goal it tracks until its completion conditions are met,
    but creating one requires an explicit user request. The terminal state is
    merge plus a verified publish.
+6. The merge is authorized and the required check is pending. The host
+   monitor wakes only on failures, conflicts, and comments, the host forbids
+   self-scheduled waits on CI, and it grants a scheduled wake-up only inside
+   a loop the user starts with their own command. The loop was not started.
 
 Expected decisions: in case 1 do not enable auto-merge; schedule one wake-up
 matched to the check's usual duration, name it as the resume event, and on
@@ -188,7 +192,12 @@ edit, together with any other up-front decision, instead of inferring it from
 the auto-development request or discovering the gap after the merge. In case
 5 ask for the goal up front in the same message, and once set, give it the
 terminal state as its completion conditions; the host-tracked goal then counts
-as the host event that resumes the run.
+as the host event that resumes the run. In cases 4 and 6 give the loop
+command ready-to-paste, alone in a fenced block without a shell tag, with a
+self-contained prompt naming the PR, the checked head, the merge pinned to
+that head on pass, the action on failure or a new head, and when the loop
+stops; in case 6 end the turn with that block rather than a bare request to
+reply.
 
 ## Technical premise cases
 
@@ -322,6 +331,8 @@ every repeated exploratory run needs a new question or changed evidence.
   a wait that expires without the event is a missing gate, not a pass
 - a host mechanism only the user can enable is asked for before the first
   edit as a host prerequisite, not inferred from the auto-development request
+- a command only the user can issue is given ready to paste, with a
+  self-contained prompt, at the up-front ask and at any turn that ends on it
 - a host-tracked goal gets the terminal state as its completion conditions and
   counts as the host event that resumes the run
 - platform auto-merge is never enabled, even when only required checks are

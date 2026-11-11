@@ -199,6 +199,10 @@ require_pattern "$autodev_skill" 'Host prerequisites are the mechanisms' \
   "vp-autodev must ask for host prerequisites before the first edit"
 require_pattern "$autodev_fixture" 'host prerequisite' \
   "vp-autodev fixture must cover a host prerequisite the user must issue"
+require_pattern "$autodev_skill" 'ready to paste' \
+  "vp-autodev must give a user-issued wake command ready to paste"
+require_pattern "$autodev_fixture" 'ready-to-paste' \
+  "vp-autodev fixture must cover a ready-to-paste loop command"
 require_pattern "$autodev_skill" 'A host-tracked goal' \
   "vp-autodev must treat a host-tracked goal as a resume event"
 require_pattern "$autodev_fixture" 'Ready PR with reviewers requested' \
