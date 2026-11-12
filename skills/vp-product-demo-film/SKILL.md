@@ -4,6 +4,7 @@ description: >-
   Create story-driven product demo and promotional films that show a user's
   problem, the product in use, and a meaningful outcome. Use for narrative
   software videos, launch films, or turning a feature walkthrough into a story.
+  Requires remotion-best-practices for Remotion production.
   Boundary: use vp-recording for capture mechanics and evidence recordings;
   this skill owns story, choreography, and editorial review.
 ---
@@ -12,7 +13,29 @@ description: >-
 
 Make the product's value understandable through a task the viewer recognizes.
 Preserve the requested format, tone, tools, and budget. A mascot, cinematic
-camera, voiceover, or particular renderer is optional.
+camera, or voiceover is optional. Use Remotion for generated animation unless
+the user explicitly chooses another renderer; use `vp-recording` for real capture.
+
+## Requirements
+
+Before creating or editing Remotion compositions, require the official
+[`remotion-best-practices`](https://github.com/remotion-dev/skills/tree/main/skills/remotion-best-practices)
+skill. Check the current agent's available skills and readable installed
+`SKILL.md`; an installed Remotion npm package does not satisfy this requirement.
+Read that skill and follow its routing to the relevant implementation references.
+This skill owns the creative direction; the Remotion skill owns Remotion usage.
+
+If missing, explain the requirement and guide installation from `remotion-dev/skills`
+through `vp-skills`. For a personal installation across supported agents:
+
+```bash
+npx -y skills@1.5.3 add remotion-dev/skills --skill remotion-best-practices -g --agent '*'
+```
+
+Install only within the user's authorized scope. After installation, verify the
+source and availability to the current agent, then read `SKILL.md`. If it is
+still unavailable, continue story and storyboard work but leave Remotion
+implementation pending. Check project packages and render dependencies separately.
 
 ## Establish the story before the effects
 
@@ -83,6 +106,10 @@ sending or publishing.
 
 ## Related skills
 
+- [`remotion-best-practices`](https://github.com/remotion-dev/skills/tree/main/skills/remotion-best-practices)
+  for required Remotion implementation guidance.
+- [`vp-skills`](https://github.com/VdustR/skills/tree/main/skills/vp-skills)
+  when the required Remotion skill needs installation or repair.
 - [`vp-recording`](https://github.com/VdustR/skills/tree/main/skills/vp-recording)
   for producing and inspecting the footage and encoded file.
 - [`vp-interaction-routing`](https://github.com/VdustR/agent-plugin-vp-interaction-routing/tree/main/skills/vp-interaction-routing)
