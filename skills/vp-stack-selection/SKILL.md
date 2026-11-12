@@ -84,7 +84,8 @@ flowchart TD
 | Selecting environments, hooks, workspaces, or release tooling | [Toolchain](references/toolchain.md) |
 | Selecting Node.js and pnpm/Yarn version ownership or evaluating Corepack | [Node.js package managers](references/node-package-managers.md) |
 | TypeScript libraries or web tooling are involved | [TypeScript](references/typescript.md) |
-| Choosing web frameworks, rendering, styles, or shared state | [Web](references/web.md) |
+| Choosing web frameworks, static sites, rendering, styles, or shared state | [Web](references/web.md) |
+| Evaluating static or marketing websites, documentation sites, or Astro/Starlight boundaries | [Astro and Starlight](references/astro-starlight.md) |
 | Selecting a renderer for Mermaid diagram source | [Diagram rendering](references/diagrams.md) |
 | Selecting syntax highlighting for code display | [Syntax highlighting](references/syntax-highlighting.md) |
 | Choosing internationalization runtime or locale-management tooling | [Internationalization](references/internationalization.md) |

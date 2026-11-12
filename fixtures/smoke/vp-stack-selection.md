@@ -59,6 +59,28 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | CI has competing manager setup, existing Corepack shims, or Node.js 25+ | Choose one dispatcher, inspect actual command paths, align CI pins, and provision Corepack separately if retained on Node.js 25+. Do not uninstall global tools without authorization. |
 | Existing supported Corepack setup; no migration requested | Keep it. The new-project preference does not authorize migration or global settings changes. |
 
+### Astro and Starlight selection
+
+Run these as manual decision walkthroughs at least twice: first select the
+candidate, then trace the owning rule and adoption boundary independently.
+Score the outcome and mechanism separately. A correct candidate without the
+required boundary does not pass the mechanism check. These are manual scenarios,
+not executable framework tests or independent agent trials.
+
+| Case | Expected decision | Required mechanism |
+| --- | --- | --- |
+| New static event site with no blog or docs; no fixed framework | Prefer Astro | Apply the static-site default without requiring a content/marketing label |
+| New marketing page with a calculator and signup form | Prefer Astro with bounded interaction | Identify hydration and the form endpoint instead of moving the entire site to an app framework |
+| Public support knowledge base with FAQs, tutorials, and operator runbooks | Prefer Astro with Starlight | Recognize documentation reading/navigation needs beyond developer docs |
+| Marketing site with a docs section and custom landing layout | Astro pages plus Starlight docs | Keep route, branding, and search boundaries explicit; do not force every page into a docs layout |
+| Downloadable PDF handbook with no website requested | Use the requested artifact workflow | Delivery format precedes the Starlight docs-site default |
+| Private wiki needs browser editing, approval history, and per-group permissions | Compare a verified CMS/site integration with a wiki platform | Do not attribute editorial workflow or authorization to Starlight |
+| Static-hosted offline editor needs shared undo history across panels and routes | Compare an application framework with Astro | Inspect state lifetime and offline integration, rather than selecting Astro from the hosting label alone |
+| Documentation must retain selectable release snapshots | Compare verified Starlight integrations with Docusaurus versioning | Locale support is not evidence of versioning support |
+| Existing supported Next.js marketing site needs one page fixed | Keep the selected stack and focused workflow | Default selection does not authorize migration |
+| Static-only hosting plus personalized server-rendered pages | Surface the runtime conflict; compare a supported server host or revised delivery | Astro supports on-demand rendering with an adapter; the static host cannot execute it |
+| Starlight page excluded from Pagefind is expected to be private | Reject the privacy premise | Search exclusion is not authorization; inspect generated assets and actual access enforcement |
+
 ### Web, styling, and optional capabilities
 
 | Case | Expected decision |
