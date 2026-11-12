@@ -8,8 +8,8 @@ flowchart TD
     A[Web requirements] --> B{Framework already selected?}
     B -->|Yes| C[Evaluate the selected framework<br/>against required contracts]
     B -->|No| D{Primary purpose}
-    D -->|Documentation| E[Prefer Starlight]
-    D -->|Content or marketing| F[Prefer Astro]
+    D -->|Documentation website| E[Prefer Astro with Starlight]
+    D -->|Static site, content, or marketing| F[Prefer Astro]
     D -->|Interactive application| G{Required React integration?}
     G -->|Yes| H[Evaluate React]
     G -->|No| I[Prefer Svelte; evaluate SvelteKit]
@@ -25,9 +25,17 @@ flowchart TD
     L -->|No| N[Explain the gap and compare alternatives]
 ```
 
-- [Astro](https://docs.astro.build/en/concepts/why-astro/) suits content-first
-  delivery with interactive areas added as needed.
-- [Starlight](https://starlight.astro.build/) supplies Astro documentation features.
+- Prefer [Astro](https://docs.astro.build/en/concepts/why-astro/) for new static
+  websites, especially marketing pages, landing pages, portfolios, and blogs.
+  Add interactive islands where needed. A static deployment alone does not make
+  Astro the best fit for an application with tightly coupled client state.
+- Prefer [Starlight](https://starlight.astro.build/) on Astro for documentation
+  websites, including developer docs, product guides, knowledge bases, FAQs,
+  tutorials, and runbooks. Match the reading and authoring workflow; a request
+  for a document does not automatically call for a website.
+- Read [Astro and Starlight](astro-starlight.md) for selection boundaries,
+  alternatives, mixed sites, and adoption checks. Honor an existing framework,
+  explicit user choice, or fixed hosting contract before these defaults.
 - [SvelteKit](https://svelte.dev/docs/kit/introduction) supplies application routing
   and rendering infrastructure around Svelte. Select its adapter and
   [rendering options](https://svelte.dev/docs/kit/page-options) explicitly.
