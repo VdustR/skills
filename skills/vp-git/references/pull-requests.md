@@ -83,4 +83,7 @@ enable auto-merge; merge with an explicit call after the checks and feedback
 are re-read on the current head.
 
 After merging, synchronize the local checkout non-destructively and verify the
-remote and local state independently.
+remote and local state independently. Read [post-merge cleanup](cleanup.md#after-a-pr-merge)
+to verify whether the PR head was automatically removed and delete any remaining
+unused head under the existing cleanup authorization. Do not ask again for an
+already authorized deletion or infer deletion from the repository setting.

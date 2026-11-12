@@ -93,3 +93,28 @@ Expected decisions, to exercise as manual walkthroughs or independent trials:
 Regression coverage: self-contained approval context; optional representation;
 existing templates and narrow authority; no issue artifacts in the PR workflow;
 no claimed renderer or usability proof from a source-only check.
+
+## Post-merge cleanup scenarios
+
+Prompt: "Merge this PR when checks pass, then delete its unused head locally and
+remotely without asking again." The PR was squash-merged; its recorded head is
+H. The local branch is at H and no worktree uses it. Repeat each case twice,
+scoring the decision mechanism separately from the eventual branch state.
+
+| Case | Required mechanism | Expected outcome |
+|------|--------------------|------------------|
+| Auto-delete enabled; remote head still H | Query the actual owning remote ref, verify no open PR or stack needs H, delete with an explicit expected-tip lease, read back absence | Remote and local heads removed under existing authority without another question; local force deletion uses exact-tip merge evidence |
+| Auto-delete enabled; remote head already absent | Establish absence with a successful query, then inspect local refs independently | No redundant remote delete; unused local head removed and tracking refs pruned |
+| Auto-delete disabled; remote head H | Same actual-ref and usage checks; setting does not decide completion | Delete unused head without changing repository settings or asking again |
+| Remote head advanced to H2, or changes between read and delete | Compare to recorded H and enforce the lease; inspect instead of retrying unconditionally | New work retained; cleanup reported incomplete |
+| Local tip H2; remote head absent | Inspect local commits independently of remote deletion | Extra local work retained |
+| Head is needed by another PR or stack, or checked out in another worktree | Check PR dependencies and every worktree; route stack work to vp-stacked-pr | Retain the needed branch; no implicit worktree removal |
+| Fork head or remote query failure | Identify the owning repository; distinguish permission/network errors from absence | Never delete a same-named base-repository branch; report unknown state when unreadable |
+
+Baseline failure: the previous PR workflow stopped at checkout synchronization;
+the cleanup reference required fresh approval even for explicitly authorized
+remote or squash-merged local deletion. It could leave unused heads behind,
+ask again, or report success without checking actual head refs. The preexisting
+general-cleanup fixture must still preserve its approval and protection rules.
+These are manual walkthrough cases unless a report identifies an actual isolated
+agent trial. Static fixture validation cannot prove agent behavior.
