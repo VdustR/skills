@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Git"
   short_description: "Handle Git workflows and readable pull requests"
-  default_prompt: "Use $vp-git to plan and execute this Git workflow with readable PR context and verified evidence."
+  default_prompt: "Use $vp-git to plan and execute this Git workflow with readable PR context and verified evidence, then verify post-merge head deletion and complete already authorized cleanup of unused branches."

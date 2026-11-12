@@ -33,7 +33,9 @@ remote state, and hosting-platform state as separate sources of truth.
 - Branch, worktree, stash, and ref cleanup: read `references/cleanup.md`.
 - PR descriptions, supporting evidence, draft, ready, review, and merge
   decisions: read
-  `references/pull-requests.md`.
+  `references/pull-requests.md`, then follow
+  `references/cleanup.md` after merge to verify automatic head deletion and
+  complete authorized cleanup of remaining unused branches.
 
 Load only the references needed for the request. Specialized PR skills remain
 authoritative for their narrower workflows.

@@ -323,6 +323,12 @@ that order against the base branch and the other open PRs immediately before
 merging, and never merges around a conflict: an order conflict is fixed in
 the unit, or the merge waits, and is reported either way.
 
+After a verified merge, follow `vp-git`'s `references/cleanup.md` to check actual
+remote and local PR-head state and complete already authorized removal of unused
+branches without renewed confirmation. Preserve branches with new work, active
+worktrees, or stack dependencies, and report any incomplete cleanup separately
+from merge success.
+
 ### Release
 
 For AUTO to release, act on the release mechanism recorded in the delivery brief
