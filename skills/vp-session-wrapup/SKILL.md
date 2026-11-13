@@ -64,6 +64,12 @@ State its pending status separately. If session risks or TODOs remain, report
 them and the next action without claiming the session is clear. Archiving and
 other mutations still follow the applicable authorization rules.
 
+Skipped or unverified naming, grouping, and other session bookkeeping from
+`vp-session-management` are not task blockers or BYE TODOs. Report their actual
+status without requiring harness repair. This does not discharge an undelivered
+subtask, an unaccepted responsibility transfer, required preservation, or an
+explicitly required archival result; evaluate those against the assignment.
+
 ### Validate blockers and actions
 
 Before concluding that the session cannot BYE, verify each proposed blocker
