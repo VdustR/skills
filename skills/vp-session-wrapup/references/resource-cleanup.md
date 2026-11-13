@@ -25,6 +25,17 @@ acquiring a resource rather than reconstructing everything at closeout.
   the running instance; stopping execution does not remove stored data.
 - Temporary changes: environment and application settings, proxy routes,
   project overrides, and tools installed only to unblock the task.
+- Git leftovers: merged local and remote PR branches, temporary worktrees,
+  staging directories, and task-created stashes. Inspect staged changes and
+  stashes for unfinished work; neither is disposable merely because it is temporary.
+- Debugging and automation artifacts from any platform or tool, including but
+  not limited to Android and Apple platforms: UI hierarchy dumps (XML, JSON,
+  or other formats), screenshots, recordings, traces, and diagnostic exports.
+  Include copies on connected devices, simulators, remote test environments,
+  and the host when the session created them and cleanup is within scope.
+- Edit backups and intermediate files, such as `.bak`, `.orig`, `.rej`, patch
+  files, and before-edit copies. Check whether they still provide required
+  recovery information or evidence before removing them.
 
 Do not scan or clear unrelated user data. A cache or ignored-file designation
 does not prove session ownership or disposability. Shared package caches,
@@ -32,6 +43,23 @@ SDKs, system images, and global tools are not session trash just because the
 session used them. Platform-managed internal state without a supported inspection
 or cleanup interface must be reported as unverified when relevant, never claimed
 cleared.
+
+## Merged branch cleanup
+
+An authorized BYE includes deleting the session's unused merged PR branches,
+both local and remote, without another confirmation. This is the user's
+standing post-merge cleanup authorization. Use `vp-git` for exact merge and tip
+verification, dependency checks, guarded deletion, and readback. Check squash
+and rebase merges through hosting-platform evidence rather than ancestry alone.
+Keep default or protected branches and branches with new commits or ongoing
+consumers; merge status does not make later work disposable. Record the owning
+repository, branch, and merged head commit in retained delivery information so
+the deleted head can be identified for recovery.
+
+Inspect temporary worktrees and staging directories separately for unique work
+and consumers before removing them under the cleanup authorization. Do not
+discard Git index changes as directory cleanup or treat branch deletion as
+permission to remove an active worktree.
 
 ## Decide by purpose and ownership
 
