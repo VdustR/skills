@@ -1,9 +1,9 @@
 ---
 name: vp-session-wrapup
 description: >-
-  Close out an agent session: summarize the outcome and open items, then find
-  leftover state such as scratch files, uncommitted or unpushed Git work,
-  running services, staged secrets, and temporary configuration. Use when the
+  Close out an agent session: summarize the outcome and open items,
+  preserve required results, and reclaim session-owned temporary files,
+  generated artifacts, runtime resources, and temporary configuration. Use when the
   user ends, wraps up, hands off, or archives a session, including a
   conditional request to clean up whatever carries no risk or an authorized
   request to archive a completed delegated session. Boundary: use
@@ -189,16 +189,31 @@ Git and pull request state, scratch files and logs, processes and background
 jobs, secret material, external or shared writes, and configuration changed
 only to unblock the task.
 
+Verify preservation and delivery separately: required results, evidence, and
+recovery information must remain usable without this chat or its temporary
+workspace, and the requested delivery endpoint must be verified. A pushed
+branch does not substitute for a required merge or release; an issue does not
+complete required work or transfer responsibility. Give retrieval references
+for retained results, not just paths inside the session workspace.
+
 ## Cleanup
 
-Remove an item only with evidence that this session created it, that it holds
-no unique work, and that it can be reproduced. Name what will be removed before
-removing it, and verify the result.
+For an authorized BYE, default to reclaiming resources whose task-only purpose
+has ended, within the user's cleanup authorization. Classify by ownership,
+remaining consumers, and required preservation rather than a directory name,
+file extension, or a prediction that something will never be useful again.
+Read [resource cleanup](references/resource-cleanup.md) for the inventory,
+decision rules, operation order, and verification.
 
-Report instead of removing when the item predates the session, holds unfinished
-work, is shared or remote, is hard to reverse, or has unclear ownership.
-Uncertainty is a reason to report. For secret material, prefer unstaging and
-reporting, and leave credential files to the user.
+Stop session-started execution and remove disposable local artifacts only after
+protecting required results and checking dependencies. A verified retrievable
+external release normally makes its redundant local artifacts disposable.
+Keep permanent local installations and the files they need as ongoing-use
+resources; their installers and intermediate output are separate candidates.
+Protect pre-existing, shared, remote, sensitive, or uncertain state unless the
+specific action is authorized and its safety established. Name cleanup targets
+before acting and verify both resource release and preserved-result access.
+Unresolved cleanup or preservation prevents a claim that closeout is complete.
 
 Wrap-up closes work; it does not start unrelated implementation. Record a newly
 found problem as a follow-up. Count it as a session TODO only when it affects
