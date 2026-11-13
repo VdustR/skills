@@ -74,3 +74,26 @@ receipts retain the original skill name because they describe past runs.
 Installed copies, personal instruction links, and external naming hooks were
 not changed or verified by this repository edit. The README records this
 migration boundary. No commit, push, PR, or installation was performed.
+
+## On-demand context supplement
+
+Observed later on November 13, 2026, Asia/Taipei, after the user explicitly
+requested minimal initial context and lookup methods, with an instruction to
+the receiving session not to read all available context on startup. Baseline
+for this supplement: the first delivery commit, before the on-demand changes.
+The prior brief-size rule limited what the sender copied but did not explicitly
+prevent a receiver from opening every source link before starting. A correct
+final result alone would therefore miss the requested mechanism.
+
+Two manual passes checked sender and receiver behavior separately:
+
+| Pass | Mechanism assessment | Outcome assessment |
+| --- | --- | --- |
+| Narrow validation task, long chat, many linked design documents | Pass: brief includes only required starting facts, authority, next action, precise sources and lookup methods; the receiver is explicitly instructed to defer optional background. A plan to read every link fails this mechanism even if it reaches a correct answer. | Pass: start the bounded validation without unrelated background reads. |
+| Add one missing historical contract and an unrelated archive | Pass: identify the missing fact and query its smallest relevant section; read applicable governing instructions, but defer the unrelated archive. | Pass: obtain the needed contract and continue without guessing or bulk context loading. |
+
+These remain manual instruction walkthroughs, not independent agent trials or
+measured context savings. No trial could write to an external system: no trial
+agent, fixture repository, or dispatch was launched. The authorized real dotfiles
+handoff will use a compact brief and lookup methods; its execution is reported
+separately by the delivering sessions.

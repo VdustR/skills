@@ -82,6 +82,12 @@ scope and terminal state to the receiver. A report being sent or a child turn
 ending does not establish acceptance or release the coordinator's obligations.
 Use the coordination reference for the brief and handoff procedure.
 
+Give the receiving session only what it needs to start its assignment, plus
+precise source locations and lookup methods for additional context. Explicitly
+instruct it to retrieve information when a concrete next decision requires it,
+not to read the entire transcript, every linked document, or all references on
+startup. This applies to independent tasks, subtasks, and continuations.
+
 ## Skip harness problems without blocking the task
 
 Treat unsupported operations, failed calls, timeouts, and inconclusive readback

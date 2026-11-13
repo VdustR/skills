@@ -25,10 +25,35 @@ default user reporting to the coordinator unless the user directs otherwise;
 the coordinator retains overall integration and verification. Respect explicit
 assignments over these defaults.
 
-Do not pass an entire transcript when a bounded brief suffices. Carry necessary
-facts, source references, decisions, and scope; do not copy secrets or unrelated
-private context. Identify stable targets through the current harness, not title
-matching. Resolve identities only for the sessions needed by the task.
+## Provide context on demand
+
+Give the receiver a compact starting brief: its outcome, authorized scope,
+completion conditions, necessary confirmed facts or contracts, and the next
+action. Include only the assignment fields above that affect its work; do not
+paste an entire transcript or a complete project history. Keep secrets and
+unrelated private context out of the brief. Do not defer a known constraint
+that the receiver needs before its first action to an optional later lookup.
+
+For additional context, provide a precise source location and a lookup method,
+with the question or condition that makes it worth opening. Examples include
+a repository-relative path and `rg` search terms, a document section, or an
+exact chat identity with a bounded read or search method. Do not replace a
+transcript dump with an exhaustive catalog the receiver is expected to read.
+
+The dispatch prompt must explicitly tell the receiver to start from the compact
+brief and retrieve more only when the next decision needs it. The receiver
+must not front-load the complete source chat, every linked document, all skill
+references, or repository-wide background reading just to orient itself.
+First identify a concrete missing fact, retrieve the smallest useful section
+or search result, and expand only if that result leaves a material gap. Read
+applicable governing instructions and references that the selected workflow
+requires; selective retrieval does not waive them.
+
+If a lookup is unavailable, continue independent work and ask only about a gap
+that affects a pending decision. Do not guess a consequential contract or turn
+missing optional background into a task blocker. Identify stable session
+targets through the current harness, not title matching, and resolve only the
+sessions needed by the task.
 
 ## Dispatch and receive
 

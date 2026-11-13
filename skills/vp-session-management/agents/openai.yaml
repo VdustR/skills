@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Session Management"
   short_description: "Coordinate task sessions and manage names and groups"
-  default_prompt: "Use $vp-session-management to classify task relationships, coordinate authorized assignments and responsibility transfers, and manage session metadata; skip failed or unverified harness operations while continuing the underlying task."
+  default_prompt: "Use $vp-session-management to classify task relationships, coordinate authorized assignments with minimal starting context and on-demand lookup methods, and manage session metadata; skip failed or unverified harness operations while continuing the underlying task."

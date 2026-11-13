@@ -35,6 +35,10 @@ on stderr and no state readback.
   from task type; classification never grants dispatch or archive authority
 - failed or inconclusive harness calls are skipped without task or BYE blockers;
   uncertain writes and dispatches are not blindly replayed
+- dispatch includes minimal starting context and precise lookup methods; the
+  receiver retrieves optional background only for a concrete pending decision
+- correct final answers do not excuse reading every linked source on startup;
+  applicable governing instructions still need to be read
 - title suggestions alone never mutate metadata, even with standing policy
 - discussion converging on an implementation direction triggers the standing
   naming policy without a separate naming request; accurate and protected
@@ -73,6 +77,12 @@ skill's decision-scenarios reference.
   require harness repair before unrelated authorized work continues.
 - A denied metadata operation stays denied without blocking the task. Missing
   required substantive results still prevent a claim of overall completion.
+- A narrow validation task has many linked documents and a long source chat.
+  Send only necessary starting facts and lookup methods, and explicitly direct
+  the receiver not to front-load all background. On the second pass, add one
+  missing contract: retrieve its smallest relevant section instead of all links.
+  Score the retrieval mechanism separately from a correct final answer, and
+  preserve mandatory repository-instruction reads.
 
 These are manual decision walkthrough cases, not executable behavior tests or
 independent agent trials. Score the classification or failure-recovery mechanism
