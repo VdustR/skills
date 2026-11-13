@@ -57,7 +57,7 @@ required_skills=(
   "vp-product-demo-film"
   "vp-github"
   "vp-agent-browser-session"
-  "vp-session-organization"
+  "vp-session-management"
   "vp-session-wrapup"
   "vp-retro"
   "vp-tunnel"

@@ -1,4 +1,0 @@
-interface:
-  display_name: "VP Session Organization"
-  short_description: "Name sessions and organize verified related work"
-  default_prompt: "Use $vp-session-organization to name this session and organize verified related work within my authorization, using supported interfaces and result readback."

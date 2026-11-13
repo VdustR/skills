@@ -81,51 +81,38 @@ confirmed stops the run with that row named; nothing starts half-ready.
 
 ## Coordinate by assignment
 
-Record these decisions for each leg before dispatch. Use the user's current
-instructions or applicable policy. Session creation, ancestry, and sidebar
-membership identify relationships but do not establish any of these decisions.
+Use [`vp-session-management`](https://github.com/VdustR/skills/tree/main/skills/vp-session-management)
+for the assignment brief, delivery and acceptance owners, reporting window,
+archive authority, and any responsibility transfer. Each required repository
+leg is a subtask of the overall delivery, even when the user works directly
+with its receiving session. The orchestrator retains integration and final
+verification; direct reporting does not transfer that responsibility.
 
-| Decision | What to record |
-|----------|----------------|
-| Delivery | Who delivers the result, who accepts it, the terminal state, and the evidence or artifact the receiver needs. The orchestrator still owns integration and verification of its dependencies. |
-| User reporting | Whether the orchestrator is the single contact or the user works directly with the delegate for this leg. Record where urgent blockers and decisions go and who follows up if receipt is pending. |
-| Archive | Any separate authorization identifying the actor, target, and conditions. An empty entry leaves the chat open. Route an authorized closeout to `vp-session-wrapup`. |
+Keep repository-specific scope, authorizing words, terminal state, hand-off
+values, and stop conditions in each leg's brief. Before the next leg starts,
+verify its prerequisite at the real interface and record acceptance. Domain
+readiness, rollback, and verification gates in this reference remain in force.
 
-In single-contact mode, the delegate makes the result and non-urgent findings
-available to the orchestrator for consolidation. In direct mode, the delegate
-reports details to the user, and the orchestrator receives only what its
-dependencies or overall outcome require. Use a permitted delivery route. Where
-pushing a message needs separate authorization, the orchestrator can read the
-delegate's result and confirm acceptance through a supported route.
-
-Apply an explicit change of reporting contact only to its stated assignment.
-A question or a correction in the delegate chat can be answered there while
-the recorded reporting contact remains in place. A reporting change by itself
-does not reassign delivery, acceptance, or archive authority. Keep the last
-verified arrangement when the evidence is ambiguous and clarify only when it
-affects a pending decision.
-
-Escalate a time-sensitive blocker or required decision through the authorized
-route promptly. If the receiver is unavailable, keep the result or blocker
-accessible, record the owner and resume condition, and stop affected work.
-Sent and accepted are separate states. Before the next leg starts, verify
-the prerequisite at the real interface and record its acceptance. A completed
-transfer of responsibility additionally requires the receiving owner's
-confirmation.
+If a harness dispatch or message call fails or cannot be confirmed, follow the
+management skill's skip-and-continue policy. Do not turn the failed session
+operation into a delivery gate or assume that responsibility transferred.
+Continue independent authorized work or a safe local fallback where feasible;
+required repository outcomes still need their substantive verification.
 
 ## Group sessions after dispatch
 
 When dispatch returns the canonical identity of a child session, the
 orchestrating session checks whether grouping is authorized and hands eligible
-sessions to [`vp-session-organization`](https://github.com/VdustR/skills/tree/main/skills/vp-session-organization).
+sessions to [`vp-session-management`](https://github.com/VdustR/skills/tree/main/skills/vp-session-management).
 Use the verified parent-child relationship to scope the operation. Reuse a
 suitable group, preserve the user's existing organization, and read back both
 sessions' membership before reporting them as grouped.
 
 Report the grouping result separately from the repository leg's delivery
 status. For a child session whose identity is missing, or when grouping is
-unauthorized, unavailable, or unverified, record the reason and continue the
-repository delivery checks.
+unauthorized, unavailable, failed, or unverified, skip the affected metadata
+operation and continue repository delivery checks. Grouping failure is not a
+delivery blocker, required user action, or BYE TODO.
 
 ## Report
 

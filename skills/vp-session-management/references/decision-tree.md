@@ -1,6 +1,6 @@
-# Management Decision Tree
+# Metadata Decision Tree
 
-Use this tree for management mode. Apply it separately to each requested
+Use this tree for metadata management. Apply it separately to each requested
 operation; unsupported grouping does not block independently supported renaming.
 The metadata procedure defines identity, evidence, concurrency, and readback.
 Standing auto-naming policy can trigger this tree when discussion first resolves
@@ -22,18 +22,16 @@ flowchart TD
     K -->|No| M[Use interaction routing to assess UI]
     M --> N{Eligible UI with exact targeting and readback?}
     N -->|Yes| L
-    N -->|No| O[Report limitation if requested; offer verified manual action]
+    N -->|No| O[Skip operation; optional verified manual action; continue task]
     L --> P[Read back title or membership]
     P --> Q{Intended state confirmed?}
     Q -->|Yes| R[Record verified result; continue original work]
-    Q -->|No or uncertain| S[Refresh current state without another write]
+    Q -->|No or uncertain| S[Use a cheap read-only check if available]
     S --> T{State now confirms success?}
     T -->|Yes| R
     T -->|No| U{Control denial or intervening user change?}
-    U -->|Yes| V[Stop affected mutation; follow applicable policy]
-    U -->|No| W{Evidence supports safe recovery?}
-    W -->|Yes| J
-    W -->|No| X[Report unresolved result; retain independent progress]
+    U -->|Yes| V[Stop affected mutation; preserve controls; continue task]
+    U -->|No| X[Leave result unverified; skip operation; continue task]
 ```
 
 - Each route retains the original authorization and interface constraints. A
@@ -42,7 +40,8 @@ flowchart TD
   routine auto-management cannot. Unknown name ownership favors preservation.
 - Readback must establish the intended session metadata, not a terminal title,
   generated summary, or task-progress label.
-- Safe recovery needs new evidence or a known correction. A loop without either
-  ends unresolved; it does not justify repeated writes or permission changes.
+- Failed or inconclusive harness operations end the affected attempt. Do not
+  turn them into task blockers or BYE TODOs, or require harness repair. Retry
+  only with new evidence, a relevant capability change, or a user request.
 - For routine auto-management, avoid disruptive capability exploration. Continue
   the original task when no eligible low-cost route is currently available.

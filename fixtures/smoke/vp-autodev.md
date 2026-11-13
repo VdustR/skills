@@ -152,10 +152,14 @@ Evaluate these without performing external writes:
 3. Dispatch returns only a title, or grouping lacks user authorization.
 
 Expected decisions: in case 1 the orchestrator routes grouping through
-`vp-session-organization`, reuses the parent's group, and verifies both
+`vp-session-management`, reuses the parent's group, and verifies both
 memberships. In case 2 record unavailable or unverified grouping as applicable
 and continue repository delivery checks. In case 3 leave metadata alone,
 record the missing prerequisite, and continue repository delivery checks.
+Failed or inconclusive grouping calls are skipped without creating delivery
+blockers, required harness repair, or BYE TODOs. Required legs remain subtasks
+even when the user works directly with a delegate; use the management skill
+for the assignment and any responsibility transfer.
 
 ## Resume cases
 

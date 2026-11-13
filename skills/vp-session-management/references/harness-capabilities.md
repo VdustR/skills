@@ -5,6 +5,12 @@ a product-wide support table. Distinguish an agent acting on itself from an
 external operator controlling a client. Verify current tools, permissions, exact
 target, and readback before use.
 
+Apply the non-blocking harness policy in `SKILL.md` to every route below. A
+failed hook, tool, SDK companion, or inconclusive readback ends that attempt;
+leave the operation unverified or unavailable as supported and continue the
+underlying task. Do not require successful metadata management for delivery or
+BYE, and do not bypass a denied action.
+
 Version-specific observations below were recorded on November 1 and 2, 2026.
 Recheck when the relevant client, permissions, tools, or target context changes.
 

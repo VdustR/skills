@@ -179,9 +179,14 @@ Capture a still screenshot or a demo video: a screenshot of a running interface,
 
 Review recent agent work to discover workflow, instruction, and skill improvements.
 
-### vp-session-organization
+### vp-session-management
 
-Generate concise session titles or manage authorized names and verified related groups through supported harness interfaces.
+Classify independent tasks and subtasks, coordinate delivery and responsibility transfers, and manage authorized session names and groups. Harness failures do not block the underlying task.
+
+Replaces `vp-session-organization`. When adopting the rename, update personal
+instruction links and any hook or integration paths, then refresh the installed
+skill through the normal installation workflow. Repository edits alone do not
+update installed copies.
 
 ### vp-session-wrapup
 
