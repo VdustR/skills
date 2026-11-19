@@ -58,6 +58,12 @@ to use every available format.
 
 ## Review
 
+When waiting for supported PR changes, use
+[`vp-github` event streams](https://github.com/VdustR/skills/blob/main/skills/vp-github/references/event-streams.md)
+for capability checks, attachment and reconnect reconciliation, bounded waiting,
+and subscription ownership. Preserve host-permitted fallbacks for uncovered
+signals. A received event does not establish review completion or merge readiness.
+
 Record the current head commit when evaluating automated review. Inspect checks,
 review threads, discussion comments, and reaction-only signals against that
 head. A green check or positive emoji can be stale or scoped to an older commit.

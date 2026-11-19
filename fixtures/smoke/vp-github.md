@@ -114,3 +114,33 @@ new issues in PR workflows; capability fallback; essential PR context; version
 provenance; partial-write reconciliation; no unnecessary
 artifacts; no authority inferred from format selection or history; audience
 preservation; HTML behavior remains unverified until exercised.
+
+## PR Event Waiting Scenarios
+
+Use `$vp-github` to wait for the current PR's review and CI. The host monitor
+reports only failures, conflicts, and comments. The host supports a command
+session that exposes stderr while running, plus completion notifications.
+Evaluate these variations independently:
+
+| Situation | Expected mechanism | Expected gate decision |
+| --- | --- | --- |
+| CLI and account support Event Streams; CI is pending | Listen for relevant suite, head, and PR state changes with a timeout; reconcile after attachment | Continue until all applicable checks and feedback pass on the current head |
+| All checks finish after the first PR read but before the listener attaches; stdout stays empty | Read state after the stderr attachment message, then stop the now-unneeded listener | Recognize completed checks from that read, without waiting for a nonexistent replay |
+| Connection drops while the last pending check completes | Read state on reattachment despite empty stdout | Evaluate the fetched checks, not the absence of an event |
+| One suite succeeds while another is pending, or a newer head exists | Read all checks and the head after the event; continue or restart observation | Never merge from one success or stale-head evidence |
+| CLI lacks `event`, account returns access `403`, or PR is on GHE.com | Use an eligible host fallback; do not retry the same access error or upgrade without authorization | Required evidence remains pending until actually verified |
+| The gating bot posts only PR conversation comments, REST statuses, or reactions | Retain inspection or notifications for that surface | Do not claim that the supported event stream covers every gating signal |
+| Host cannot read state while a blocking listener runs, or cannot resume an ended turn | Select an eligible execution interface or another permitted wait | Do not promise the process or stdout will wake the chat |
+| Timeout exits `8`, or an out-of-order event names old state | Refresh state and preserve any missing gate | Neither timeout nor event order establishes a pass |
+| Matching subscription already exists and another consumer is listening | Record ownership; stop only the task's stream and preserve the shared subscription | Cleanup does not interrupt another consumer |
+
+Run each decision scenario at least twice when evaluating changed instructions.
+Score the chosen mechanism separately from the gate outcome: a correct decision
+obtained by an unrelated manual query does not prove the listener procedure.
+These can be manual walkthroughs with no external writes. Report independent
+agent trials or live service tests only when actually performed and isolated.
+
+Regression coverage: event-wait discovery; capability and host-resumption gates;
+attachment and reconnect races; partial CI and stale heads; uncovered feedback;
+bounded waiting; shared subscription cleanup; no replay or delivery guarantees
+inferred from CLI auto-reconnect.

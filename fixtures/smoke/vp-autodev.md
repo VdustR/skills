@@ -375,6 +375,15 @@ every repeated exploratory run needs a new question or changed evidence.
 
 ## Endpoint and active waiting cases
 
+For a host monitor that reports failures but not successful CI, also exercise
+the event-waiting cases in the
+[`vp-github` fixture](vp-github.md#pr-event-waiting-scenarios). Check that AUTO
+routes to the shared Event Streams reference when eligible, retains the host's
+resume restrictions, reconciles after attachment and reconnect, and still
+requires the current-head integrate gate. Repeat the walkthrough and score the
+transport choice separately from completion. No live subscription is required
+for a manual walkthrough.
+
 Evaluate each case without performing external writes:
 
 | Request and evidence | Expected action |
