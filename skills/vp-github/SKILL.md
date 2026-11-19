@@ -5,8 +5,9 @@ description: >-
   images, videos, or files to issues, pull requests, and comments; managing
   artifacts for research, plans, HTML documents, and links on an issue the
   user authored or took over; controlling
-  how Markdown renders on GitHub surfaces; and choosing a credential that can
-  reach the endpoint. Use for any request to upload, attach, embed, or show a
+  how Markdown renders on GitHub surfaces; waiting for PR changes through
+  GitHub Event Streams; and choosing a credential that can reach the endpoint.
+  Use for PR event subscriptions or any request to upload, attach, embed, or show a
   local artifact on GitHub. Also use proactively when writing or editing GitHub
   content and an available screenshot, recording, diagram, or other local file
   would provide material evidence, even when the user did not say "upload."
@@ -18,6 +19,9 @@ description: >-
 
 ## Route
 
+- Waiting for PR reviews, head or state changes, conflicts, or completed check
+  suites: read [event streams](references/event-streams.md). This owns event
+  transport; the calling workflow owns acceptance gates and agent resumption.
 - Placing substantial research, plans, HTML documents, or collected links on
   an issue the user authored or took over, or managing its artifacts: read
   [issue artifacts](references/issue-artifacts.md). PRs do not use artifacts.

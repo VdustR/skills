@@ -184,7 +184,12 @@ permitted wait mechanism can still prevent progress. Before ending a turn to
 wait for a check required by the selected endpoint, name the event that will resume the work.
 A host PR monitor may wake the
 session only for failures, conflicts, or new comments, so
-a check that passes emits nothing. Host rules that forbid self-polling stay
+a check that passes emits nothing. For supported GitHub PR events, use
+`vp-github`'s [event streams](https://github.com/VdustR/skills/blob/main/skills/vp-github/references/event-streams.md)
+to supplement missing coverage, including check-suite completion. Verify
+capability, signal coverage, and the host's permitted resume path before
+choosing it. Stream attachment and reconnection require a fresh state read;
+an event is not a passed gate. Host rules that forbid self-polling stay
 binding. When no event covers the success path, do not end
 the turn as if the work will continue. Pick the resume mechanism in this
 order, record it in the brief, and name it before ending the turn:
