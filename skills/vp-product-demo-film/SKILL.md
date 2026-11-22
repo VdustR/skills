@@ -60,9 +60,9 @@ same step:
 - Before delivery, the composition check reports no errors, every kept warning
   has a recorded reason, and the frame review has been done and written up.
   Combine that review note with this skill's editorial review.
-- The HyperFrames CLI reports usage telemetry. Honor the user's or
-  organization's telemetry preference through the opt-out that the
-  `hyperframes` skill documents.
+- The HyperFrames CLI reports usage telemetry. When the user or organization
+  has asked for telemetry to be off, use the opt-out that the `hyperframes`
+  skill documents; otherwise leave its defaults unchanged.
 
 ## Establish the story before the effects
 
