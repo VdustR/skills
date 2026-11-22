@@ -1,4 +1,4 @@
 interface:
   display_name: "VP Product Demo Film"
   short_description: "Tell a product story through tasks, actions, and outcomes"
-  default_prompt: "Use $vp-product-demo-film to check the required Remotion skill and guide installation if missing, establish the product story, choreograph the film, and deliver a verified reproducible result."
+  default_prompt: "Use $vp-product-demo-film to check the required HyperFrames skill and guide installation if missing, establish the product story, choreograph the film and any language versions, and deliver a verified reproducible result."

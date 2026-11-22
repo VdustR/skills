@@ -3,8 +3,9 @@ name: vp-product-demo-film
 description: >-
   Create story-driven product demo and promotional films that show a user's
   problem, the product in use, and a meaningful outcome. Use for narrative
-  software videos, launch films, or turning a feature walkthrough into a story.
-  Requires remotion-best-practices for Remotion production.
+  software videos, launch films, feature introductions in several languages,
+  or turning a feature walkthrough into a story. Requires the hyperframes
+  skill for HyperFrames production.
   Boundary: use vp-recording for capture mechanics and evidence recordings;
   this skill owns story, choreography, and editorial review.
 ---
@@ -13,29 +14,57 @@ description: >-
 
 Make the product's value understandable through a task the viewer recognizes.
 Preserve the requested format, tone, tools, and budget. A mascot, cinematic
-camera, or voiceover is optional. Use Remotion for generated animation unless
-the user explicitly chooses another renderer; use `vp-recording` for real capture.
+camera, or voiceover is optional. Compose and render the film with HyperFrames
+unless the user explicitly chooses another renderer; use `vp-recording` for
+real capture.
 
 ## Requirements
 
-Before creating or editing Remotion compositions, require the official
-[`remotion-best-practices`](https://github.com/remotion-dev/skills/tree/main/skills/remotion-best-practices)
+Before creating or editing a HyperFrames composition, require the official
+[`hyperframes`](https://github.com/heygen-com/hyperframes/tree/main/skills/hyperframes)
 skill. Check the current agent's available skills and readable installed
-`SKILL.md`; an installed Remotion npm package does not satisfy this requirement.
-Read that skill and follow its routing to the relevant implementation references.
-This skill owns the creative direction; the Remotion skill owns Remotion usage.
+`SKILL.md`; an installed `hyperframes` npm package does not satisfy this
+requirement. Read that skill and follow its routing to the references the film
+needs and to its companion skills: `hyperframes-cli`, `hyperframes-registry`,
+and `media-use` for music and other media. Install the companions with it; only
+`hyperframes` gates composition work.
 
-If missing, explain the requirement and guide installation from `remotion-dev/skills`
-through `vp-skills`. For a personal installation across supported agents:
+If missing, explain the requirement and guide installation from
+`heygen-com/hyperframes` through `vp-skills`. For a personal installation
+across supported agents:
 
 ```bash
-npx -y skills@1.5.3 add remotion-dev/skills --skill remotion-best-practices -g --agent '*'
+npx -y skills@1.5.3 add heygen-com/hyperframes --skill hyperframes --skill hyperframes-cli --skill hyperframes-registry --skill media-use -g --agent '*'
 ```
 
 Install only within the user's authorized scope. After installation, verify the
 source and availability to the current agent, then read `SKILL.md`. If it is
-still unavailable, continue story and storyboard work but leave Remotion
-implementation pending. Check project packages and render dependencies separately.
+still unavailable, continue story and storyboard work but leave composition and
+rendering pending. Check project packages and render dependencies separately.
+
+When the user chooses another renderer, use that renderer's official guidance
+instead; do not require HyperFrames. For any renderer, verify that its license
+permits the intended use by the user's organization before production.
+
+### Divide the work with HyperFrames
+
+This skill owns the story, choreography, claims, language versions, and
+editorial review. The `hyperframes` skill owns the composition contract, CLI,
+registry effects, checks, frame review, and rendering. Where both describe the
+same step:
+
+- An agreed story cut from this skill is the chosen storyline. Pass it into
+  the HyperFrames spec instead of proposing new storylines.
+- Follow the user's approval gates. A request for a finished film, or an
+  authorized autonomous run, asks for the rendered file, so continue past the
+  `hyperframes` skill's preview stop. When the user asked only for a draft or
+  a preview, stop at the preview.
+- Before delivery, the composition check reports no errors, every kept warning
+  has a recorded reason, and the frame review has been done and written up.
+  Combine that review note with this skill's editorial review.
+- The HyperFrames CLI reports usage telemetry. When the user or organization
+  has asked for telemetry to be off, use the opt-out that the `hyperframes`
+  skill documents; otherwise leave its defaults unchanged.
 
 ## Establish the story before the effects
 
@@ -54,6 +83,10 @@ Write a short sequence of causal beats: the user's request, the obstacle,
 the product's intervention, and the resulting task outcome. Show the product
 where the value happens. If a helper unblocks another app, show the blocked
 task and the handoff rather than spending the film on unrelated app chrome.
+
+Open on the task or its problem, with sound and visible motion from the first
+second; a silent or empty opening loses the viewer before the story starts.
+Name the feature on title cards and captions exactly as the product names it.
 
 Produce an inexpensive story cut with rough timing, placeholder art, and
 dialogue or captions before detailed effects. Check whether a viewer can tell
@@ -74,8 +107,16 @@ encounters a workspace choice, selects the authorized workspace, and reveals
 the order. The camera follows the choice and result; a character's relief
 follows the result. Decorative movement alone does not communicate the change.
 
-Use `vp-recording` for real UI capture, cursor and caption layers, deterministic
-renders, encoding, and file inspection. Keep genuine clicks tied to actual
+When the film introduces the user's own product, record the real interface in
+a seeded non-production environment rather than drawing a mock of it. Real
+screens carry the product's actual layout, wording, and behavior; a mock drifts
+from them and needs its own review. Use a mock only when real capture is
+unavailable or the brief calls for an invented product, and keep that choice
+in the brief.
+
+Use `vp-recording` for real UI capture, cursor and caption layers on that
+footage, and inspection of the encoded file. HyperFrames composes and renders
+the film unless the user chose another renderer. Keep genuine clicks tied to actual
 targets. A simulated UI or animated cursor can illustrate a fictional scene,
 but cannot stand in as evidence that the real action ran.
 
@@ -83,6 +124,21 @@ Keep production constraints and editorial notes in working documents. Apply
 `vp-recording`'s viewer-copy guidance when replacing sensitive content and
 deciding which qualifications belong on screen. Keep product and security
 claims within the demonstrated mechanism's limits.
+
+## Make language versions
+
+When the film needs several languages, finish and review one reference language
+before producing the others, so story and timing problems are fixed once.
+
+- Record each language from the product with its interface switched to that
+  language, so menus, dates, and system messages are the product's own text.
+  Do not lay translated captions over another language's screens.
+- Fit each recording to the reference cut's scene lengths, for example with a
+  modest per-scene playback rate, so captions and emphasis keep their timing.
+- Shorten translated captions to fit the reading time instead of shrinking
+  them. Check that each script's font renders its glyphs and punctuation.
+- Review every language's render. Report captions that no native speaker has
+  reviewed.
 
 ## Finish and deliver
 
@@ -106,10 +162,10 @@ sending or publishing.
 
 ## Related skills
 
-- [`remotion-best-practices`](https://github.com/remotion-dev/skills/tree/main/skills/remotion-best-practices)
-  for required Remotion implementation guidance.
+- [`hyperframes`](https://github.com/heygen-com/hyperframes/tree/main/skills/hyperframes)
+  for required HyperFrames composition, checks, and rendering.
 - [`vp-skills`](https://github.com/VdustR/skills/tree/main/skills/vp-skills)
-  when the required Remotion skill needs installation or repair.
+  when the required HyperFrames skills need installation or repair.
 - [`vp-recording`](https://github.com/VdustR/skills/tree/main/skills/vp-recording)
   for producing and inspecting the footage and encoded file.
 - [`vp-interaction-routing`](https://github.com/VdustR/agent-plugin-vp-interaction-routing/tree/main/skills/vp-interaction-routing)

@@ -34,6 +34,10 @@ An offered music file is labeled "free," with no author or license supplied.
   misrepresent the scene as a verified real operation.
 - Verify music provenance and license before including it. Unknown permission
   blocks that asset, not the independent story work. Keep required credits.
+- Name HyperFrames as the renderer when the user names none, with the
+  `hyperframes` skill as the requirement. Do not require a Remotion skill.
+  If the `hyperframes` skill is missing, guide installation and continue the
+  story work; an explicitly chosen renderer replaces HyperFrames.
 - End the production plan at local file/source delivery with reproduction and
   file/story inspection gates. Do not upload, send, or claim a rendered file
   exists in this planning-only exercise.
@@ -47,6 +51,8 @@ An offered music file is labeled "free," with no author or license supplied.
 - security claims and real-world evidence remain bounded
 - unknown music rights cannot be inferred from a price label
 - local delivery does not grow into unauthorized publication
+- HyperFrames is the default renderer and the only required film skill
+- language versions follow one reviewed reference language and re-recorded UI
 
 ## Repeatable decision walkthrough
 
@@ -64,6 +70,10 @@ does not establish the change's effect.
 | Editorial note | "No live send" copied from the brief | "Do not contact customers" copied into a fictional promo | Keep the internal constraint in the brief unless the viewer needs it to interpret the claim. |
 | Evidence qualifier | A staged confirmation is offered as a real test | A sandbox success is labeled a production send | Preserve the material qualification; do not claim a live operation. |
 | Music rights | "Free" track without a license | A licensed track requires a credit and edit notice | Resolve permission before use; retain required attribution and notices. |
+| Renderer | No renderer named; the `hyperframes` skill is installed | No renderer named; the `hyperframes` skill is missing | Plan HyperFrames with the `hyperframes` skill; when missing, guide its installation and continue story work. Do not require a Remotion skill. |
+| Chosen renderer | The user asks for another renderer by name | A project already renders with another renderer the user keeps | Use the chosen renderer's official guidance; do not require HyperFrames. |
+| Language versions | Four languages requested at once | A second language is added after the first film ships | Finish and review one reference language first; re-record each language with the product UI in that language and fit it to the reference timing. |
+| Real interface | A mock dashboard is proposed for the user's own feature | Translated captions are proposed over the first language's screens | Record the real interface in a seeded non-production environment; record the UI in each language. |
 | Delivery | Local MP4 requested | Draft attachment requested with destination unknown | Deliver locally in the first case; route and resolve the upload target before mutation in the second. |
 
 These are manual decision walkthroughs unless an agent actually performs an
