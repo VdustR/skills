@@ -24,16 +24,17 @@ Before creating or editing a HyperFrames composition, require the official
 [`hyperframes`](https://github.com/heygen-com/hyperframes/tree/main/skills/hyperframes)
 skill. Check the current agent's available skills and readable installed
 `SKILL.md`; an installed `hyperframes` npm package does not satisfy this
-requirement. Read that skill and follow its routing to `hyperframes-cli`,
-`hyperframes-registry`, `media-use` for music and other media, and the
-references the film needs.
+requirement. Read that skill and follow its routing to the references the film
+needs and to its companion skills: `hyperframes-cli`, `hyperframes-registry`,
+and `media-use` for music and other media. Install the companions with it; only
+`hyperframes` gates composition work.
 
 If missing, explain the requirement and guide installation from
 `heygen-com/hyperframes` through `vp-skills`. For a personal installation
 across supported agents:
 
 ```bash
-npx -y skills@1.5.3 add heygen-com/hyperframes --skill hyperframes hyperframes-cli hyperframes-registry media-use -g --agent '*'
+npx -y skills@1.5.3 add heygen-com/hyperframes --skill hyperframes --skill hyperframes-cli --skill hyperframes-registry --skill media-use -g --agent '*'
 ```
 
 Install only within the user's authorized scope. After installation, verify the
@@ -55,8 +56,9 @@ same step:
 - An agreed story cut from this skill is the chosen storyline. Pass it into
   the HyperFrames spec instead of proposing new storylines.
 - Follow the user's approval gates. A request for a finished film, or an
-  authorized autonomous run, asks for the rendered file; otherwise stop where
-  the `hyperframes` skill says to wait for preview approval.
+  authorized autonomous run, asks for the rendered file, so continue past the
+  `hyperframes` skill's preview stop. When the user asked only for a draft or
+  a preview, stop at the preview.
 - Before delivery, the composition check reports no errors, every kept warning
   has a recorded reason, and the frame review has been done and written up.
   Combine that review note with this skill's editorial review.
@@ -112,8 +114,9 @@ from them and needs its own review. Use a mock only when real capture is
 unavailable or the brief calls for an invented product, and keep that choice
 in the brief.
 
-Use `vp-recording` for real UI capture, cursor and caption layers, deterministic
-renders, encoding, and file inspection. Keep genuine clicks tied to actual
+Use `vp-recording` for real UI capture, cursor and caption layers on that
+footage, and inspection of the encoded file. HyperFrames composes and renders
+the film unless the user chose another renderer. Keep genuine clicks tied to actual
 targets. A simulated UI or animated cursor can illustrate a fictional scene,
 but cannot stand in as evidence that the real action ran.
 
