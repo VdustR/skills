@@ -14,7 +14,7 @@ flowchart TD
     F -->|No| H[Select needed standalone tools]
     B -->|TS staged checks| I[Prefer Husky + lint-staged;<br/>compare the Vite+ integration]
     I --> J[Keep one hook dispatcher<br/>and staged-check scheduler]
-    B -->|TS monorepo| K[Prefer pnpm workspaces]
+    B -->|TS monorepo| K[Bun workspaces first;<br/>whole Node + pnpm fallback only when necessary]
     B -->|TS package releases| L{Versioned package release needed?}
     L -->|Yes| M[Prefer Changesets for one or many packages;<br/>exclude generated changelogs from formatting/linting]
     L -->|No| N[Omit package release tooling]
@@ -33,10 +33,12 @@ decision rules, then record tested versions in project configuration and locks.
 Alpha, beta, RC, preview, and nightly releases are eligible when their concrete
 benefits and verified compatibility justify adoption. Pin moving channels to
 exact tested releases rather than floating `latest` or `next` in reproducible CI.
-Choose a Node.js version meeting build-tool and deployment requirements;
+Choose a runtime version meeting build-tool and deployment requirements;
 consumer runtime support is a separate promise.
 
-Prefer mise to manage Node.js and pnpm/Yarn directly when the selected backend
+Apply the [Bun-first policy](bun-first.md) before selecting a JS/TS runtime.
+Prefer mise to manage Bun when its backend fits. For a selected Node.js stack,
+prefer mise to manage Node.js and pnpm/Yarn directly when the selected backend
 works on the target platforms. Corepack is optional; retain it for required
 dispatch/validation behavior or a verified backend limitation. Follow
 [Node.js package-manager ownership](node-package-managers.md) for opt-in
@@ -55,8 +57,13 @@ Keep hooks fast, preserve partially staged edits, and run full checks in CI.
 
 ## Workspaces and releases
 
-Prefer [pnpm workspaces](https://pnpm.io/workspaces) for TS monorepos. Add task
-orchestration only when execution dependencies or caching justify it.
+Prefer [Bun workspaces](https://bun.sh/docs/pm/workspaces) for new TS monorepos,
+with one root package-manager choice, authoritative lockfile, and runtime
+policy across packages and CI. If a necessary constraint has no reasonable
+verified solution, switch the entire repository to Node.js +
+[pnpm workspaces](https://pnpm.io/workspaces); do not partition fallback by
+package or command. Follow [Bun-first](bun-first.md) for the decision evidence.
+Add task orchestration only when execution dependencies or caching justify it.
 
 Prefer [Changesets](https://github.com/changesets/changesets) for versioned
 package releases, including a single published library. It manages versions and

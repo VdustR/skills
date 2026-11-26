@@ -1,5 +1,9 @@
 # Node.js package-manager ownership
 
+Use this reference when Node.js is required or the repository selects the
+Node.js + pnpm fallback under [Bun-first](bun-first.md); it does not override
+that default. Preserve explicitly selected existing Yarn setups.
+
 Prefer mise for Node.js and pnpm/Yarn version management when its selected
 backend meets the platform and integrity requirements. The package manager
 still installs project dependencies. Keep a fitting existing setup unless the

@@ -1,6 +1,7 @@
 # TypeScript
 
-Prefer pnpm, compatible TypeScript, and ESM for new code. Require
+Prefer Bun, compatible TypeScript, and ESM for new code under the
+[Bun-first policy](bun-first.md). Require
 `@tsconfig/strictest` and application-owned `@total-typescript/ts-reset`, including
 for lightweight scripts and `tsx`; running without a build does not waive the
 checking setup. Follow the
@@ -33,7 +34,21 @@ local, such as a config file whose loader requires JavaScript. Preserve vendored
 or generated upstream JavaScript, and keep local fixes in existing JavaScript
 projects scoped; this default does not authorize a repository-wide migration.
 
-## Node.js script execution
+## Script execution and checking
+
+Default new scripts to Bun native TypeScript execution (`bun scripts/task.ts`),
+`bun test` for tests, and `bun check` for ordinary TypeScript checking. Execute
+framework checkers and declaration emitters under Bun where verified compatible;
+these remain part of one Bun toolchain. Use explicit Bun types for Bun-owned
+projects and isolate browser, server, and script environments. Running or
+transpiling TypeScript does not establish type safety. Preserve strictest and
+application-owned ts-reset, including for small scripts. See [Bun-first](bun-first.md)
+for checker coverage, negative controls, and whole-repository fallback.
+
+### When Node.js is selected
+
+The following native execution and tsx rules apply to a required Node.js host or
+the selected Node.js + pnpm repository, not as per-command Bun exceptions.
 
 Default lightweight Node.js scripts to native execution (`node scripts/task.ts`)
 when the supported runtime has stable type stripping and the code uses erasable
@@ -99,9 +114,12 @@ or emitted artifacts from the deployment contract and framework requirements.
 
 Prefer the VoidZero ecosystem where it fits:
 [Vite+](https://www.viteplus.dev/guide) integrates Vite, Vitest, Oxlint, Oxfmt,
-and Rolldown-based packaging. Prefer that integration when its versions and
-framework support meet the requirements. Otherwise select the needed standalone
-tools; a supported alternative can also win on lower technical cost.
+and Rolldown-based packaging. Prefer that integration when its versions,
+framework support, and actual Bun execution meet the requirements. Test Vite+ commands individually: package-manager
+support does not establish runtime, worker-pool, or checker compatibility. A
+standalone tool running under Bun is a reasonable alternative before fallback.
+For a selected Node stack, verify the integration there. Select needed standalone
+tools when integration does not fit; compare their technical maintenance cost.
 
 Check framework plugins, lint-rule coverage, supported file types, formatting,
 and type checking. Retain targeted framework tools where coverage is missing.
