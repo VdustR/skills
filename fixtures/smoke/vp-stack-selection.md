@@ -34,12 +34,37 @@ training cost. Treat each Expected Behavior row as a separate decision scenario.
 | User explicitly requires JavaScript for a new project | Honor the explicit choice and explain the departure from the default without silently substituting TypeScript. |
 | Local bug fix in an existing `.mjs` project, with no stack evaluation or migration request | Keep the local fix scoped to the existing stack. Do not start a TypeScript migration from the new-project default. |
 
-### Node.js script execution and required checking
+### Bun-first and whole-repository fallback
+
+Run these decision walkthroughs twice, scoring the final outcome separately
+from the mechanism. Contrast the previous Node/pnpm defaults and the current
+rules; unchanged outcomes alone do not establish the new fallback mechanism.
+These are manual instruction scenarios, not executable runtime tests or blind
+agent trials. They need no dependencies, credentials, repositories, or writes.
+
+| Case | Expected decision | Required mechanism |
+| --- | --- | --- |
+| New TS API plus scripts and tests; no fixed host; Bun checks all pass | Bun install/runtime, bun test, bun check | Apply Bun-first across build/script/serve, not only installation |
+| New monorepo contains Vue, Svelte, and a shared library emitting declarations; framework checkers and emitter run under Bun | One Bun workspace toolchain with specialized checking/emission | Reject skipped templates as a pass; specialized tools alone do not require Node + pnpm |
+| Required pnpm hook adds a missing dependency; equivalent packageExtensions passes fresh and frozen Bun installs | Keep Bun with verified declarative metadata | Verify fresh resolution, not merely migrated lockfile behavior |
+| Required immutable SDK calls a failing V8-specific API; compatible releases/config/adapters fail, replacement breaks its fixed contract | Entire monorepo uses Node.js + pnpm | Record necessary behavior, failed alternatives, and cost; do not run just this package on Node |
+| A server package must deploy to a fixed Node-only host; remaining packages work on Bun | Whole repository Node.js + pnpm | Fixed deployment runtime triggers the repository boundary, not a mixed install/runtime policy |
+| Build succeeds through a Node shebang child; package manager is Bun | Bun-only claim is unverified; test supported explicit Bun execution, then apply fallback gate | Inspect child runtime identity; process.versions.node alone is insufficient |
+| New library supports Node consumers; Bun builds JS/declarations and packed Node consumers pass | Keep Bun development toolchain | Distinguish consumer verification from a fixed Node application deployment |
+| Tests need DOM, fake timers, snapshots, and isolated module state | Prefer bun test with explicit supported setup and negative controls | Do not infer Vitest compatibility or remove coverage to get a pass |
+| bun check passes but invalid SFC template or downstream referenced type is not checked | Add compatible framework/project coverage under Bun; verify the invalid case fails | Preserve strictest/ts-reset and compiler compatibility, rather than accept a skipped input set |
+| Existing pnpm/Node monorepo needs a one-line bug fix, no migration requested | Keep existing toolchain | Preserve scope; Bun-first does not authorize a migration |
+| A prospective native dependency has not been tested on target libc | Provisional decision, then representative check | Neither native-module label nor an untested compatibility claim justifies fallback or adoption |
+
+### Selected Node.js script execution and required checking
+
+These cases fix Node.js as the required host or selected whole-repository
+fallback; they do not override Bun-first for unconstrained new scripts.
 
 | Case | Expected decision |
 | --- | --- |
 | New lightweight asset/API/file automation script on a compatible Node host | Prefer native TypeScript execution. Require a checking project extending `@tsconfig/strictest`, an included application-owned `reset.d.ts` importing `@total-typescript/ts-reset`, and a separate type-check command. No-build execution does not waive dependencies or checking. |
-| Required JSX or existing tsconfig path aliases; contrast a larger erasable script needing only watch mode | Use tsx for the required extra capability and retain strictest/ts-reset checking. Size or watch alone does not disqualify native execution. |
+| Selected Node host requires JSX or existing tsconfig path aliases; contrast a larger erasable script needing only watch mode | Use tsx for the required extra capability and retain strictest/ts-reset checking. Size or watch alone does not disqualify native execution. |
 | Existing code must keep runtime enums and needs tsx; new code has no such contract | Document and verify the bounded erasableSyntaxOnly exception for existing code. Retain the erasable baseline for new code; tsx does not automatically waive it. |
 | Framework requires emitDecoratorMetadata | Evaluate its compiler or TypeScript emission. Do not claim tsx implements every TypeScript compiler feature. |
 | Native execution succeeds but strictest rejects an unsafe index access or ts-reset makes JSON unknown | Treat the independent type check as failing. Validate/narrow the value; do not replace the baseline with strict alone or remove the reset. |
@@ -345,3 +370,21 @@ required checker incompatibility still blocks that candidate, separate API and
 checker roles remain possible, and compiler removal requires coverage evidence.
 This was a manual walkthrough by the editing agent, not an independent agent
 trial or a new package-integration benchmark.
+
+## Bun-first decision walkthroughs: 2026-11-26 (Asia/Taipei)
+
+The editing agent walked all 11 Bun-first cases twice: first selecting the
+outcome from each supplied contract, then tracing the owning rules in reverse
+case order and checking fallback alternatives, scope, and runtime identity.
+Both passes met all 11 outcome expectations and all 11 mechanism expectations.
+This is author-performed manual verification, not a blind agent trial or proof
+that future agents obey the instructions. No scenario could write externally.
+
+The previous defaults could select Node/pnpm for an unconstrained new script or
+monorepo, including a resolvable hook or Bun-built library. Those cases exercise
+the changed preference. The fixed Node host and SDK cases can yield Node/pnpm
+under either version; the new mechanism additionally requires a repository-wide
+choice and evidence against reasonable alternatives. Existing-project scope and
+provisional untested-platform cases are preservation checks, not evidence that
+the new preference changed an outcome. Static repository validation checks
+format and fixture presence separately from these manual decisions.

@@ -3,9 +3,10 @@ name: vp-stack-selection
 description: >-
   Select a technology stack for a new project, full-system refactor, rewrite,
   port, or explicit stack evaluation. Compare ecosystem capabilities and
-  technical costs. Default to TypeScript over JavaScript for new JS-ecosystem
-  code; prefer TypeScript/Rust across ecosystems when alternatives fit equally
-  well. Not for routine fixes, local refactoring, or isolated dependency changes.
+  technical costs. Prefer Bun-first with one toolchain per JS/TS monorepo;
+  fall back as a whole to Node.js + pnpm only for necessary constraints without
+  a reasonable verified solution. Default to TypeScript over JavaScript for new
+  code; prefer TypeScript/Rust across ecosystems when alternatives fit equally well. Not for routine fixes, local refactoring, or isolated dependency changes.
 ---
 
 # Stack Selection
@@ -27,10 +28,16 @@ explain a different choice with concrete technical reasons.
   not a reason to adopt one either.
 - Keep supported existing choices unless the requested change justifies replacing
   them. For a rewrite, compare retaining or incrementally adapting the current stack.
-- Prefer mise for Node.js and pnpm/Yarn versions when the backend fits. Use
-  Corepack for required Corepack behavior or a verified compatibility exception;
-  check selector precedence, integrity, command ownership, and CI through the
-  [toolchain reference](references/toolchain.md) before adoption.
+- Prefer Bun for new JS/TS projects: dependency installation, scripts, build and
+  serving runtimes, `bun test`, and `bun check`. Keep one repository-wide
+  toolchain in a monorepo. First verify reasonable supported solutions to gaps;
+  only an unresolved necessary constraint justifies switching the whole
+  repository to Node.js + pnpm. Do not maintain a routine hybrid. Follow the
+  [Bun-first decision process](references/bun-first.md), including framework
+  checking, declaration emission, actual runtime identity, and fallback evidence.
+- Prefer mise for compatible runtime and developer CLI version management.
+  When Node.js + pnpm is selected, use the [toolchain reference](references/toolchain.md)
+  for selector precedence, integrity, ownership, and bounded Corepack exceptions.
 - Default to TypeScript over JavaScript for newly authored JS-ecosystem code,
   including Node.js utilities, build/release scripts, tests, and Electron code.
   Small size, direct execution, or avoiding a build step alone does not justify
@@ -40,9 +47,10 @@ explain a different choice with concrete technical reasons.
 - Across different ecosystems, use TypeScript/Rust preferences when technical fit
   and lifecycle costs are comparable. Exclude team experience, familiarity,
   staffing, and training cost.
-- For lightweight Node.js scripts, prefer native TypeScript execution when the
-  supported runtime and erasable syntax fit. Use `tsx` for a concrete transform
-  or resolution need. Both paths require `@tsconfig/strictest`, application-owned
+- For lightweight scripts, prefer Bun native TypeScript execution. When Node.js
+  is required or the whole repository uses the fallback, prefer its native type
+  stripping when supported; use `tsx` for a concrete missing capability. Require
+  `@tsconfig/strictest`, application-owned
   `@total-typescript/ts-reset`, and independent type checking; see the
   [TypeScript reference](references/typescript.md) for setup and publication boundaries.
 
@@ -81,6 +89,7 @@ flowchart TD
 | Read when | Reference |
 | --- | --- |
 | Choosing languages or researching an unfamiliar domain | [Languages and ecosystem fit](references/languages.md) |
+| Selecting a JS/TS runtime, package manager, test/check defaults, or monorepo fallback | [Bun-first](references/bun-first.md) |
 | Selecting environments, hooks, workspaces, or release tooling | [Toolchain](references/toolchain.md) |
 | Selecting Node.js and pnpm/Yarn version ownership or evaluating Corepack | [Node.js package managers](references/node-package-managers.md) |
 | TypeScript libraries or web tooling are involved | [TypeScript](references/typescript.md) |
